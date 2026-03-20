@@ -1,1 +1,41 @@
+import os, random, time
+from gtts import gTTS
+from moviepy.editor import ImageClip, AudioFileClip, TextClip, CompositeVideoClip
+from uploader import upload_video
 
+MEDIA_DIR = "backend/media"
+MUSIC_DIR = "backend/music"
+CHANNELS_DIR = "backend/channels"
+
+CHANNELS = os.listdir(CHANNELS_DIR)  # auto-detect your 5 JSONs
+
+TOPICS = ["space", "history", "psychology", "mystery", "science"]
+
+def create_video(topic, index):
+    img_file = os.path.join(MEDIA_DIR, random.choice(os.listdir(MEDIA_DIR)))
+    music_file = os.path.join(MUSIC_DIR, random.choice(os.listdir(MUSIC_DIR)))
+    tts = gTTS(f"Did you know this about {topic}? Watch carefully...")
+    voice_path = f"voice_{index}.mp3"
+    tts.save(voice_path)
+
+    audio = AudioFileClip(voice_path)
+    bg = ImageClip(img_file).set_duration(audio.duration)
+    txt = TextClip(topic.upper(), fontsize=50, color="yellow", font="Arial-Bold")\
+          .set_position("center").set_duration(audio.duration)
+    video = CompositeVideoClip([bg, txt]).set_audio(audio)
+    video_file = f"video_{topic}_{index}.mp4"
+    video.write_videofile(video_file, fps=24, verbose=False, logger=None)
+    os.remove(voice_path)
+    return video_file
+
+def run_batch():
+    for channel in CHANNELS:
+        for i in range(5):  # 5 videos per channel
+            topic = random.choice(TOPICS)
+            print(f"Generating video {i+1} for {channel} on topic {topic}")
+            video_file = create_video(topic, i)
+            upload_video(video_file, os.path.join(CHANNELS_DIR, channel))
+            time.sleep(random.randint(300, 900))  # delay 5–15 min
+
+if __name__ == "__main__":
+    run_batch()
