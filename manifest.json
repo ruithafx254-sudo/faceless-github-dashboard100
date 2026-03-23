@@ -1,0 +1,16 @@
+{
+  "name": "Vault Pro Wallet",
+  "short_name": "VaultPro",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#0b0e11",
+  "theme_color": "#3b82f6",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/10543/10543206.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
