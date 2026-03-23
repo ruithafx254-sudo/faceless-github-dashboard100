@@ -3,198 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Vault Pro | Live Timer</title>
+    <title>Vault Pro | Crypto Wallet</title>
+    <link rel="manifest" href="./manifest.json">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
-        :root { --bg: #0b0e11; --card: #181a20; --blue: #3b82f6; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: white; -webkit-tap-highlight-color: transparent; }
-        .glass-card { background: var(--card); border: 1px solid rgba(255,255,255,0.05); }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; align-items: flex-end; backdrop-filter: blur(10px); }
-        .modal.active { display: flex; }
-        .modal-content { background: var(--card); width: 100%; border-radius: 2.5rem 2.5rem 0 0; padding: 2.5rem; border-top: 1px solid rgba(255,255,255,0.1); }
-        .btn-click:active { transform: scale(0.96); opacity: 0.8; }
-        
-        /* Pulse for Incoming */
-        .incoming-pulse { animation: pulse 2s infinite; font-weight: 800; color: #3b82f6; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #000000; color: white; -webkit-tap-highlight-color: transparent; }
+        .action-btn { background: #1e1e1e; border-radius: 50%; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .action-btn:active { background: #333; transform: scale(0.9); }
+        .tab-item { color: #888; font-size: 11px; font-weight: 500; }
+        .tab-active { color: #10d078; }
+        .asset-card { background: #000; border-bottom: 1px solid #1a1a1a; padding: 16px 0; }
+        .pending-badge { font-size: 10px; background: #f3ba2f22; color: #f3ba2f; padding: 2px 6px; border-radius: 4px; }
+        #install-popup { display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); width: 90%; z-index: 2000; background: #1e1e1e; border: 1px solid #333; }
     </style>
 </head>
 <body>
 
-    <div class="max-w-[450px] mx-auto px-6 pt-10 pb-32 min-h-screen">
-        <header class="flex justify-between items-center mb-10">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                    <i class="fa-solid fa-vault text-white text-sm"></i>
-                </div>
-                <h2 class="text-xs font-black tracking-widest uppercase opacity-60">Pro Terminal</h2>
+    <div id="install-popup" class="p-4 rounded-2xl shadow-2xl flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center"><i class="fa-solid fa-wallet"></i></div>
+            <div>
+                <p class="text-sm font-bold">Install Vault Pro</p>
+                <p class="text-xs text-gray-400">Add to home screen</p>
             </div>
-            <button onclick="wipe()" class="text-[9px] font-black opacity-30 text-red-500 uppercase">Clear All</button>
-        </header>
-
-        <section class="text-center mb-12">
-            <p class="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Portfolio Value</p>
-            <h1 id="main-balance" class="text-5xl font-extrabold tracking-tighter tabular-nums">$0.00</h1>
-            
-            <div class="flex justify-center space-x-12 mt-10">
-                <button onclick="openTx('Buy')" class="btn-click flex flex-col items-center gap-3">
-                    <div class="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center text-xl shadow-xl shadow-blue-500/30"><i class="fa-solid fa-plus"></i></div>
-                    <span class="text-[10px] font-black uppercase text-gray-400">Deposit</span>
-                </button>
-                <button onclick="openTx('Send')" class="btn-click flex flex-col items-center gap-3">
-                    <div class="w-14 h-14 bg-white/5 border border-white/10 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-arrow-up"></i></div>
-                    <span class="text-[10px] font-black uppercase text-gray-400">Send</span>
-                </button>
-            </div>
-        </section>
-
-        <div id="asset-container" class="space-y-3 mb-12"></div>
-
-        <section>
-            <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-6">Recent Activity</h3>
-            <div id="history-container" class="space-y-6"></div>
-        </section>
+        </div>
+        <button id="install-btn" class="bg-white text-black px-4 py-2 rounded-lg text-xs font-bold">Install</button>
     </div>
 
-    <div id="txModal" class="modal" onclick="if(event.target==this) closeTx()">
-        <div class="modal-content">
-            <div class="w-10 h-1 bg-gray-800 rounded-full mx-auto mb-8"></div>
-            <h2 id="modalTitle" class="text-2xl font-black mb-8 italic uppercase">Action</h2>
-            
-            <div class="space-y-6">
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-white/5 p-4 rounded-2xl">
-                        <label class="text-[9px] font-black text-gray-500 block mb-1">ASSET</label>
-                        <select id="assetSelect" class="bg-transparent font-bold outline-none w-full text-sm">
-                            <option value="USDT">USDT (Tether)</option>
-                            <option value="SOL">SOL (Solana)</option>
-                            <option value="BTC">BTC (Bitcoin)</option>
-                        </select>
-                    </div>
-                    <div class="bg-white/5 p-4 rounded-2xl">
-                        <label class="text-[9px] font-black text-gray-500 block mb-1">TIMER: <span id="timeLabel" class="text-blue-500">30s</span></label>
-                        <input type="range" id="timerRange" min="5" max="60" value="30" class="w-full accent-blue-500" oninput="document.getElementById('timeLabel').innerText = this.value + 's'">
-                    </div>
-                </div>
+    <div class="max-w-md mx-auto px-4 pt-6 pb-24">
+        <header class="flex justify-between items-center mb-8">
+            <button class="w-10 h-10 bg-[#1e1e1e] rounded-full flex items-center justify-center">
+                <i class="fa-solid fa-gear text-gray-400"></i>
+            </button>
+            <div class="flex items-center space-x-2 bg-[#1e1e1e] px-4 py-1.5 rounded-full border border-white/5">
+                <span class="text-xs font-bold">Ruitha's Wallet</span>
+                <i class="fa-solid fa-chevron-down text-[10px] text-gray-500"></i>
+            </div>
+            <button class="w-10 h-10 bg-[#1e1e1e] rounded-full flex items-center justify-center">
+                <i class="fa-solid fa-expand text-gray-400"></i>
+            </button>
+        </header>
 
-                <div class="bg-white/5 p-6 rounded-3xl border border-white/5">
-                    <input type="number" id="txAmount" placeholder="0.00" class="bg-transparent w-full text-4xl font-black text-center outline-none tabular-nums">
-                </div>
+        <div class="text-center mb-8">
+            <div class="flex justify-center items-center space-x-2 mb-1">
+                <span id="total-balance" class="text-4xl font-bold tabular-nums">$0.00</span>
+                <i class="fa-solid fa-eye-slash text-gray-600 text-sm"></i>
+            </div>
+            <div class="text-[#10d078] text-sm font-medium">+$0.00 (0.00%) <i class="fa-solid fa-chart-line ml-1"></i></div>
+        </div>
 
-                <button onclick="submitTx()" class="btn-click w-full bg-blue-600 py-5 rounded-3xl font-black text-lg shadow-2xl shadow-blue-600/30">CONFIRM TRANSACTION</button>
+        <div class="flex justify-between px-4 mb-10">
+            <div class="flex flex-col items-center space-y-2">
+                <button onclick="openModal('txModal', 'Send')" class="action-btn text-xl"><i class="fa-solid fa-arrow-up"></i></button>
+                <span class="text-xs font-medium text-gray-300">Send</span>
+            </div>
+            <div class="flex flex-col items-center space-y-2">
+                <button class="action-btn text-xl"><i class="fa-solid fa-arrow-down"></i></button>
+                <span class="text-xs font-medium text-gray-300">Receive</span>
+            </div>
+            <div class="flex flex-col items-center space-y-2">
+                <button class="action-btn text-xl"><i class="fa-solid fa-repeat"></i></button>
+                <span class="text-xs font-medium text-gray-300">Swap</span>
+            </div>
+            <div class="flex flex-col items-center space-y-2">
+                <button onclick="openModal('txModal', 'Buy')" class="action-btn text-xl"><i class="fa-solid fa-plus"></i></button>
+                <span class="text-xs font-medium text-gray-300">Buy</span>
+            </div>
+        </div>
+
+        <div class="flex space-x-6 border-b border-white/10 mb-2">
+            <button class="pb-3 border-b-2 border-[#10d078] text-sm font-bold">Crypto</button>
+            <button class="pb-3 text-sm font-bold text-gray-500">Watchlist</button>
+            <button class="pb-3 text-sm font-bold text-gray-500">NFTs</button>
+        </div>
+
+        <div id="asset-list" class="divide-y divide-white/5">
+            </div>
+    </div>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-lg border-t border-white/5 px-6 py-4 flex justify-between items-center z-50">
+        <div class="flex flex-col items-center tab-active"><i class="fa-solid fa-house text-xl mb-1"></i><span class="text-[10px]">Home</span></div>
+        <div class="flex flex-col items-center text-gray-500"><i class="fa-solid fa-chart-simple text-xl mb-1"></i><span class="text-[10px]">Trending</span></div>
+        <div class="flex flex-col items-center"><div class="w-12 h-12 bg-[#10d078] rounded-full flex items-center justify-center text-black text-xl mb-1"><i class="fa-solid fa-right-left"></i></div></div>
+        <div class="flex flex-col items-center text-gray-500"><i class="fa-solid fa-gift text-xl mb-1"></i><span class="text-[10px]">Rewards</span></div>
+        <div class="flex flex-col items-center text-gray-500"><i class="fa-solid fa-compass text-xl mb-1"></i><span class="text-[10px]">Discover</span></div>
+    </nav>
+
+    <div id="txModal" class="fixed inset-0 bg-black/90 z-[3000] hidden items-end">
+        <div class="bg-[#1e1e1e] w-full rounded-t-3xl p-6 pb-12">
+            <div class="w-12 h-1 bg-gray-700 rounded-full mx-auto mb-6"></div>
+            <h2 id="modalTitle" class="text-xl font-bold mb-6">Action</h2>
+            <div class="space-y-4">
+                <select id="assetSelect" class="w-full bg-[#2a2a2a] p-4 rounded-xl border border-white/5">
+                    <option value="BTC">Bitcoin (BTC)</option>
+                    <option value="ETH">Ethereum (ETH)</option>
+                    <option value="SOL">Solana (SOL)</option>
+                    <option value="USDT">Tether (USDT)</option>
+                </select>
+                <input type="number" id="txAmount" placeholder="Amount" class="w-full bg-[#2a2a2a] p-4 rounded-xl border border-white/5 text-xl font-bold">
+                <div id="time-setting">
+                    <p class="text-xs text-gray-500 mb-2">Wait time for deposit (seconds):</p>
+                    <input type="number" id="waitTime" value="10" class="w-full bg-[#2a2a2a] p-3 rounded-xl border border-white/5 text-sm">
+                </div>
+                <button onclick="handleTransaction()" class="w-full bg-[#10d078] text-black py-4 rounded-xl font-bold text-lg">Confirm</button>
+                <button onclick="closeModal('txModal')" class="w-full py-2 text-gray-500 text-sm">Cancel</button>
             </div>
         </div>
     </div>
 
     <script>
-        const PRICES = { USDT: 1, SOL: 145, BTC: 68000 };
-        // Using v7 for a fresh start
-        let state = JSON.parse(localStorage.getItem('vault_v7')) || { balances: { USDT: 0, SOL: 0, BTC: 0 }, history: [] };
-        let mode = '';
+        const PRICES = { BTC: 70848.06, ETH: 2450.00, SOL: 145.20, USDT: 1.00 };
+        const COIN_NAMES = { BTC: 'Bitcoin', ETH: 'Ethereum', SOL: 'Solana', USDT: 'Tether' };
+        
+        let state = JSON.parse(localStorage.getItem('vaultData')) || { balances: { BTC: 0, ETH: 0, SOL: 0, USDT: 0 }, pending: [] };
+        let activeAction = '';
 
-        function openTx(m) { mode = m; document.getElementById('modalTitle').innerText = m; document.getElementById('txModal').classList.add('active'); }
-        function closeTx() { document.getElementById('txModal').classList.remove('active'); }
-
-        function submitTx() {
-            const coin = document.getElementById('assetSelect').value;
-            const amt = parseFloat(document.getElementById('txAmount').value);
-            const seconds = parseInt(document.getElementById('timerRange').value);
-
-            if (!amt || amt <= 0) return;
-
-            const tx = {
-                id: Date.now(),
-                type: mode,
-                coin: coin,
-                amt: amt,
-                status: 'pending',
-                timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-                timeLeft: seconds,
-                targetTime: Date.now() + (seconds * 1000)
-            };
-
-            state.history.push(tx);
-            save();
-            closeTx();
-            document.getElementById('txAmount').value = '';
+        function openModal(id, action) {
+            activeAction = action;
+            document.getElementById('modalTitle').innerText = action + " Crypto";
+            document.getElementById('txModal').style.display = 'flex';
         }
 
-        function save() { localStorage.setItem('vault_v7', JSON.stringify(state)); render(); }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        function handleTransaction() {
+            const coin = document.getElementById('assetSelect').value;
+            const amt = parseFloat(document.getElementById('txAmount').value);
+            const delay = parseInt(document.getElementById('waitTime').value) * 1000;
+
+            if(isNaN(amt) || amt <= 0) return;
+
+            if(activeAction === 'Buy') {
+                // Timer Logic
+                alert(`Transaction initiated. ${coin} will arrive in ${delay/1000} seconds.`);
+                state.pending.push({ coin, amt, type: 'deposit' });
+                
+                setTimeout(() => {
+                    state.balances[coin] += amt;
+                    state.pending = state.pending.filter(p => p.amt !== amt);
+                    save();
+                }, delay);
+            } else {
+                if(state.balances[coin] < amt) return alert("Insufficient funds");
+                state.balances[coin] -= amt;
+            }
+            
+            save();
+            closeModal('txModal');
+        }
+
+        function save() {
+            localStorage.setItem('vaultData', JSON.stringify(state));
+            render();
+        }
 
         function render() {
             let total = 0;
-            const assetBox = document.getElementById('asset-container');
-            assetBox.innerHTML = '';
+            const list = document.getElementById('asset-list');
+            list.innerHTML = '';
 
-            for (let c in state.balances) {
-                const usd = state.balances[c] * PRICES[c];
-                total += usd;
-                assetBox.innerHTML += `
-                    <div class="glass-card p-5 rounded-3xl flex justify-between items-center">
-                        <div class="flex items-center space-x-4">
-                            <div class="w-10 h-10 bg-gray-900 rounded-xl flex items-center justify-center font-black text-[10px]">${c}</div>
-                            <div><p class="font-bold text-sm text-white">${c}</p><p class="text-[10px] text-gray-500 font-bold">$${PRICES[c]}</p></div>
-                        </div>
-                        <div class="text-right"><p class="font-black text-sm">${state.balances[c].toLocaleString()}</p><p class="text-[10px] text-gray-500 font-bold">$${usd.toLocaleString()}</p></div>
-                    </div>`;
-            }
-            document.getElementById('main-balance').innerText = `$${total.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            for(let coin in state.balances) {
+                const usdValue = state.balances[coin] * PRICES[coin];
+                total += usdValue;
+                const isPending = state.pending.find(p => p.coin === coin);
 
-            const histBox = document.getElementById('history-container');
-            histBox.innerHTML = state.history.length ? '' : '<p class="text-center py-10 text-[10px] opacity-20 font-black">NO RECENT MOVES</p>';
-            
-            state.history.slice(-10).reverse().forEach(tx => {
-                const isPending = tx.status === 'pending';
-                histBox.innerHTML += `
-                    <div class="flex justify-between items-center">
+                list.innerHTML += `
+                    <div class="asset-card flex justify-between items-center">
                         <div class="flex items-center space-x-4">
-                            <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
-                                <i class="fa-solid ${tx.type==='Buy'?'fa-plus text-green-500':'fa-arrow-up text-blue-500'} text-xs"></i>
-                            </div>
+                            <div class="w-10 h-10 bg-[#1e1e1e] rounded-full flex items-center justify-center font-bold text-[10px]">${coin}</div>
                             <div>
-                                <p class="text-xs font-black">${tx.type} ${tx.coin}</p>
-                                <p class="text-[9px] text-gray-600 font-bold uppercase">${tx.timestamp}</p>
+                                <div class="flex items-center space-x-2">
+                                    <span class="font-bold text-sm">${coin}</span>
+                                    <span class="text-[10px] text-gray-500 font-medium">${COIN_NAMES[coin]}</span>
+                                    ${isPending ? '<span class="pending-badge">Pending</span>' : ''}
+                                </div>
+                                <p class="text-xs text-gray-500">$${PRICES[coin].toLocaleString()} <span class="text-[#10d078]">+3.61%</span></p>
                             </div>
                         </div>
                         <div class="text-right">
-                            <p class="text-sm font-black ${isPending ? 'text-white/30' : (tx.type==='Buy'?'text-green-500':'text-blue-500')}">
-                                ${tx.type === 'Buy' ? '+' : '-'}${tx.amt.toLocaleString()}
-                            </p>
-                            ${isPending ? 
-                                `<p class="text-[10px] incoming-pulse uppercase tracking-tight">Incoming: ${tx.timeLeft}s</p>` : 
-                                `<p class="text-[9px] font-black text-gray-700 uppercase tracking-widest">Confirmed</p>`
-                            }
+                            <p class="text-sm font-bold tabular-nums">${state.balances[coin].toFixed(4)}</p>
+                            <p class="text-xs text-gray-500 font-medium">$${usdValue.toLocaleString()}</p>
                         </div>
-                    </div>`;
-            });
+                    </div>
+                `;
+            }
+            document.getElementById('total-balance').innerText = `$${total.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
         }
 
-        // --- THE COUNTDOWN ENGINE ---
-        setInterval(() => {
-            let needsSave = false;
-            const now = Date.now();
-            
-            state.history.forEach(tx => {
-                if (tx.status === 'pending') {
-                    // Calculate remaining seconds
-                    const diff = Math.ceil((tx.targetTime - now) / 1000);
-                    tx.timeLeft = diff > 0 ? diff : 0;
+        // PWA Install Logic
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('install-popup').style.display = 'flex';
+        });
 
-                    if (tx.timeLeft <= 0) {
-                        tx.status = 'confirmed';
-                        state.balances[tx.coin] += (tx.type === 'Buy' ? tx.amt : -tx.amt);
-                        needsSave = true;
-                    }
-                }
-            });
+        document.getElementById('install-btn').addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt = null;
+                document.getElementById('install-popup').style.display = 'none';
+            }
+        });
 
-            // Re-render every second to show the numbers moving
-            if (needsSave) save(); else render();
-        }, 1000);
-
-        function wipe() { if(confirm("Wipe Everything?")) { localStorage.clear(); location.reload(); } }
         render();
     </script>
 </body>
