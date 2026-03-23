@@ -1,120 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Faceless Video Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-body {
-    font-family: 'Inter', sans-serif;
-    background: #0f172a;
-    color: white;
-    margin: 0;
-    padding: 0;
-}
-.container {
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 20px;
-    background: #1e293b;
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
-h1 {
-    text-align: center;
-    color: #22c55e;
-}
-.input-group {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 20px;
-}
-.input-group label {
-    margin-bottom: 5px;
-    font-weight: 600;
-}
-.input-group input {
-    padding: 12px;
-    border-radius: 8px;
-    border: none;
-    font-size: 16px;
-}
-button {
-    padding: 12px 20px;
-    font-size: 18px;
-    font-weight: 600;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    background: #22c55e;
-    color: black;
-    transition: 0.3s;
-}
-button:hover {
-    background: #16a34a;
-}
-#log {
-    background: #0f172a;
-    padding: 15px;
-    border-radius: 12px;
-    max-height: 300px;
-    overflow-y: auto;
-    font-family: monospace;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusPay | Digital Wallet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+    </style>
 </head>
 <body>
 
-<div class="container">
-<h1>Faceless Video Automation</h1>
+    <nav class="bg-white border-b border-gray-200 px-8 py-4 flex justify-between items-center sticky top-0 z-50">
+        <div class="flex items-center space-x-10">
+            <div class="text-2xl font-bold text-blue-600 tracking-tighter">NEXUS<span class="text-gray-800">PAY</span></div>
+            <div class="hidden md:flex space-x-6 text-gray-600 font-medium">
+                <a href="#" class="hover:text-blue-600 border-b-2 border-blue-600 pb-1">Summary</a>
+                <a href="#" class="hover:text-blue-600">Activity</a>
+                <a href="#" class="hover:text-blue-600">Send & Request</a>
+                <a href="#" class="hover:text-blue-600">Wallet</a>
+            </div>
+        </div>
+        <div class="flex items-center space-x-6">
+            <i class="fa-regular fa-bell text-gray-500 cursor-pointer hover:text-blue-600"></i>
+            <i class="fa-solid fa-gear text-gray-500 cursor-pointer hover:text-blue-600"></i>
+            <button class="text-sm font-semibold text-gray-700 border border-gray-300 px-4 py-2 rounded-full hover:bg-gray-50">LOG OUT</button>
+        </div>
+    </nav>
 
-<div class="input-group">
-    <label>Topic (optional):</label>
-    <input id="topic" placeholder="space, history, psychology..." />
-</div>
+    <main class="max-w-6xl mx-auto mt-8 px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <div class="lg:col-span-2 space-y-6">
+            
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h2 class="text-gray-500 font-medium uppercase text-xs tracking-widest">NexusPay Balance</h2>
+                        <div class="text-4xl font-bold text-gray-900 mt-2">$12,450.80</div>
+                        <p class="text-blue-600 text-sm font-semibold mt-4 cursor-pointer hover:underline">Transfer Funds</p>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-full">
+                        <i class="fa-solid fa-wallet text-blue-600 text-2xl"></i>
+                    </div>
+                </div>
+            </div>
 
-<div class="input-group">
-    <label>Number of videos per channel (1–5):</label>
-    <input id="count" type="number" value="1" min="1" max="5" />
-</div>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-6 border-b border-gray-50 flex justify-between items-center">
+                    <h3 class="font-bold text-gray-800">Recent Activity</h3>
+                    <a href="#" class="text-blue-600 text-sm font-semibold hover:underline">View All</a>
+                </div>
+                <div class="divide-y divide-gray-50">
+                    <div class="p-6 flex justify-between items-center hover:bg-gray-50 transition">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center font-bold text-gray-600">AM</div>
+                            <div>
+                                <p class="font-semibold text-gray-900">Apple Music Subscription</p>
+                                <p class="text-sm text-gray-500">Mar 22 • Automatic Payment</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-gray-900">-$10.99</p>
+                        </div>
+                    </div>
+                    <div class="p-6 flex justify-between items-center hover:bg-gray-50 transition">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center font-bold text-green-600">JD</div>
+                            <div>
+                                <p class="font-semibold text-gray-900">John Doe</p>
+                                <p class="text-sm text-gray-500">Mar 20 • Payment Received</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-green-600">+$450.00</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-<div class="input-group">
-    <label>Channels (comma-separated JSONs):</label>
-    <input id="channels" placeholder="channel1.json,channel2.json" />
-</div>
+        <div class="space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 class="font-bold text-gray-800 mb-4">Send Again</h3>
+                <div class="flex space-x-4 mb-6">
+                    <div class="text-center group cursor-pointer">
+                        <div class="w-12 h-12 bg-gray-100 rounded-full mb-2 group-hover:ring-2 ring-blue-400 transition"></div>
+                        <p class="text-xs text-gray-600">Sarah</p>
+                    </div>
+                    <div class="text-center group cursor-pointer">
+                        <div class="w-12 h-12 bg-gray-100 rounded-full mb-2 group-hover:ring-2 ring-blue-400 transition"></div>
+                        <p class="text-xs text-gray-600">Mike</p>
+                    </div>
+                    <div class="text-center group cursor-pointer">
+                        <div class="w-12 h-12 border-2 border-dashed border-gray-300 rounded-full mb-2 flex items-center justify-center">
+                            <i class="fa-solid fa-plus text-gray-400"></i>
+                        </div>
+                        <p class="text-xs text-gray-600">More</p>
+                    </div>
+                </div>
+                <button class="w-full bg-blue-600 text-white font-bold py-3 rounded-full hover:bg-blue-700 transition shadow-lg shadow-blue-100">Send Money</button>
+            </div>
 
-<button onclick="generateVideos()">Generate & Upload</button>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 class="font-bold text-gray-800 mb-4">Banks and Cards</h3>
+                <div class="flex items-center space-x-4 py-2">
+                    <i class="fa-solid fa-building-columns text-gray-400 text-xl"></i>
+                    <div>
+                        <p class="text-sm font-semibold">Chase Bank •••• 1234</p>
+                        <p class="text-xs text-gray-500">Confirmed</p>
+                    </div>
+                </div>
+                <p class="text-blue-600 text-sm font-semibold mt-4 cursor-pointer hover:underline">Link a Card or Bank</p>
+            </div>
+        </div>
 
-<h3>Log:</h3>
-<div id="log"></div>
-</div>
-
-<script>
-const logDiv = document.getElementById('log');
-
-function appendLog(msg){
-  const p = document.createElement('p');
-  p.innerText = `[${new Date().toLocaleTimeString()}] ${msg}`;
-  logDiv.appendChild(p);
-  logDiv.scrollTop = logDiv.scrollHeight;
-}
-
-function generateVideos(){
-  const topic = document.getElementById('topic').value;
-  const count = parseInt(document.getElementById('count').value);
-  const channels = document.getElementById('channels').value.split(',').map(c=>c.trim());
-  
-  if(!channels.length){ appendLog("Enter at least one channel JSON."); return; }
-
-  appendLog("Starting video generation...");
-  for(let i=0;i<count;i++){
-    for(let channel of channels){
-      appendLog(`✅ Video would be generated and uploaded to ${channel}`);
-    }
-  }
-  appendLog("All videos generated (simulation).");
-}
-</script>
+    </main>
 
 </body>
 </html>
