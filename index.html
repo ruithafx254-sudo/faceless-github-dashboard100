@@ -9,16 +9,17 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Vault Pro">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/10543/10543206.png">
+    <meta name="theme-color" content="#0b0e11">
     
-    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/10543/10543206.png">
+    <link rel="manifest" href="./manifest.json">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         :root { --bg: #0b0e11; --card: #181a20; --accent: #3b82f6; --text-sec: #848e9c; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: white; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: white; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
         .app-container { max-width: 450px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
         .btn-press:active { transform: scale(0.95); opacity: 0.8; }
         .glass-card { background: var(--card); border: 1px solid rgba(255,255,255,0.05); }
@@ -27,20 +28,23 @@
         .modal-content { background: var(--card); width: 100%; border-radius: 2rem 2rem 0 0; padding: 2rem; transform: translateY(100%); transition: 0.3s ease-out; }
         .modal.active .modal-content { transform: translateY(0); }
         .tab-active { color: #3b82f6; }
-        #install-popup { display: none; position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; z-index: 2000; }
+        #install-popup { display: none; position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 400px; z-index: 2000; }
     </style>
 </head>
 <body>
 
-    <div id="install-popup" class="bg-blue-600 p-4 rounded-2xl shadow-2xl flex items-center justify-between border border-blue-400 animate-bounce">
+    <div id="install-popup" class="bg-blue-600 p-4 rounded-2xl shadow-2xl flex items-center justify-between border border-blue-400 animate-pulse">
         <div class="flex items-center space-x-3">
-            <i class="fa-solid fa-mobile-screen-button text-2xl"></i>
+            <i class="fa-solid fa-cloud-arrow-down text-2xl"></i>
             <div>
-                <p class="text-xs font-bold">Install Vault Pro</p>
-                <p class="text-[10px] opacity-80">Use as a dedicated app</p>
+                <p class="text-xs font-bold">Vault Pro App</p>
+                <p class="text-[10px] opacity-90">Install for faster access</p>
             </div>
         </div>
-        <button id="install-btn" class="bg-white text-blue-600 px-4 py-2 rounded-xl text-xs font-black uppercase">Install</button>
+        <div class="flex space-x-2">
+            <button id="close-install" class="text-white opacity-60 text-xs px-2">Later</button>
+            <button id="install-btn" class="bg-white text-blue-600 px-4 py-2 rounded-xl text-xs font-black uppercase">Install</button>
+        </div>
     </div>
 
     <div class="app-container px-5 pt-8 pb-32">
@@ -65,7 +69,7 @@
             <h1 id="total-usd" class="text-4xl font-extrabold tracking-tight mb-8 tabular-nums">$0.00</h1>
             <div class="flex justify-center space-x-10">
                 <button onclick="openModal('txModal', 'Buy')" class="btn-press flex flex-col items-center space-y-2">
-                    <div class="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-plus"></i></div>
+                    <div class="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center text-xl shadow-lg shadow-blue-900/40"><i class="fa-solid fa-plus"></i></div>
                     <span class="text-xs font-bold">Buy</span>
                 </button>
                 <button onclick="openModal('txModal', 'Send')" class="btn-press flex flex-col items-center space-y-2">
@@ -108,51 +112,65 @@
             <div class="w-12 h-1 bg-gray-700 rounded-full mx-auto mb-6"></div>
             <h2 id="modalTitle" class="text-2xl font-bold mb-6">Action</h2>
             <div class="space-y-5">
-                <select id="assetSelect" class="w-full bg-gray-800 p-4 rounded-xl mt-2 outline-none border border-gray-700">
+                <select id="assetSelect" class="w-full bg-gray-800 p-4 rounded-xl outline-none border border-gray-700">
                     <option value="USDT">Tether (USDT)</option>
                     <option value="SOL">Solana (SOL)</option>
                     <option value="ETH">Ethereum (ETH)</option>
                     <option value="BTC">Bitcoin (BTC)</option>
                 </select>
                 <div id="addrField" class="hidden">
-                    <input type="text" id="targetAddr" placeholder="Recipient Address" class="w-full bg-gray-800 p-4 rounded-xl mt-2 outline-none border border-gray-700 text-sm font-mono">
+                    <input type="text" id="targetAddr" placeholder="Recipient Address" class="w-full bg-gray-800 p-4 rounded-xl outline-none border border-gray-700 text-sm font-mono">
                 </div>
-                <input type="number" id="txAmount" placeholder="0.00" class="w-full bg-gray-800 p-4 rounded-xl mt-2 outline-none border border-gray-700 text-2xl font-bold">
+                <input type="number" id="txAmount" placeholder="0.00" class="w-full bg-gray-800 p-4 rounded-xl outline-none border border-gray-700 text-2xl font-bold">
                 <button onclick="executeTransaction()" class="w-full bg-blue-600 py-4 rounded-2xl font-bold text-lg mt-4 shadow-xl shadow-blue-900/40">Confirm Transaction</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Register Service Worker
+        // 1. Service Worker Registration
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('SW Registered'))
+                .catch(err => console.log('SW Error', err));
+            });
         }
 
+        // 2. Global State & Config
         const PRICES = { USDT: 1.00, SOL: 145.20, ETH: 2450.00, BTC: 64200.00 };
         let state = JSON.parse(localStorage.getItem('vaultData')) || { balances: { USDT: 0, SOL: 0, ETH: 0, BTC: 0 }, history: [] };
         let activeAction = '';
 
-        // App Install Logic
+        // 3. PWA Install Handler
         let deferredPrompt;
         const installPopup = document.getElementById('install-popup');
         const installBtn = document.getElementById('install-btn');
+        const closeInstall = document.getElementById('close-install');
 
         window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
+            e.preventDefault(); // Stop automatic prompt
             deferredPrompt = e;
-            installPopup.style.display = 'flex';
+            installPopup.style.display = 'flex'; // Show our custom UI
         });
 
         installBtn.addEventListener('click', async () => {
             if (deferredPrompt) {
-                deferredPrompt.prompt();
+                deferredPrompt.prompt(); // Show browser prompt
                 const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') installPopup.style.display = 'none';
+                if (outcome === 'accepted') {
+                    console.log('User installed app');
+                    installPopup.style.display = 'none';
+                }
                 deferredPrompt = null;
             }
         });
 
+        closeInstall.addEventListener('click', () => {
+            installPopup.style.display = 'none';
+        });
+
+        // 4. Wallet Functions
         function openModal(id, action) {
             activeAction = action;
             document.getElementById('modalTitle').innerText = action + " Crypto";
@@ -182,7 +200,7 @@
             const hist = document.getElementById('tx-history');
             hist.innerHTML = state.history.length ? '' : '<p class="text-center text-gray-600 text-xs py-10">No history</p>';
             state.history.slice(-5).reverse().forEach(tx => {
-                hist.innerHTML += `<div class="flex justify-between items-center"><div class="flex items-center space-x-4"><div class="w-10 h-10 rounded-xl bg-gray-900 border border-white/5 flex items-center justify-center text-xs"><i class="fa-solid ${tx.type === 'Buy' ? 'fa-plus text-green-500' : 'fa-arrow-up text-blue-500'}"></i></div><div><p class="text-xs font-bold">${tx.type} ${tx.coin}</p><p class="text-[9px] text-gray-500 font-bold uppercase">${tx.date}</p></div></div><p class="text-xs font-extrabold ${tx.type === 'Buy' ? 'text-green-500' : 'text-white'}">${tx.type === 'Buy' ? '+' : '-'}${tx.amt}</p></div>`;
+                hist.innerHTML += `<div class="flex justify-between items-center mb-4"><div class="flex items-center space-x-4"><div class="w-10 h-10 rounded-xl bg-gray-900 border border-white/5 flex items-center justify-center text-xs"><i class="fa-solid ${tx.type === 'Buy' ? 'fa-plus text-green-500' : 'fa-arrow-up text-blue-500'}"></i></div><div><p class="text-xs font-bold">${tx.type} ${tx.coin}</p><p class="text-[9px] text-gray-500 font-bold uppercase">${tx.date}</p></div></div><p class="text-xs font-extrabold ${tx.type === 'Buy' ? 'text-green-500' : 'text-white'}">${tx.type === 'Buy' ? '+' : '-'}${tx.amt}</p></div>`;
             });
         }
 
@@ -195,7 +213,7 @@
             state.history.push({ type: activeAction, coin, amt, date: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) });
             save(); closeModal('txModal'); document.getElementById('txAmount').value = '';
         }
-        function clearData() { if(confirm("Wipe all?")) { localStorage.clear(); location.reload(); } }
+        function clearData() { if(confirm("Wipe all data?")) { localStorage.clear(); location.reload(); } }
         render();
     </script>
 </body>
