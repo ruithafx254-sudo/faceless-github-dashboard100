@@ -3,194 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nexus Vault | Elite</title>
+    <title>Vault Pro | Multi-Chain</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
-        :root { --bg: #040608; --card: #11141b; --blue: #3b82f6; --green: #10b981; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: white; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         
-        .app-shell { max-width: 420px; margin: 0 auto; min-height: 100vh; position: relative; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.07); }
-        .btn-active:active { transform: scale(0.92); opacity: 0.7; }
+        :root { --bg: #0b0e11; --card: #181a20; --accent: #3b82f6; --text-sec: #848e9c; }
         
-        /* Modal Engine */
-        .modal { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.9); align-items: flex-end; backdrop-filter: blur(8px); }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: white; -webkit-tap-highlight-color: transparent; }
+        .app-container { max-width: 450px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
+        
+        /* Smooth interactions */
+        .btn-press:active { transform: scale(0.95); opacity: 0.8; }
+        .glass-card { background: var(--card); border: 1px solid rgba(255,255,255,0.05); }
+        
+        /* Modals */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; align-items: flex-end; }
         .modal.active { display: flex; }
-        .modal-sheet { background: #161a22; width: 100%; border-radius: 2.5rem 2.5rem 0 0; padding: 2.5rem; transform: translateY(100%); transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        .modal.active .modal-sheet { transform: translateY(0); }
-
-        /* Loader Animation */
-        .loader-ring { width: 80px; height: 80px; border-radius: 50%; border: 4px solid rgba(59, 130, 246, 0.1); border-top-color: var(--blue); animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .modal-content { background: var(--card); width: 100%; border-radius: 2rem 2rem 0 0; padding: 2rem; transform: translateY(100%); transition: 0.3s ease-out; }
+        .modal.active .modal-content { transform: translateY(0); }
         
-        /* Success Icon Pop */
-        .success-pop { animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+        .tab-active { color: #3b82f6; }
     </style>
 </head>
 <body>
 
-    <div class="app-shell px-6 pt-14 pb-32">
-        <div class="flex justify-between items-center mb-10">
+    <div class="app-container px-5 pt-8 pb-32">
+        
+        <header class="flex justify-between items-center mb-8">
             <div class="flex items-center space-x-3">
-                <div class="w-12 h-12 bg-gradient-to-tr from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center shadow-2xl">
-                    <i class="fa-solid fa-shield-halved text-white text-xl"></i>
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center border-2 border-white/10">
+                    <i class="fa-solid fa-user text-sm"></i>
                 </div>
                 <div>
-                    <h2 class="text-base font-extrabold">Vault Elite</h2>
-                    <p class="text-[10px] text-green-500 font-bold uppercase tracking-widest">● Secure Node</p>
+                    <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-none mb-1">Secure Vault</p>
+                    <h2 class="text-sm font-bold">Wallet 1 <i class="fa-solid fa-chevron-down text-[10px] ml-1 opacity-50"></i></h2>
                 </div>
             </div>
-            <i class="fa-solid fa-gear text-xl text-gray-600"></i>
-        </div>
+            <div class="flex space-x-5 text-gray-400">
+                <i class="fa-solid fa-expand text-lg"></i>
+                <i class="fa-solid fa-bell text-lg"></i>
+            </div>
+        </header>
 
-        <div class="glass rounded-[3rem] p-10 mb-10 text-center">
-            <p class="text-gray-500 text-xs font-bold uppercase tracking-widest mb-3">Net Balance</p>
-            <h1 id="total-usd" class="text-5xl font-extrabold tracking-tighter mb-10 tabular-nums">$0.00</h1>
+        <section class="text-center mb-10">
+            <p class="text-gray-400 text-sm font-medium mb-1">Total Balance</p>
+            <h1 id="total-usd" class="text-4xl font-extrabold tracking-tight mb-8">$0.00</h1>
             
-            <div class="flex justify-around">
-                <button onclick="openAction('Buy')" class="btn-active flex flex-col items-center gap-2">
+            <div class="flex justify-center space-x-10">
+                <button onclick="openModal('txModal', 'Buy')" class="btn-press flex flex-col items-center space-y-2">
                     <div class="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-plus"></i></div>
                     <span class="text-xs font-bold">Buy</span>
                 </button>
-                <button onclick="openAction('Send')" class="btn-active flex flex-col items-center gap-2">
-                    <div class="w-14 h-14 bg-white/5 rounded-full flex items-center justify-center text-xl border border-white/10"><i class="fa-solid fa-arrow-up"></i></div>
+                <button onclick="openModal('txModal', 'Send')" class="btn-press flex flex-col items-center space-y-2">
+                    <div class="w-14 h-14 bg-gray-800 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-arrow-up"></i></div>
                     <span class="text-xs font-bold">Send</span>
                 </button>
+                <button class="btn-press flex flex-col items-center space-y-2">
+                    <div class="w-14 h-14 bg-gray-800 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-arrow-down-long"></i></div>
+                    <span class="text-xs font-bold">Receive</span>
+                </button>
             </div>
-        </div>
+        </section>
 
-        <div id="asset-list" class="space-y-3 mb-12"></div>
+        <section class="space-y-4 mb-10">
+            <div class="flex justify-between items-end mb-2">
+                <h3 class="font-bold text-lg">Assets</h3>
+                <span class="text-xs text-blue-500 font-bold">See All</span>
+            </div>
+            
+            <div id="asset-list" class="space-y-3">
+                </div>
+        </section>
 
-        <h3 class="text-lg font-extrabold mb-5">Activity</h3>
-        <div id="activity-list" class="space-y-4"></div>
+        <section>
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold">Recent Transactions</h3>
+                <button onclick="clearData()" class="text-[10px] text-red-500 font-bold opacity-50">RESET</button>
+            </div>
+            <div id="tx-history" class="space-y-4">
+                </div>
+        </section>
+
     </div>
 
-    <div id="processingOverlay" class="fixed inset-0 bg-black/95 z-[2000] hidden items-center justify-center flex-col text-center p-10">
-        <div id="loaderGroup">
-            <div class="loader-ring mx-auto mb-8"></div>
-            <h2 class="text-2xl font-black mb-2">Broadcasting...</h2>
-            <p class="text-gray-500 text-sm">Verifying on blockchain (10s)</p>
-        </div>
-        
-        <div id="successGroup" class="hidden">
-            <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 success-pop">
-                <i class="fa-solid fa-check text-white text-4xl"></i>
-            </div>
-            <h2 class="text-3xl font-black mb-2">Success!</h2>
-            <p class="text-gray-500 mb-10">Your transaction has been confirmed.</p>
-            <button onclick="closeSuccess()" class="bg-white text-black px-12 py-4 rounded-2xl font-bold btn-active">Done</button>
-        </div>
+    <nav class="fixed bottom-0 left-0 right-0 bg-[#181a20]/95 backdrop-blur-xl border-t border-white/5 px-8 py-5 flex justify-between items-center z-50">
+        <div class="flex flex-col items-center space-y-1 tab-active"><i class="fa-solid fa-wallet text-xl"></i><span class="text-[10px] font-bold">Wallet</span></div>
+        <div class="flex flex-col items-center space-y-1 text-gray-500"><i class="fa-solid fa-repeat text-xl"></i><span class="text-[10px] font-bold">Swap</span></div>
+        <div class="flex flex-col items-center space-y-1 text-gray-500"><i class="fa-solid fa-compass text-xl"></i><span class="text-[10px] font-bold">Discover</span></div>
+        <div class="flex flex-col items-center space-y-1 text-gray-500"><i class="fa-solid fa-clock-rotate-left text-xl"></i><span class="text-[10px] font-bold">History</span></div>
+    </nav>
 
-        <div class="mt-10 w-full max-w-xs bg-white/5 h-1 rounded-full overflow-hidden" id="progressWrapper">
-            <div id="progressBar" class="h-full bg-blue-600 w-0 transition-all duration-1000"></div>
-        </div>
-    </div>
-
-    <div id="actionModal" class="modal" onclick="if(event.target==this) closeAction()">
-        <div class="modal-sheet">
-            <h2 id="modalTitle" class="text-2xl font-black mb-6">Action</h2>
-            <div class="space-y-4">
-                <select id="coinSelect" class="w-full bg-white/5 p-5 rounded-2xl border border-white/10 font-bold outline-none">
-                    <option value="USDT">Tether (USDT)</option>
-                    <option value="SOL">Solana (SOL)</option>
-                    <option value="BTC">Bitcoin (BTC)</option>
-                </select>
-                <input type="number" id="amtInput" placeholder="0.00" class="w-full bg-white/5 p-6 rounded-3xl border border-white/10 text-4xl font-black text-center outline-none">
-                <button onclick="startTx()" class="btn-active w-full bg-blue-600 py-5 rounded-3xl font-black text-lg mt-4">Confirm</button>
+    <div id="txModal" class="modal" onclick="if(event.target == this) closeModal('txModal')">
+        <div class="modal-content">
+            <div class="w-12 h-1 bg-gray-700 rounded-full mx-auto mb-6"></div>
+            <h2 id="modalTitle" class="text-2xl font-bold mb-6">Action</h2>
+            
+            <div class="space-y-5">
+                <div>
+                    <label class="text-[10px] font-bold text-gray-500 uppercase">Select Asset</label>
+                    <select id="assetSelect" class="w-full bg-gray-800 p-4 rounded-xl mt-2 outline-none border border-gray-700">
+                        <option value="SOL">Solana (SOL)</option>
+                        <option value="ETH">Ethereum (ETH)</option>
+                        <option value="BTC">Bitcoin (BTC)</option>
+                    </select>
+                </div>
+                <div id="addrField" class="hidden">
+                    <label class="text-[10px] font-bold text-gray-500 uppercase">Recipient Address</label>
+                    <input type="text" id="targetAddr" placeholder="0x... / Address" class="w-full bg-gray-800 p-4 rounded-xl mt-2 outline-none border border-gray-700 text-sm font-mono">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-500 uppercase">Amount</label>
+                    <input type="number" id="txAmount" placeholder="0.00" class="w-full bg-gray-800 p-4 rounded-xl mt-2 outline-none border border-gray-700 text-2xl font-bold">
+                </div>
+                <button onclick="executeTransaction()" class="w-full bg-blue-600 py-4 rounded-2xl font-bold text-lg mt-4 shadow-xl shadow-blue-900/40">Confirm Transaction</button>
             </div>
         </div>
     </div>
 
     <script>
-        const COINS = {
-            USDT: { name: 'Tether', price: 1.00, icon: 'fa-dollar-sign', color: 'bg-green-600' },
-            SOL: { name: 'Solana', price: 185.20, icon: 'fa-s', color: 'bg-black border border-white/10' },
-            BTC: { name: 'Bitcoin', price: 69200.00, icon: 'fa-brands fa-bitcoin', color: 'bg-orange-500' }
+        // Real-time fake prices
+        const PRICES = { SOL: 145.20, ETH: 2450.00, BTC: 64200.00 };
+        
+        let state = JSON.parse(localStorage.getItem('vaultData')) || {
+            balances: { SOL: 0, ETH: 0, BTC: 0 },
+            history: []
         };
 
-        let db = JSON.parse(localStorage.getItem('nexus_v4')) || { balances: { USDT: 0, SOL: 0, BTC: 0 }, history: [] };
-        let activeType = '';
+        let activeAction = '';
 
-        function openAction(type) {
-            activeType = type;
-            document.getElementById('modalTitle').innerText = type + " Crypto";
-            document.getElementById('actionModal').classList.add('active');
+        function openModal(id, action) {
+            activeAction = action;
+            document.getElementById('modalTitle').innerText = action + " Crypto";
+            document.getElementById('addrField').className = (action === 'Send') ? 'block' : 'hidden';
+            document.getElementById(id).classList.add('active');
         }
 
-        function closeAction() { document.getElementById('actionModal').classList.remove('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-        function startTx() {
-            const amt = parseFloat(document.getElementById('amtInput').value);
-            const coin = document.getElementById('coinSelect').value;
-            if(!amt || amt <= 0) return;
-
-            closeAction();
-            document.getElementById('processingOverlay').style.display = 'flex';
-            document.getElementById('loaderGroup').classList.remove('hidden');
-            document.getElementById('successGroup').classList.add('hidden');
-            document.getElementById('progressWrapper').classList.remove('hidden');
-
-            let p = 0;
-            const itv = setInterval(() => {
-                p += 10;
-                document.getElementById('progressBar').style.width = p + '%';
-                if(p >= 100) {
-                    clearInterval(itv);
-                    // Update Data
-                    db.balances[coin] += (activeType === 'Buy' ? amt : -amt);
-                    db.history.push({ type: activeType, coin, amt, time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) });
-                    localStorage.setItem('nexus_v4', JSON.stringify(db));
-                    
-                    // Show Success
-                    document.getElementById('loaderGroup').classList.add('hidden');
-                    document.getElementById('progressWrapper').classList.add('hidden');
-                    document.getElementById('successGroup').classList.remove('hidden');
-                    render();
-                }
-            }, 1000);
-        }
-
-        function closeSuccess() {
-            document.getElementById('processingOverlay').style.display = 'none';
-            document.getElementById('progressBar').style.width = '0%';
-            document.getElementById('amtInput').value = '';
+        function save() {
+            localStorage.setItem('vaultData', JSON.stringify(state));
+            render();
         }
 
         function render() {
+            // Calculate Total USD
             let total = 0;
-            const assetList = document.getElementById('asset-list');
-            assetList.innerHTML = '';
-            for(let k in COINS) {
-                const bal = db.balances[k];
-                const val = bal * COINS[k].price;
-                total += val;
-                assetList.innerHTML += `
-                    <div class="glass p-5 rounded-[2rem] flex justify-between items-center">
-                        <div class="flex items-center space-x-4">
-                            <div class="w-12 h-12 ${COINS[k].color} rounded-2xl flex items-center justify-center"><i class="fa-solid ${COINS[k].icon}"></i></div>
-                            <div><p class="font-bold text-sm">${COINS[k].name}</p><p class="text-[10px] text-gray-500 font-bold">$${COINS[k].price.toLocaleString()}</p></div>
-                        </div>
-                        <div class="text-right"><p class="font-black text-sm">${bal.toFixed(2)} ${k}</p><p class="text-[10px] text-gray-400">$${val.toLocaleString()}</p></div>
-                    </div>`;
-            }
+            for(let coin in state.balances) { total += state.balances[coin] * PRICES[coin]; }
             document.getElementById('total-usd').innerText = `$${total.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
 
-            const hist = document.getElementById('activity-list');
-            hist.innerHTML = db.history.length ? '' : '<p class="text-center text-gray-600 text-xs py-5">No Moves Yet</p>';
-            db.history.slice(-3).reverse().forEach(tx => {
-                hist.innerHTML += `
-                    <div class="flex justify-between items-center opacity-80">
+            // Render Assets
+            const assetList = document.getElementById('asset-list');
+            assetList.innerHTML = '';
+            for(let coin in state.balances) {
+                const usd = (state.balances[coin] * PRICES[coin]).toLocaleString();
+                assetList.innerHTML += `
+                    <div class="glass-card p-4 rounded-2xl flex justify-between items-center">
                         <div class="flex items-center space-x-4">
-                            <i class="fa-solid ${tx.type==='Buy'?'fa-plus text-green-500':'fa-arrow-up text-blue-500'}"></i>
-                            <div><p class="text-xs font-bold">${tx.type} ${tx.coin}</p><p class="text-[9px] text-gray-600 uppercase">${tx.time}</p></div>
+                            <div class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center font-bold text-xs">${coin}</div>
+                            <div>
+                                <p class="font-bold text-sm">${coin === 'SOL' ? 'Solana' : coin === 'ETH' ? 'Ethereum' : 'Bitcoin'}</p>
+                                <p class="text-[10px] text-gray-500 font-bold">$${PRICES[coin].toLocaleString()}</p>
+                            </div>
                         </div>
-                        <p class="text-xs font-black ${tx.type==='Buy'?'text-green-500':'text-white'}">${tx.type==='Buy'?'+':'-'}${tx.amt}</p>
-                    </div>`;
+                        <div class="text-right">
+                            <p class="text-sm font-bold">${state.balances[coin].toFixed(4)} ${coin}</p>
+                            <p class="text-[10px] text-gray-400 font-bold">$${usd}</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Render History
+            const hist = document.getElementById('tx-history');
+            hist.innerHTML = state.history.length ? '' : '<p class="text-center text-gray-600 text-xs py-10">No history</p>';
+            state.history.slice(-5).reverse().forEach(tx => {
+                hist.innerHTML += `
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-10 h-10 rounded-xl bg-gray-900 border border-white/5 flex items-center justify-center text-xs">
+                                <i class="fa-solid ${tx.type === 'Buy' ? 'fa-plus text-green-500' : 'fa-arrow-up text-blue-500'}"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold">${tx.type} ${tx.coin}</p>
+                                <p class="text-[9px] text-gray-500 uppercase font-bold">${tx.date}</p>
+                            </div>
+                        </div>
+                        <p class="text-xs font-extrabold ${tx.type === 'Buy' ? 'text-green-500' : 'text-white'}">
+                            ${tx.type === 'Buy' ? '+' : '-'}${tx.amt} ${tx.coin}
+                        </p>
+                    </div>
+                `;
             });
         }
+
+        function executeTransaction() {
+            const coin = document.getElementById('assetSelect').value;
+            const amt = parseFloat(document.getElementById('txAmount').value);
+            
+            if(isNaN(amt) || amt <= 0) return alert("Enter valid amount");
+            
+            if(activeAction === 'Send') {
+                if(state.balances[coin] < amt) return alert("Insufficient balance");
+                state.balances[coin] -= amt;
+            } else {
+                state.balances[coin] += amt;
+            }
+
+            state.history.push({
+                type: activeAction,
+                coin: coin,
+                amt: amt,
+                date: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            });
+
+            save();
+            closeModal('txModal');
+            document.getElementById('txAmount').value = '';
+        }
+
+        function clearData() {
+            if(confirm("Wipe all data?")) {
+                localStorage.removeItem('vaultData');
+                location.reload();
+            }
+        }
+
         render();
     </script>
 </body>
