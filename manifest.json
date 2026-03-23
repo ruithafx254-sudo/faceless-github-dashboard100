@@ -1,22 +1,20 @@
 {
-  "name": "Vault Pro Wallet",
-  "short_name": "VaultPro",
-  "start_url": "./index.html",
+  "name": "Vault Pro Elite",
+  "short_name": "Vault",
+  "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#0b0e11",
-  "theme_color": "#3b82f6",
+  "background_color": "#000000",
+  "theme_color": "#000000",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/10543/10543206.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
+      "src": "https://cdn-icons-png.flaticon.com/512/5968/5968260.png",
+      "sizes": "192x192",
+      "type": "image/png"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/10543/10543206.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
+      "src": "https://cdn-icons-png.flaticon.com/512/5968/5968260.png",
+      "sizes": "512x512",
+      "type": "image/png"
     }
   ]
 }
