@@ -4,8 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Vault Pro | Multi-Chain</title>
+    
     <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Vault Pro">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/10543/10543206.png">
+    
+    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Vault%20Pro%22,%22short_name%22:%22Vault%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22#0b0e11%22,%22theme_color%22:%22#0b0e11%22,%22icons%22:[{%22src%22:%22https://cdn-icons-png.flaticon.com/512/10543/10543206.png%22,%22sizes%22:%22512x512%22,%22type%22:%22image/png%22,%22purpose%22:%22any%20maskable%22}]} border-box;">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -135,6 +142,11 @@
     </div>
 
     <script>
+        // PWA Registration Script
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('data:text/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdmZXRjaCcsIGZ1bmN0aW9uKGV2ZW50KSB7IH0pOw==');
+        }
+
         const PRICES = { USDT: 1.00, SOL: 145.20, ETH: 2450.00, BTC: 64200.00 };
         
         let state = JSON.parse(localStorage.getItem('vaultData')) || {
