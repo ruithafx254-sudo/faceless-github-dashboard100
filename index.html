@@ -2,220 +2,234 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Vault | Multi-Chain</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vault Pro | Multi-Chain</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #f8fafc; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        :root { --bg: #0b0e11; --card: #181a20; --accent: #3b82f6; --text-sec: #848e9c; }
+        
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: white; -webkit-tap-highlight-color: transparent; }
+        .app-container { max-width: 450px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
+        
+        /* Smooth interactions */
+        .btn-press:active { transform: scale(0.95); opacity: 0.8; }
+        .glass-card { background: var(--card); border: 1px solid rgba(255,255,255,0.05); }
+        
+        /* Modals */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; align-items: flex-end; }
         .modal.active { display: flex; }
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        .modal-content { background: var(--card); width: 100%; border-radius: 2rem 2rem 0 0; padding: 2rem; transform: translateY(100%); transition: 0.3s ease-out; }
+        .modal.active .modal-content { transform: translateY(0); }
+        
+        .tab-active { color: #3b82f6; }
     </style>
 </head>
-<body class="pb-10">
+<body>
 
-    <nav class="max-w-lg mx-auto px-6 py-6 flex justify-between items-center sticky top-0 z-50 bg-[#0f172a]/80 backdrop-blur-md">
-        <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center shadow-lg shadow-blue-500/20">
-                <i class="fa-solid fa-shield-halved text-white"></i>
-            </div>
-            <div>
-                <h1 class="text-sm font-bold tracking-tight">Main Wallet</h1>
-                <div class="flex items-center text-[10px] text-green-400 font-bold uppercase tracking-widest">
-                    <span class="w-1.5 h-1.5 bg-green-400 rounded-full mr-1.5 animate-pulse"></span> Secured
-                </div>
-            </div>
-        </div>
-        <div class="flex space-x-4 text-slate-400">
-            <i class="fa-solid fa-qrcode cursor-pointer hover:text-white transition"></i>
-            <i class="fa-solid fa-gear cursor-pointer hover:text-white transition"></i>
-        </div>
-    </nav>
-
-    <main class="max-w-lg mx-auto px-6 space-y-8">
+    <div class="app-container px-5 pt-8 pb-32">
         
-        <div class="relative overflow-hidden bg-gradient-to-br from-blue-700 to-indigo-900 p-8 rounded-[2.5rem] shadow-2xl shadow-blue-900/20">
-            <div class="relative z-10 text-center">
-                <p class="text-blue-100/70 text-xs font-semibold uppercase tracking-widest mb-2">Total Portfolio</p>
-                <h2 id="total-balance" class="text-4xl font-extrabold tracking-tighter mb-8">$0.00</h2>
-                
-                <div class="grid grid-cols-3 gap-4">
-                    <button onclick="openModal('addModal')" class="flex flex-col items-center space-y-2 group">
-                        <div class="w-12 h-12 bg-white/10 group-hover:bg-white/20 rounded-2xl flex items-center justify-center transition">
-                            <i class="fa-solid fa-plus text-white"></i>
-                        </div>
-                        <span class="text-[11px] font-bold text-blue-100">Buy</span>
-                    </button>
-                    <button onclick="openModal('withdrawModal')" class="flex flex-col items-center space-y-2 group">
-                        <div class="w-12 h-12 bg-white/10 group-hover:bg-white/20 rounded-2xl flex items-center justify-center transition">
-                            <i class="fa-solid fa-arrow-up text-white"></i>
-                        </div>
-                        <span class="text-[11px] font-bold text-blue-100">Send</span>
-                    </button>
-                    <button class="flex flex-col items-center space-y-2 group">
-                        <div class="w-12 h-12 bg-white/10 group-hover:bg-white/20 rounded-2xl flex items-center justify-center transition">
-                            <i class="fa-solid fa-arrow-down text-white"></i>
-                        </div>
-                        <span class="text-[11px] font-bold text-blue-100">Receive</span>
-                    </button>
+        <header class="flex justify-between items-center mb-8">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center border-2 border-white/10">
+                    <i class="fa-solid fa-user text-sm"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-none mb-1">Secure Vault</p>
+                    <h2 class="text-sm font-bold">Wallet 1 <i class="fa-solid fa-chevron-down text-[10px] ml-1 opacity-50"></i></h2>
                 </div>
             </div>
-            <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
-        </div>
+            <div class="flex space-x-5 text-gray-400">
+                <i class="fa-solid fa-expand text-lg"></i>
+                <i class="fa-solid fa-bell text-lg"></i>
+            </div>
+        </header>
 
-        <section>
-            <h3 class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-4 px-2">Assets</h3>
-            <div class="space-y-3">
-                <div class="glass p-4 rounded-2xl flex justify-between items-center">
-                    <div class="flex items-center space-x-4">
-                        <div class="w-10 h-10 bg-black rounded-full flex items-center justify-center border border-slate-700">
-                            <img src="https://cryptologos.cc/logos/solana-sol-logo.png" class="w-6" alt="SOL">
-                        </div>
-                        <div>
-                            <p class="font-bold text-sm">Solana</p>
-                            <p class="text-[10px] text-slate-500 font-bold uppercase">SOL <span class="text-green-400 ml-1">+2.4%</span></p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p id="sol-qty" class="text-sm font-bold">0.00 SOL</p>
-                        <p id="sol-val" class="text-[10px] text-slate-500 font-bold">$0.00</p>
-                    </div>
-                </div>
-
-                <div class="glass p-4 rounded-2xl flex justify-between items-center">
-                    <div class="flex items-center space-x-4">
-                        <div class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center border border-slate-700">
-                            <i class="fa-brands fa-ethereum text-xl"></i>
-                        </div>
-                        <div>
-                            <p class="font-bold text-sm">Ethereum</p>
-                            <p class="text-[10px] text-slate-500 font-bold uppercase">ETH</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-sm font-bold">0.00 ETH</p>
-                        <p class="text-[10px] text-slate-500 font-bold">$0.00</p>
-                    </div>
-                </div>
+        <section class="text-center mb-10">
+            <p class="text-gray-400 text-sm font-medium mb-1">Total Balance</p>
+            <h1 id="total-usd" class="text-4xl font-extrabold tracking-tight mb-8">$0.00</h1>
+            
+            <div class="flex justify-center space-x-10">
+                <button onclick="openModal('txModal', 'Buy')" class="btn-press flex flex-col items-center space-y-2">
+                    <div class="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-plus"></i></div>
+                    <span class="text-xs font-bold">Buy</span>
+                </button>
+                <button onclick="openModal('txModal', 'Send')" class="btn-press flex flex-col items-center space-y-2">
+                    <div class="w-14 h-14 bg-gray-800 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-arrow-up"></i></div>
+                    <span class="text-xs font-bold">Send</span>
+                </button>
+                <button class="btn-press flex flex-col items-center space-y-2">
+                    <div class="w-14 h-14 bg-gray-800 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-arrow-down-long"></i></div>
+                    <span class="text-xs font-bold">Receive</span>
+                </button>
             </div>
         </section>
 
-        <section>
-            <div class="flex justify-between items-center mb-4 px-2">
-                <h3 class="text-slate-400 text-xs font-bold uppercase tracking-widest">Recent Activity</h3>
-                <button onclick="clearHistory()" class="text-[10px] text-red-400 font-bold hover:underline">CLEAR ALL</button>
+        <section class="space-y-4 mb-10">
+            <div class="flex justify-between items-end mb-2">
+                <h3 class="font-bold text-lg">Assets</h3>
+                <span class="text-xs text-blue-500 font-bold">See All</span>
             </div>
-            <div id="history-container" class="space-y-2">
+            
+            <div id="asset-list" class="space-y-3">
                 </div>
         </section>
 
-    </main>
+        <section>
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold">Recent Transactions</h3>
+                <button onclick="clearData()" class="text-[10px] text-red-500 font-bold opacity-50">RESET</button>
+            </div>
+            <div id="tx-history" class="space-y-4">
+                </div>
+        </section>
 
-    <div id="addModal" class="modal">
-        <div class="bg-slate-900 p-8 rounded-[2.5rem] w-full max-w-sm mx-4 border border-slate-800">
-            <h2 class="text-xl font-bold mb-6 flex items-center"><i class="fa-solid fa-circle-plus text-blue-500 mr-2"></i> Add SOL</h2>
-            <input type="number" id="addAmount" placeholder="Amount of SOL" class="w-full p-4 bg-slate-800 rounded-2xl outline-none focus:ring-2 ring-blue-500 font-bold mb-4 text-white">
-            <button onclick="processDeposit()" class="w-full bg-blue-600 py-4 rounded-2xl font-bold hover:bg-blue-500 transition shadow-lg shadow-blue-600/20">Confirm Buy</button>
-            <button onclick="closeModal('addModal')" class="w-full text-slate-500 text-sm mt-4">Close</button>
-        </div>
     </div>
 
-    <div id="withdrawModal" class="modal">
-        <div class="bg-slate-900 p-8 rounded-[2.5rem] w-full max-w-sm mx-4 border border-slate-800">
-            <h2 class="text-xl font-bold mb-2 flex items-center"><i class="fa-solid fa-paper-plane text-indigo-500 mr-2"></i> Send SOL</h2>
-            <p class="text-slate-500 text-xs mb-6 font-medium">Network: Solana Mainnet Beta</p>
-            <input type="text" id="withdrawAddr" placeholder="Recipient Address" class="w-full p-4 bg-slate-800 rounded-2xl outline-none focus:ring-2 ring-indigo-500 text-xs font-mono mb-3 text-white">
-            <input type="number" id="withdrawAmount" placeholder="0.00 SOL" class="w-full p-4 bg-slate-800 rounded-2xl outline-none focus:ring-2 ring-indigo-500 font-bold mb-6 text-white">
-            <button onclick="processWithdraw()" class="w-full bg-white text-black py-4 rounded-2xl font-bold hover:bg-slate-200 transition">Send Assets</button>
-            <button onclick="closeModal('withdrawModal')" class="text-slate-500 text-sm block w-full mt-4">Cancel</button>
+    <nav class="fixed bottom-0 left-0 right-0 bg-[#181a20]/95 backdrop-blur-xl border-t border-white/5 px-8 py-5 flex justify-between items-center z-50">
+        <div class="flex flex-col items-center space-y-1 tab-active"><i class="fa-solid fa-wallet text-xl"></i><span class="text-[10px] font-bold">Wallet</span></div>
+        <div class="flex flex-col items-center space-y-1 text-gray-500"><i class="fa-solid fa-repeat text-xl"></i><span class="text-[10px] font-bold">Swap</span></div>
+        <div class="flex flex-col items-center space-y-1 text-gray-500"><i class="fa-solid fa-compass text-xl"></i><span class="text-[10px] font-bold">Discover</span></div>
+        <div class="flex flex-col items-center space-y-1 text-gray-500"><i class="fa-solid fa-clock-rotate-left text-xl"></i><span class="text-[10px] font-bold">History</span></div>
+    </nav>
+
+    <div id="txModal" class="modal" onclick="if(event.target == this) closeModal('txModal')">
+        <div class="modal-content">
+            <div class="w-12 h-1 bg-gray-700 rounded-full mx-auto mb-6"></div>
+            <h2 id="modalTitle" class="text-2xl font-bold mb-6">Action</h2>
+            
+            <div class="space-y-5">
+                <div>
+                    <label class="text-[10px] font-bold text-gray-500 uppercase">Select Asset</label>
+                    <select id="assetSelect" class="w-full bg-gray-800 p-4 rounded-xl mt-2 outline-none border border-gray-700">
+                        <option value="SOL">Solana (SOL)</option>
+                        <option value="ETH">Ethereum (ETH)</option>
+                        <option value="BTC">Bitcoin (BTC)</option>
+                    </select>
+                </div>
+                <div id="addrField" class="hidden">
+                    <label class="text-[10px] font-bold text-gray-500 uppercase">Recipient Address</label>
+                    <input type="text" id="targetAddr" placeholder="0x... / Address" class="w-full bg-gray-800 p-4 rounded-xl mt-2 outline-none border border-gray-700 text-sm font-mono">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-500 uppercase">Amount</label>
+                    <input type="number" id="txAmount" placeholder="0.00" class="w-full bg-gray-800 p-4 rounded-xl mt-2 outline-none border border-gray-700 text-2xl font-bold">
+                </div>
+                <button onclick="executeTransaction()" class="w-full bg-blue-600 py-4 rounded-2xl font-bold text-lg mt-4 shadow-xl shadow-blue-900/40">Confirm Transaction</button>
+            </div>
         </div>
     </div>
 
     <script>
-        const SOL_PRICE = 145.50; // Hardcoded fake price
-        let wallet = JSON.parse(localStorage.getItem('walletData')) || {
-            solBalance: 0,
+        // Real-time fake prices
+        const PRICES = { SOL: 145.20, ETH: 2450.00, BTC: 64200.00 };
+        
+        let state = JSON.parse(localStorage.getItem('vaultData')) || {
+            balances: { SOL: 0, ETH: 0, BTC: 0 },
             history: []
         };
 
+        let activeAction = '';
+
+        function openModal(id, action) {
+            activeAction = action;
+            document.getElementById('modalTitle').innerText = action + " Crypto";
+            document.getElementById('addrField').className = (action === 'Send') ? 'block' : 'hidden';
+            document.getElementById(id).classList.add('active');
+        }
+
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
         function save() {
-            localStorage.setItem('walletData', JSON.stringify(wallet));
+            localStorage.setItem('vaultData', JSON.stringify(state));
             render();
         }
 
-        function openModal(id) { document.getElementById(id).classList.add('active'); }
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-
         function render() {
-            const usdVal = wallet.solBalance * SOL_PRICE;
-            document.getElementById('total-balance').innerText = `$${usdVal.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-            document.getElementById('sol-qty').innerText = `${wallet.solBalance.toFixed(2)} SOL`;
-            document.getElementById('sol-val').innerText = `$${usdVal.toLocaleString()}`;
+            // Calculate Total USD
+            let total = 0;
+            for(let coin in state.balances) { total += state.balances[coin] * PRICES[coin]; }
+            document.getElementById('total-usd').innerText = `$${total.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
 
-            const container = document.getElementById('history-container');
-            container.innerHTML = wallet.history.length ? '' : '<p class="text-center text-slate-600 text-xs py-10">No transactions yet</p>';
-            
-            wallet.history.forEach((tx) => {
-                const html = `
-                    <div class="glass p-4 rounded-2xl flex justify-between items-center opacity-90">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-8 h-8 ${tx.type === 'in' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'} rounded-lg flex items-center justify-center text-xs">
-                                <i class="fa-solid ${tx.type === 'in' ? 'fa-arrow-down' : 'fa-arrow-up'}"></i>
-                            </div>
+            // Render Assets
+            const assetList = document.getElementById('asset-list');
+            assetList.innerHTML = '';
+            for(let coin in state.balances) {
+                const usd = (state.balances[coin] * PRICES[coin]).toLocaleString();
+                assetList.innerHTML += `
+                    <div class="glass-card p-4 rounded-2xl flex justify-between items-center">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center font-bold text-xs">${coin}</div>
                             <div>
-                                <p class="text-xs font-bold">${tx.label}</p>
-                                <p class="text-[9px] text-slate-500 font-bold uppercase">${tx.date}</p>
+                                <p class="font-bold text-sm">${coin === 'SOL' ? 'Solana' : coin === 'ETH' ? 'Ethereum' : 'Bitcoin'}</p>
+                                <p class="text-[10px] text-gray-500 font-bold">$${PRICES[coin].toLocaleString()}</p>
                             </div>
                         </div>
-                        <p class="text-xs font-extrabold ${tx.type === 'in' ? 'text-green-400' : 'text-slate-200'}">
-                            ${tx.type === 'in' ? '+' : '-'}${tx.amt} SOL
+                        <div class="text-right">
+                            <p class="text-sm font-bold">${state.balances[coin].toFixed(4)} ${coin}</p>
+                            <p class="text-[10px] text-gray-400 font-bold">$${usd}</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Render History
+            const hist = document.getElementById('tx-history');
+            hist.innerHTML = state.history.length ? '' : '<p class="text-center text-gray-600 text-xs py-10">No history</p>';
+            state.history.slice(-5).reverse().forEach(tx => {
+                hist.innerHTML += `
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-10 h-10 rounded-xl bg-gray-900 border border-white/5 flex items-center justify-center text-xs">
+                                <i class="fa-solid ${tx.type === 'Buy' ? 'fa-plus text-green-500' : 'fa-arrow-up text-blue-500'}"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold">${tx.type} ${tx.coin}</p>
+                                <p class="text-[9px] text-gray-500 uppercase font-bold">${tx.date}</p>
+                            </div>
+                        </div>
+                        <p class="text-xs font-extrabold ${tx.type === 'Buy' ? 'text-green-500' : 'text-white'}">
+                            ${tx.type === 'Buy' ? '+' : '-'}${tx.amt} ${tx.coin}
                         </p>
                     </div>
                 `;
-                container.insertAdjacentHTML('afterbegin', html);
             });
         }
 
-        function processDeposit() {
-            const val = parseFloat(document.getElementById('addAmount').value);
-            if(val > 0) {
-                wallet.solBalance += val;
-                wallet.history.push({
-                    type: 'in', label: 'Purchased SOL', amt: val, 
-                    date: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-                });
-                save();
-                closeModal('addModal');
-                document.getElementById('addAmount').value = '';
+        function executeTransaction() {
+            const coin = document.getElementById('assetSelect').value;
+            const amt = parseFloat(document.getElementById('txAmount').value);
+            
+            if(isNaN(amt) || amt <= 0) return alert("Enter valid amount");
+            
+            if(activeAction === 'Send') {
+                if(state.balances[coin] < amt) return alert("Insufficient balance");
+                state.balances[coin] -= amt;
+            } else {
+                state.balances[coin] += amt;
             }
-        }
 
-        function processWithdraw() {
-            const val = parseFloat(document.getElementById('withdrawAmount').value);
-            const addr = document.getElementById('withdrawAddr').value;
-            if(val > 0 && wallet.solBalance >= val && addr.length > 10) {
-                wallet.solBalance -= val;
-                wallet.history.push({
-                    type: 'out', label: `Sent to ${addr.substring(0,6)}...`, amt: val,
-                    date: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-                });
-                save();
-                closeModal('withdrawModal');
-                document.getElementById('withdrawAmount').value = '';
-                document.getElementById('withdrawAddr').value = '';
-            }
-        }
+            state.history.push({
+                type: activeAction,
+                coin: coin,
+                amt: amt,
+                date: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            });
 
-        function clearHistory() {
-            wallet.history = [];
             save();
+            closeModal('txModal');
+            document.getElementById('txAmount').value = '';
         }
 
-        // Initialize UI
+        function clearData() {
+            if(confirm("Wipe all data?")) {
+                localStorage.removeItem('vaultData');
+                location.reload();
+            }
+        }
+
         render();
     </script>
 </body>
