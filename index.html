@@ -10,161 +10,129 @@
     <meta name="theme-color" content="#000000">
     <link rel="manifest" href="manifest.json">
 
-    <script>
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-    </script>
-
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: '#00d395', 
-                        btc: '#f7931a',
-                        eth: '#627eea',
-                        sol: '#14f195',
-                        bnb: '#f3ba2f',
-                        darkCard: '#121212',
-                        lightBg: '#F3F4F6'
-                    }
-                }
-            }
-        }
-    </script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s ease; }
-        .btn-interact:active { transform: scale(0.95); opacity: 0.8; }
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); z-index: 1000; align-items: flex-end; }
+        :root { --trust-blue: #3b82f6; --trust-green: #05f49c; --bg: #000000; --card: #121212; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: white; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
+        .shimmer { background: linear-gradient(90deg, #121212 25%, #1a1a1a 50%, #121212 75%); background-size: 200% 100%; animation: shimmer 2s infinite; }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        .btn-interact:active { transform: scale(0.92); opacity: 0.8; transition: 0.1s; }
+        .glass-card { background: var(--card); border: 1px solid rgba(255,255,255,0.04); border-radius: 24px; }
+        .confirming-pulse { animation: pulse 2s infinite; color: var(--trust-green); font-size: 10px; font-weight: 800; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(12px); z-index: 1000; align-items: flex-end; }
         .modal-overlay.active { display: flex; }
-        .modal-sheet { width: 100%; border-radius: 32px 32px 0 0; transform: translateY(100%); transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .modal-sheet { background: #141414; width: 100%; border-radius: 32px 32px 0 0; padding: 24px; transform: translateY(100%); transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); border-top: 1px solid rgba(255,255,255,0.08); }
         .modal-overlay.active .modal-sheet { transform: translateY(0); }
+        .balance-gradient { background: linear-gradient(180deg, #FFFFFF 0%, #999999 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     </style>
 </head>
-<body class="bg-lightBg dark:bg-black text-gray-900 dark:text-white select-none pb-safe">
+<body class="select-none pb-safe">
 
-    <div id="toast" class="fixed top-12 left-1/2 -translate-x-1/2 z-[2000] bg-gray-900 dark:bg-white text-white dark:text-black px-6 py-3 rounded-full font-bold text-sm shadow-2xl opacity-0 transition-all duration-300 pointer-events-none"></div>
+    <div id="toast" class="fixed top-12 left-1/2 -translate-x-1/2 z-[2000] bg-white text-black px-6 py-3 rounded-full font-bold text-sm shadow-2xl opacity-0 translate-y-[-20px] transition-all duration-300 pointer-events-none"></div>
 
-    <div class="max-w-md mx-auto min-h-screen flex flex-col px-4">
-        <header class="flex justify-between items-center py-6">
-            <button onclick="toggleTheme()" class="w-10 h-10 rounded-full bg-white dark:bg-darkCard flex items-center justify-center btn-interact shadow-sm">
-                <i id="theme-icon" class="fa-solid fa-moon text-sm"></i>
-            </button>
-            <div class="bg-white dark:bg-darkCard px-4 py-1.5 rounded-full flex items-center space-x-2 shadow-sm">
-                <span class="text-xs font-bold">Ruitha's Wallet</span>
-                <i class="fa-regular fa-copy text-[10px] opacity-40"></i>
+    <div class="max-w-md mx-auto min-h-screen flex flex-col px-6">
+        <header class="flex justify-between items-center py-8">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/30">
+                    <i class="fa-solid fa-shield-check text-sm"></i>
+                </div>
+                <div>
+                    <span class="text-[10px] font-black text-blue-500 uppercase tracking-widest leading-none">Main Wallet</span>
+                    <h2 class="text-sm font-extrabold flex items-center">Vault-01 <i class="fa-solid fa-chevron-down text-[10px] ml-1.5 opacity-30"></i></h2>
+                </div>
             </div>
-            <div class="w-10 h-10 rounded-full bg-white dark:bg-darkCard flex items-center justify-center shadow-sm">
-                <i class="fa-solid fa-expand text-sm"></i>
+            <div class="flex space-x-5 text-gray-500">
+                <i class="fa-solid fa-bell text-lg btn-interact"></i>
+                <i onclick="clearData()" class="fa-solid fa-circle-nodes text-lg text-red-900/40 btn-interact"></i>
             </div>
         </header>
 
-        <section class="grid grid-cols-4 gap-4 my-4">
-            <div class="flex flex-col items-center space-y-2" onclick="openModal('Withdraw')">
-                <div class="w-14 h-14 bg-white dark:bg-darkCard rounded-2xl flex items-center justify-center shadow-sm btn-interact"><i class="fa-solid fa-arrow-up text-xl"></i></div>
-                <span class="text-xs font-bold text-gray-500">Send</span>
-            </div>
-            <div class="flex flex-col items-center space-y-2">
-                <div class="w-14 h-14 bg-white dark:bg-darkCard rounded-2xl flex items-center justify-center shadow-sm btn-interact"><i class="fa-solid fa-arrow-down text-xl"></i></div>
-                <span class="text-xs font-bold text-gray-500">Receive</span>
-            </div>
-            <div class="flex flex-col items-center space-y-2">
-                <div class="w-14 h-14 bg-white dark:bg-darkCard rounded-2xl flex items-center justify-center shadow-sm btn-interact"><i class="fa-solid fa-rotate text-xl"></i></div>
-                <span class="text-xs font-bold text-gray-500">Swap</span>
-            </div>
-            <div class="flex flex-col items-center space-y-2" onclick="openModal('Deposit')">
-                <div class="w-14 h-14 bg-white dark:bg-darkCard rounded-2xl flex items-center justify-center shadow-sm btn-interact"><i class="fa-solid fa-plus text-xl"></i></div>
-                <span class="text-xs font-bold text-gray-500">Buy</span>
+        <section class="text-center my-4">
+            <p class="text-gray-500 text-xs font-bold uppercase tracking-widest mb-2">Total Balance</p>
+            <h1 id="total-usd" class="text-5xl font-extrabold tracking-tight balance-gradient tabular-nums mb-10">$0.00</h1>
+            
+            <div class="flex justify-between px-2">
+                <div class="flex flex-col items-center space-y-2" onclick="openModal('Deposit')">
+                    <div class="w-14 h-14 bg-white text-black rounded-full flex items-center justify-center text-xl btn-interact"><i class="fa-solid fa-plus"></i></div>
+                    <span class="text-[11px] font-black text-gray-400">BUY</span>
+                </div>
+                <div class="flex flex-col items-center space-y-2" onclick="openModal('Withdraw')">
+                    <div class="w-14 h-14 bg-zinc-900 rounded-full flex items-center justify-center text-xl btn-interact"><i class="fa-solid fa-arrow-up"></i></div>
+                    <span class="text-[11px] font-black text-gray-400">SEND</span>
+                </div>
+                <div class="flex flex-col items-center space-y-2">
+                    <div class="w-14 h-14 bg-zinc-900 rounded-full flex items-center justify-center text-xl btn-interact"><i class="fa-solid fa-arrow-down"></i></div>
+                    <span class="text-[11px] font-black text-gray-400">RECEIVE</span>
+                </div>
+                <div class="flex flex-col items-center space-y-2">
+                    <div class="w-14 h-14 bg-zinc-900 rounded-full flex items-center justify-center text-xl btn-interact"><i class="fa-solid fa-shuffle"></i></div>
+                    <span class="text-[11px] font-black text-gray-400">SWAP</span>
+                </div>
             </div>
         </section>
 
-        <div class="flex space-x-6 mt-6 border-b border-gray-200 dark:border-white/5 overflow-x-auto whitespace-nowrap scrollbar-hide">
-            <button class="pb-3 border-b-2 border-brand text-sm font-extrabold text-gray-900 dark:text-white">Crypto</button>
-            <button class="pb-3 text-sm font-bold text-gray-400">Watchlist</button>
-            <button class="pb-3 text-sm font-bold text-gray-400">NFTs</button>
-            <i class="fa-solid fa-clock-rotate-left text-gray-400 self-center ml-auto pb-3"></i>
+        <div id="asset-list" class="mt-8 space-y-2">
+            <div class="shimmer h-20 w-full rounded-3xl opacity-20"></div>
         </div>
 
-        <div id="asset-list" class="mt-6 space-y-1"></div>
-
-        <button class="w-full py-4 text-brand font-bold text-sm flex items-center justify-center space-x-2 opacity-80">
-            <i class="fa-solid fa-plus text-xs"></i> <span>Add tokens</span>
-        </button>
-
-        <section class="mt-8 mb-32">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="font-extrabold text-lg">Activity</h3>
-                <i class="fa-solid fa-chevron-right text-xs opacity-30"></i>
-            </div>
-            <div id="tx-history" class="space-y-3"></div>
+        <section class="mt-10 mb-32">
+            <h3 class="font-black text-gray-600 text-[10px] uppercase tracking-[2px] mb-6">Network Activity</h3>
+            <div id="tx-history" class="space-y-4"></div>
         </section>
 
-        <nav class="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-black/90 backdrop-blur-xl border-t border-gray-200 dark:border-white/5 px-6 pt-3 pb-8 flex justify-between items-center z-50">
-            <div class="flex flex-col items-center space-y-1 text-brand"><i class="fa-solid fa-house text-xl"></i><span class="text-[10px] font-bold">Home</span></div>
-            <div class="flex flex-col items-center space-y-1 text-gray-400"><i class="fa-solid fa-arrow-trend-up text-xl"></i><span class="text-[10px] font-bold">Trending</span></div>
-            <div class="w-12 h-12 bg-brand rounded-full flex items-center justify-center text-black -mt-8 shadow-lg shadow-brand/20"><i class="fa-solid fa-right-left text-lg"></i></div>
-            <div class="flex flex-col items-center space-y-1 text-gray-400"><i class="fa-solid fa-gift text-xl"></i><span class="text-[10px] font-bold">Rewards</span></div>
-            <div class="flex flex-col items-center space-y-1 text-gray-400"><i class="fa-solid fa-compass text-xl"></i><span class="text-[10px] font-bold">Discover</span></div>
+        <nav class="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-2xl border-t border-white/5 px-10 pt-4 pb-10 flex justify-between items-center z-50">
+            <div class="flex flex-col items-center space-y-1 text-white"><i class="fa-solid fa-wallet text-xl"></i><span class="text-[10px] font-black">Wallet</span></div>
+            <div class="flex flex-col items-center space-y-1 text-gray-600"><i class="fa-solid fa-chart-pie text-xl"></i><span class="text-[10px] font-black">Market</span></div>
+            <div class="flex flex-col items-center space-y-1 text-gray-600"><i class="fa-solid fa-compass text-xl"></i><span class="text-[10px] font-black">DApps</span></div>
+            <div class="flex flex-col items-center space-y-1 text-gray-600"><i class="fa-solid fa-gear text-xl"></i><span class="text-[10px] font-black">Settings</span></div>
         </nav>
     </div>
 
     <div id="txModal" class="modal-overlay" onclick="if(event.target == this) closeModal()">
-        <div class="modal-sheet bg-white dark:bg-darkCard p-8 border-t border-gray-200 dark:border-white/10 shadow-2xl">
-            <div class="w-12 h-1 bg-gray-200 dark:bg-zinc-800 rounded-full mx-auto mb-8"></div>
-            <h2 id="modalTitle" class="text-2xl font-black mb-6">SELECT ASSET</h2>
-            <div class="space-y-4">
-                <select id="assetSelect" class="w-full bg-gray-100 dark:bg-black p-4 rounded-2xl font-bold outline-none appearance-none text-gray-900 dark:text-white">
-                    <option value="BTC">Bitcoin (BTC)</option>
-                    <option value="ETH">Ethereum (ETH)</option>
-                    <option value="SOL">Solana (SOL)</option>
-                    <option value="BNB">Binance (BNB)</option>
-                    <option value="USDT">Tether (USDT)</option>
-                </select>
-                <div class="bg-gray-100 dark:bg-black p-4 rounded-2xl">
-                    <div class="flex justify-between text-[10px] font-black text-gray-400 uppercase mb-2"><span>Network Delay</span><span id="timerVal" class="text-brand">30s</span></div>
-                    <input type="range" id="timerInput" min="5" max="300" value="30" class="w-full accent-brand" oninput="document.getElementById('timerVal').innerText = this.value + 's'">
+        <div class="modal-sheet">
+            <div class="w-12 h-1 bg-zinc-800 rounded-full mx-auto mb-10"></div>
+            <h2 id="modalTitle" class="text-3xl font-black mb-8 italic italic">TRANSACTION</h2>
+            <div class="space-y-6">
+                <div class="glass-card p-5">
+                    <select id="assetSelect" class="w-full bg-transparent py-2 text-xl font-bold outline-none border-none">
+                        <option value="BTC">Bitcoin (BTC)</option>
+                        <option value="USDT">Tether (USDT)</option>
+                        <option value="ETH">Ethereum (ETH)</option>
+                    </select>
                 </div>
-                <input type="number" id="txAmount" placeholder="0.00" class="w-full bg-transparent text-5xl font-black text-center outline-none py-4 text-gray-900 dark:text-white">
-                <button onclick="processTx()" class="w-full bg-brand text-black py-5 rounded-2xl font-extrabold text-lg btn-interact">CONFIRM TRANSACTION</button>
+                <div class="glass-card p-5">
+                    <div class="flex justify-between mb-4 text-[10px] font-black text-gray-500 uppercase"><span>Wait Time</span><span id="timerVal" class="text-blue-500">30s</span></div>
+                    <input type="range" id="timerInput" min="5" max="300" value="30" class="w-full accent-blue-600" oninput="document.getElementById('timerVal').innerText = this.value + 's'">
+                </div>
+                <div class="glass-card p-8">
+                    <input type="number" id="txAmount" placeholder="0.00" class="w-full bg-transparent text-6xl font-black text-center outline-none">
+                </div>
+                <button onclick="processTx()" class="w-full bg-blue-600 py-6 rounded-3xl font-black text-lg btn-interact">BROADCAST</button>
             </div>
         </div>
     </div>
 
     <script>
-        const DATA = {
-            ETH: { price: 2160, mcap: '29.9B', change: '+4.59%', icon: 'fa-ethereum', color: 'text-eth' },
-            SOL: { price: 91.5, mcap: '5.52B', change: '+5.31%', icon: 'fa-bolt', color: 'text-sol' },
-            BNB: { price: 638, mcap: '2.42B', change: '+1.63%', icon: 'fa-cube', color: 'text-bnb' },
-            BTC: { price: 70848, mcap: '54.1B', change: '+3.6%', icon: 'fa-bitcoin', color: 'text-btc' },
-            USDT: { price: 1, mcap: '100B', change: '0.00%', icon: 'fa-dollar-sign', color: 'text-brand' }
-        };
-
-        let state = JSON.parse(localStorage.getItem('vault_v8')) || { balances: { BTC: 0, ETH: 0, SOL: 0, BNB: 0, USDT: 0 }, history: [] };
+        const PRICES = { USDT: 1, BTC: 64200, ETH: 2450 };
+        let state = JSON.parse(localStorage.getItem('elite_vault_v6')) || { balances: { USDT: 0, BTC: 0, ETH: 0 }, history: [] };
         
-        function toggleTheme() {
-            const isDark = document.documentElement.classList.toggle('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            const icon = document.getElementById('theme-icon');
-            icon.className = isDark ? 'fa-solid fa-sun text-sm' : 'fa-solid fa-moon text-sm';
-            render();
+        setInterval(checkPendingTransactions, 1000);
+
+        function openModal(action) {
+            document.getElementById('modalTitle').innerText = action.toUpperCase();
+            document.getElementById('txModal').classList.add('active');
         }
 
-        window.addEventListener('load', () => {
-            const icon = document.getElementById('theme-icon');
-            icon.className = document.documentElement.classList.contains('dark') ? 'fa-solid fa-sun text-sm' : 'fa-solid fa-moon text-sm';
-        });
-
-        setInterval(checkPendingTransactions, 1000);
-        function openModal(action) { document.getElementById('modalTitle').innerText = action + ' ASSET'; document.getElementById('txModal').classList.add('active'); }
         function closeModal() { document.getElementById('txModal').classList.remove('active'); }
-        function showToast(msg) { const t = document.getElementById('toast'); t.innerText = msg; t.style.opacity = "1"; setTimeout(() => { t.style.opacity = "0"; }, 3000); }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg; t.style.opacity = "1"; t.style.transform = "translate(-50%, 20px)";
+            setTimeout(() => { t.style.opacity = "0"; t.style.transform = "translate(-50%, -20px)"; }, 3000);
+        }
 
         function processTx() {
             const coin = document.getElementById('assetSelect').value;
@@ -172,8 +140,8 @@
             const seconds = parseInt(document.getElementById('timerInput').value);
             if(!amt || amt <= 0) return;
             const now = Date.now();
-            state.history.push({ id: now, type: document.getElementById('modalTitle').innerText.split(' ')[0], coin, amt, status: 'pending', date: 'Just now', finishAt: now + (seconds * 1000) });
-            save(); closeModal();
+            state.history.push({ id: now, type: document.getElementById('modalTitle').innerText.split(' ')[0], coin, amt, status: 'pending', date: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), finishAt: now + (seconds * 1000) });
+            save(); closeModal(); document.getElementById('txAmount').value = ''; showToast("Transaction Broadcasted");
         }
 
         function checkPendingTransactions() {
@@ -182,62 +150,35 @@
                 if (tx.status === 'pending' && now >= tx.finishAt) {
                     tx.status = 'confirmed';
                     state.balances[tx.coin] += (tx.type === 'DEPOSIT' || tx.type === 'BUY' ? tx.amt : -tx.amt);
-                    changed = true;
-                    showToast("Transaction Finalized");
+                    showToast(`${tx.coin} Confirmed`); changed = true;
                 }
             });
             if (changed) save(); else render();
         }
 
-        function save() { localStorage.setItem('vault_v8', JSON.stringify(state)); render(); }
+        function save() { localStorage.setItem('elite_vault_v6', JSON.stringify(state)); render(); }
 
         function render() {
-            const list = document.getElementById('asset-list');
-            list.innerHTML = '';
-            for(let coin in DATA) {
-                const info = DATA[coin];
-                const bal = state.balances[coin] || 0;
-                list.innerHTML += `
-                <div class="flex justify-between items-center py-4 border-b border-gray-200 dark:border-white/[0.03]">
-                    <div class="flex items-center space-x-4">
-                        <div class="w-11 h-11 bg-white dark:bg-darkCard rounded-full flex items-center justify-center text-lg ${info.color} shadow-sm">
-                            <i class="fa-brands ${info.icon}"></i>
-                        </div>
-                        <div>
-                            <div class="flex items-center space-x-2">
-                                <span class="font-extrabold text-sm text-gray-900 dark:text-white">${coin}</span>
-                                <span class="text-[10px] font-bold text-gray-400">$${info.mcap}</span>
-                            </div>
-                            <span class="text-[10px] font-bold text-gray-500">${bal > 0 ? bal.toLocaleString() + ' ' + coin : ''}</span>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-bold text-sm text-gray-900 dark:text-white">$${info.price.toLocaleString()}</p>
-                        <p class="text-[10px] font-black text-brand">${info.change}</p>
-                    </div>
-                </div>`;
+            let total = 0; const assetDiv = document.getElementById('asset-list'); assetDiv.innerHTML = '';
+            for(let c in state.balances) {
+                const val = state.balances[c] * PRICES[c]; total += val;
+                assetDiv.innerHTML += `<div class="glass-card p-5 flex justify-between items-center mb-3"><div class="flex items-center space-x-4"><div class="w-11 h-11 bg-black rounded-full flex items-center justify-center font-black text-[10px] border border-white/5">${c}</div><div><p class="font-extrabold text-sm">${c}</p><p class="text-[10px] text-gray-500">$${PRICES[c].toLocaleString()}</p></div></div><div class="text-right"><p class="font-black text-sm">${state.balances[c].toLocaleString()}</p><p class="text-[10px] text-gray-500">$${val.toLocaleString()}</p></div></div>`;
             }
-
+            document.getElementById('total-usd').innerText = `$${total.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
             const hist = document.getElementById('tx-history');
-            hist.innerHTML = '';
-            state.history.slice(-3).reverse().forEach(tx => {
+            hist.innerHTML = state.history.length ? '' : '<div class="py-12 text-center opacity-10 text-[10px] font-black">SECURE CONNECTION</div>';
+            state.history.slice(-5).reverse().forEach(tx => {
                 const isPending = tx.status === 'pending';
-                hist.innerHTML += `
-                <div class="bg-white dark:bg-darkCard p-4 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-tighter">${tx.type} Request</span>
-                        <span class="text-[10px] font-bold ${isPending ? 'text-orange-500 animate-pulse' : 'text-brand'}">${tx.status.toUpperCase()}</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <div class="flex items-center space-x-3 text-gray-900 dark:text-white">
-                            <div class="w-8 h-8 bg-gray-100 dark:bg-black rounded-full flex items-center justify-center text-xs"><i class="fa-brands ${DATA[tx.coin].icon}"></i></div>
-                            <span class="font-black text-sm">${tx.amt} ${tx.coin}</span>
-                        </div>
-                        <i class="fa-solid fa-chevron-right text-[10px] opacity-20"></i>
-                    </div>
-                </div>`;
+                let subtext = isPending ? `CONFIRMING ${Math.min(3, Math.floor(((Date.now()-tx.id)/(tx.finishAt-tx.id))*3)+1)}/3` : 'FINALIZED';
+                hist.innerHTML += `<div class="flex justify-between items-center py-2"><div class="flex items-center space-x-4"><div class="w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center border border-white/5"><i class="fa-solid ${tx.type==='DEPOSIT'?'fa-arrow-down text-green-500':'fa-arrow-up text-blue-500'} text-[10px]"></i></div><div><p class="text-[11px] font-black uppercase">${tx.type} ${tx.coin}</p><p class="text-[9px] text-gray-500">${tx.date}</p></div></div><div class="text-right"><p class="text-sm font-black ${isPending ? 'text-gray-500' : 'text-white'}">${tx.amt.toLocaleString()}</p><p class="${isPending ? 'confirming-pulse' : 'text-[9px] text-gray-600 font-black italic'}">${subtext}</p></div></div>`;
             });
         }
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js'); });
+        }
+
+        function clearData() { if(confirm("Purge Storage?")) { localStorage.clear(); location.reload(); } }
         render();
     </script>
 </body>
