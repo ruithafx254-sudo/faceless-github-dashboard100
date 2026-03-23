@@ -3,194 +3,187 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Vault Pro | Multi-Chain</title>
+    <title>Nexus Vault | Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        :root { --bg: #05070a; --card: #12141a; --accent: #3b82f6; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: white; overflow-x: hidden; }
         
-        :root { --bg: #0b0e11; --card: #181a20; --accent: #3b82f6; --text-sec: #848e9c; }
+        .app-shell { max-width: 430px; margin: 0 auto; min-height: 100vh; position: relative; background: var(--bg); }
         
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: white; -webkit-tap-highlight-color: transparent; }
-        .app-container { max-width: 450px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
+        /* Glass & Shadows */
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .haptic:active { transform: scale(0.96); opacity: 0.9; }
         
-        /* Smooth interactions */
-        .btn-press:active { transform: scale(0.95); opacity: 0.8; }
-        .glass-card { background: var(--card); border: 1px solid rgba(255,255,255,0.05); }
-        
-        /* Modals */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; align-items: flex-end; }
+        /* Modal Animation */
+        .modal { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.85); align-items: flex-end; }
         .modal.active { display: flex; }
-        .modal-content { background: var(--card); width: 100%; border-radius: 2rem 2rem 0 0; padding: 2rem; transform: translateY(100%); transition: 0.3s ease-out; }
-        .modal.active .modal-content { transform: translateY(0); }
-        
-        .tab-active { color: #3b82f6; }
+        .modal-sheet { background: #1c1f26; width: 100%; border-radius: 2.5rem 2.5rem 0 0; padding: 2rem; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.33, 1, 0.68, 1); }
+        .modal.active .modal-sheet { transform: translateY(0); }
+
+        /* Price Flicker Effect */
+        .price-up { color: #10b981; animation: flash-green 1s; }
+        .price-down { color: #ef4444; animation: flash-red 1s; }
+        @keyframes flash-green { from { background: rgba(16, 185, 129, 0.2); } to { background: transparent; } }
+        @keyframes flash-red { from { background: rgba(239, 68, 68, 0.2); } to { background: transparent; } }
     </style>
 </head>
 <body>
 
-    <div class="app-container px-5 pt-8 pb-32">
+    <div class="app-shell px-6 pt-12 pb-32">
         
-        <header class="flex justify-between items-center mb-8">
+        <div class="flex justify-between items-center mb-10">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center border-2 border-white/10">
-                    <i class="fa-solid fa-user text-sm"></i>
+                <div class="w-11 h-11 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
+                    <i class="fa-solid fa-bolt-lightning text-white text-lg"></i>
                 </div>
                 <div>
-                    <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-none mb-1">Secure Vault</p>
-                    <h2 class="text-sm font-bold">Wallet 1 <i class="fa-solid fa-chevron-down text-[10px] ml-1 opacity-50"></i></h2>
+                    <h2 class="text-sm font-extrabold tracking-tight">Personal Wallet</h2>
+                    <p class="text-[10px] text-blue-400 font-bold uppercase tracking-widest">Multi-Chain Active</p>
                 </div>
             </div>
-            <div class="flex space-x-5 text-gray-400">
-                <i class="fa-solid fa-expand text-lg"></i>
-                <i class="fa-solid fa-bell text-lg"></i>
+            <div class="flex space-x-4 opacity-60">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <i class="fa-solid fa-ellipsis-vertical"></i>
             </div>
-        </header>
+        </div>
 
-        <section class="text-center mb-10">
-            <p class="text-gray-400 text-sm font-medium mb-1">Total Balance</p>
-            <h1 id="total-usd" class="text-4xl font-extrabold tracking-tight mb-8">$0.00</h1>
+        <div class="relative overflow-hidden glass rounded-[2.5rem] p-8 mb-10 text-center">
+            <p class="text-gray-500 text-xs font-bold uppercase tracking-widest mb-2">Portfolio Value</p>
+            <h1 id="total-usd" class="text-5xl font-extrabold tracking-tighter mb-8 tabular-nums">$0.00</h1>
             
-            <div class="flex justify-center space-x-10">
-                <button onclick="openModal('txModal', 'Buy')" class="btn-press flex flex-col items-center space-y-2">
-                    <div class="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-plus"></i></div>
-                    <span class="text-xs font-bold">Buy</span>
+            <div class="flex justify-around">
+                <button onclick="openAction('Buy')" class="haptic flex flex-col items-center space-y-2">
+                    <div class="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center text-xl shadow-xl shadow-blue-600/20"><i class="fa-solid fa-plus"></i></div>
+                    <span class="text-[11px] font-bold opacity-80">Buy</span>
                 </button>
-                <button onclick="openModal('txModal', 'Send')" class="btn-press flex flex-col items-center space-y-2">
-                    <div class="w-14 h-14 bg-gray-800 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-arrow-up"></i></div>
-                    <span class="text-xs font-bold">Send</span>
+                <button onclick="openAction('Send')" class="haptic flex flex-col items-center space-y-2">
+                    <div class="w-14 h-14 bg-white/5 rounded-full flex items-center justify-center text-xl border border-white/10"><i class="fa-solid fa-arrow-up"></i></div>
+                    <span class="text-[11px] font-bold opacity-80">Send</span>
                 </button>
-                <button class="btn-press flex flex-col items-center space-y-2">
-                    <div class="w-14 h-14 bg-gray-800 rounded-full flex items-center justify-center text-xl"><i class="fa-solid fa-arrow-down-long"></i></div>
-                    <span class="text-xs font-bold">Receive</span>
+                <button class="haptic flex flex-col items-center space-y-2">
+                    <div class="w-14 h-14 bg-white/5 rounded-full flex items-center justify-center text-xl border border-white/10"><i class="fa-solid fa-qrcode"></i></div>
+                    <span class="text-[11px] font-bold opacity-80">Receive</span>
                 </button>
             </div>
-        </section>
+        </div>
 
-        <section class="space-y-4 mb-10">
-            <div class="flex justify-between items-end mb-2">
-                <h3 class="font-bold text-lg">Assets</h3>
-                <span class="text-xs text-blue-500 font-bold">See All</span>
+        <div class="space-y-4 mb-10">
+            <div class="flex justify-between items-center px-2">
+                <h3 class="font-extrabold text-lg">My Assets</h3>
+                <i class="fa-solid fa-chart-line text-blue-500"></i>
             </div>
-            
-            <div id="asset-list" class="space-y-3">
+            <div id="asset-container" class="space-y-3">
                 </div>
-        </section>
+        </div>
 
-        <section>
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="font-bold">Recent Transactions</h3>
-                <button onclick="clearData()" class="text-[10px] text-red-500 font-bold opacity-50">RESET</button>
-            </div>
-            <div id="tx-history" class="space-y-4">
+        <div class="px-2">
+            <h3 class="font-extrabold text-lg mb-4">Activity</h3>
+            <div id="activity-list" class="space-y-5">
                 </div>
-        </section>
+        </div>
 
     </div>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-[#181a20]/95 backdrop-blur-xl border-t border-white/5 px-8 py-5 flex justify-between items-center z-50">
-        <div class="flex flex-col items-center space-y-1 tab-active"><i class="fa-solid fa-wallet text-xl"></i><span class="text-[10px] font-bold">Wallet</span></div>
-        <div class="flex flex-col items-center space-y-1 text-gray-500"><i class="fa-solid fa-repeat text-xl"></i><span class="text-[10px] font-bold">Swap</span></div>
-        <div class="flex flex-col items-center space-y-1 text-gray-500"><i class="fa-solid fa-compass text-xl"></i><span class="text-[10px] font-bold">Discover</span></div>
-        <div class="flex flex-col items-center space-y-1 text-gray-500"><i class="fa-solid fa-clock-rotate-left text-xl"></i><span class="text-[10px] font-bold">History</span></div>
+    <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] glass border-t-0 rounded-t-[2.5rem] px-10 py-6 flex justify-between items-center z-50">
+        <i class="fa-solid fa-wallet text-blue-500 text-xl"></i>
+        <i class="fa-solid fa-arrow-right-arrow-left text-gray-500 text-xl"></i>
+        <i class="fa-solid fa-compass text-gray-500 text-xl"></i>
+        <i class="fa-solid fa-clock-rotate-left text-gray-500 text-xl"></i>
     </nav>
 
-    <div id="txModal" class="modal" onclick="if(event.target == this) closeModal('txModal')">
-        <div class="modal-content">
-            <div class="w-12 h-1 bg-gray-700 rounded-full mx-auto mb-6"></div>
-            <h2 id="modalTitle" class="text-2xl font-bold mb-6">Action</h2>
+    <div id="actionModal" class="modal" onclick="if(event.target == this) closeAction()">
+        <div class="modal-sheet">
+            <div class="w-12 h-1.5 bg-gray-700 rounded-full mx-auto mb-8"></div>
+            <h2 id="actionTitle" class="text-2xl font-black mb-6 tracking-tight">Action</h2>
             
             <div class="space-y-5">
-                <div>
-                    <label class="text-[10px] font-bold text-gray-500 uppercase">Select Asset</label>
-                    <select id="assetSelect" class="w-full bg-gray-800 p-4 rounded-xl mt-2 outline-none border border-gray-700">
-                        <option value="SOL">Solana (SOL)</option>
-                        <option value="ETH">Ethereum (ETH)</option>
-                        <option value="BTC">Bitcoin (BTC)</option>
-                    </select>
-                </div>
-                <div id="addrField" class="hidden">
-                    <label class="text-[10px] font-bold text-gray-500 uppercase">Recipient Address</label>
-                    <input type="text" id="targetAddr" placeholder="0x... / Address" class="w-full bg-gray-800 p-4 rounded-xl mt-2 outline-none border border-gray-700 text-sm font-mono">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-gray-500 uppercase">Amount</label>
-                    <input type="number" id="txAmount" placeholder="0.00" class="w-full bg-gray-800 p-4 rounded-xl mt-2 outline-none border border-gray-700 text-2xl font-bold">
-                </div>
-                <button onclick="executeTransaction()" class="w-full bg-blue-600 py-4 rounded-2xl font-bold text-lg mt-4 shadow-xl shadow-blue-900/40">Confirm Transaction</button>
+                <select id="coinSelect" class="w-full bg-gray-900/50 p-5 rounded-2xl outline-none border border-white/10 font-bold">
+                    <option value="USDT">Tether (USDT)</option>
+                    <option value="SOL">Solana (SOL)</option>
+                    <option value="ETH">Ethereum (ETH)</option>
+                    <option value="BTC">Bitcoin (BTC)</option>
+                </select>
+                <input type="text" id="addressInput" placeholder="Recipient Wallet Address" class="hidden w-full bg-gray-900/50 p-5 rounded-2xl outline-none border border-white/10 text-sm font-mono">
+                <input type="number" id="amountInput" placeholder="0.00" class="w-full bg-gray-900/50 p-5 rounded-2xl outline-none border border-white/10 text-3xl font-black tabular-nums">
+                
+                <button onclick="confirmTransaction()" class="w-full bg-blue-600 py-5 rounded-2xl font-black text-lg shadow-2xl shadow-blue-600/30 haptic mt-4">Confirm</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Real-time fake prices
-        const PRICES = { SOL: 145.20, ETH: 2450.00, BTC: 64200.00 };
-        
-        let state = JSON.parse(localStorage.getItem('vaultData')) || {
-            balances: { SOL: 0, ETH: 0, BTC: 0 },
+        const COINS = {
+            USDT: { name: 'Tether', icon: 'fa-dollar-sign', color: 'bg-green-500', price: 1.00 },
+            SOL: { name: 'Solana', icon: 'fa-s', color: 'bg-black', price: 148.25 },
+            ETH: { name: 'Ethereum', icon: 'fa-brands fa-ethereum', color: 'bg-indigo-500', price: 2640.10 },
+            BTC: { name: 'Bitcoin', icon: 'fa-brands fa-bitcoin', color: 'bg-orange-500', price: 68420.50 }
+        };
+
+        let db = JSON.parse(localStorage.getItem('nexus_vault')) || {
+            balances: { USDT: 0, SOL: 0, ETH: 0, BTC: 0 },
             history: []
         };
 
-        let activeAction = '';
+        let currentAction = '';
 
-        function openModal(id, action) {
-            activeAction = action;
-            document.getElementById('modalTitle').innerText = action + " Crypto";
-            document.getElementById('addrField').className = (action === 'Send') ? 'block' : 'hidden';
-            document.getElementById(id).classList.add('active');
+        function openAction(type) {
+            currentAction = type;
+            document.getElementById('actionTitle').innerText = type + " Assets";
+            document.getElementById('addressInput').style.display = (type === 'Send') ? 'block' : 'none';
+            document.getElementById('actionModal').classList.add('active');
         }
 
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-
-        function save() {
-            localStorage.setItem('vaultData', JSON.stringify(state));
-            render();
-        }
+        function closeAction() { document.getElementById('actionModal').classList.remove('active'); }
 
         function render() {
-            // Calculate Total USD
             let total = 0;
-            for(let coin in state.balances) { total += state.balances[coin] * PRICES[coin]; }
-            document.getElementById('total-usd').innerText = `$${total.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            const container = document.getElementById('asset-container');
+            container.innerHTML = '';
 
-            // Render Assets
-            const assetList = document.getElementById('asset-list');
-            assetList.innerHTML = '';
-            for(let coin in state.balances) {
-                const usd = (state.balances[coin] * PRICES[coin]).toLocaleString();
-                assetList.innerHTML += `
-                    <div class="glass-card p-4 rounded-2xl flex justify-between items-center">
+            for(let key in COINS) {
+                const bal = db.balances[key];
+                const usd = bal * COINS[key].price;
+                total += usd;
+
+                container.innerHTML += `
+                    <div class="glass p-5 rounded-3xl flex justify-between items-center">
                         <div class="flex items-center space-x-4">
-                            <div class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center font-bold text-xs">${coin}</div>
+                            <div class="w-12 h-12 ${COINS[key].color} rounded-2xl flex items-center justify-center text-white shadow-lg">
+                                <i class="fa-solid ${COINS[key].icon}"></i>
+                            </div>
                             <div>
-                                <p class="font-bold text-sm">${coin === 'SOL' ? 'Solana' : coin === 'ETH' ? 'Ethereum' : 'Bitcoin'}</p>
-                                <p class="text-[10px] text-gray-500 font-bold">$${PRICES[coin].toLocaleString()}</p>
+                                <p class="font-black text-sm">${COINS[key].name}</p>
+                                <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">$${COINS[key].price.toLocaleString()}</p>
                             </div>
                         </div>
                         <div class="text-right">
-                            <p class="text-sm font-bold">${state.balances[coin].toFixed(4)} ${coin}</p>
-                            <p class="text-[10px] text-gray-400 font-bold">$${usd}</p>
+                            <p class="font-black text-sm tabular-nums">${bal.toFixed(bal > 0 ? 4 : 2)} ${key}</p>
+                            <p class="text-[10px] font-bold text-gray-400">$${usd.toLocaleString(undefined, {minimumFractionDigits: 2})}</p>
                         </div>
                     </div>
                 `;
             }
 
-            // Render History
-            const hist = document.getElementById('tx-history');
-            hist.innerHTML = state.history.length ? '' : '<p class="text-center text-gray-600 text-xs py-10">No history</p>';
-            state.history.slice(-5).reverse().forEach(tx => {
+            document.getElementById('total-usd').innerText = `$${total.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+
+            const hist = document.getElementById('activity-list');
+            hist.innerHTML = db.history.length ? '' : '<p class="text-center text-gray-600 text-[10px] font-bold py-8 uppercase tracking-widest">No recent moves</p>';
+            db.history.slice(-4).reverse().forEach(tx => {
                 hist.innerHTML += `
-                    <div class="flex justify-between items-center">
+                    <div class="flex justify-between items-center opacity-80">
                         <div class="flex items-center space-x-4">
-                            <div class="w-10 h-10 rounded-xl bg-gray-900 border border-white/5 flex items-center justify-center text-xs">
-                                <i class="fa-solid ${tx.type === 'Buy' ? 'fa-plus text-green-500' : 'fa-arrow-up text-blue-500'}"></i>
+                            <div class="w-9 h-9 bg-white/5 rounded-xl flex items-center justify-center text-xs">
+                                <i class="fa-solid ${tx.type === 'Buy' ? 'fa-arrow-down-long text-green-400' : 'fa-arrow-up-long text-blue-400'}"></i>
                             </div>
                             <div>
                                 <p class="text-xs font-bold">${tx.type} ${tx.coin}</p>
-                                <p class="text-[9px] text-gray-500 uppercase font-bold">${tx.date}</p>
+                                <p class="text-[9px] font-bold text-gray-600 uppercase">${tx.time}</p>
                             </div>
                         </div>
-                        <p class="text-xs font-extrabold ${tx.type === 'Buy' ? 'text-green-500' : 'text-white'}">
+                        <p class="text-xs font-black ${tx.type === 'Buy' ? 'text-green-400' : 'text-white'}">
                             ${tx.type === 'Buy' ? '+' : '-'}${tx.amt} ${tx.coin}
                         </p>
                     </div>
@@ -198,37 +191,34 @@
             });
         }
 
-        function executeTransaction() {
-            const coin = document.getElementById('assetSelect').value;
-            const amt = parseFloat(document.getElementById('txAmount').value);
-            
-            if(isNaN(amt) || amt <= 0) return alert("Enter valid amount");
-            
-            if(activeAction === 'Send') {
-                if(state.balances[coin] < amt) return alert("Insufficient balance");
-                state.balances[coin] -= amt;
-            } else {
-                state.balances[coin] += amt;
-            }
+        function confirmTransaction() {
+            const coin = document.getElementById('coinSelect').value;
+            const amt = parseFloat(document.getElementById('amountInput').value);
 
-            state.history.push({
-                type: activeAction,
+            if(!amt || amt <= 0) return;
+            if(currentAction === 'Send' && db.balances[coin] < amt) return alert("Insufficient balance");
+
+            db.balances[coin] += (currentAction === 'Buy' ? amt : -amt);
+            db.history.push({
+                type: currentAction,
                 coin: coin,
                 amt: amt,
-                date: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
             });
 
-            save();
-            closeModal('txModal');
-            document.getElementById('txAmount').value = '';
+            localStorage.setItem('nexus_vault', JSON.stringify(db));
+            render();
+            closeAction();
+            document.getElementById('amountInput').value = '';
         }
 
-        function clearData() {
-            if(confirm("Wipe all data?")) {
-                localStorage.removeItem('vaultData');
-                location.reload();
-            }
-        }
+        // Fake live price movement
+        setInterval(() => {
+            const el = document.getElementById('total-usd');
+            const direction = Math.random() > 0.5 ? 1 : -1;
+            el.classList.add(direction > 0 ? 'price-up' : 'price-down');
+            setTimeout(() => el.classList.remove('price-up', 'price-down'), 1000);
+        }, 5000);
 
         render();
     </script>
