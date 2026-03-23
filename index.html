@@ -3,181 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusPay | Digital Wallet</title>
+    <title>Nexus Vault | Multi-Chain</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
         .modal.active { display: flex; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
     </style>
 </head>
-<body>
+<body class="pb-10">
 
-    <nav class="bg-white border-b border-gray-200 px-8 py-4 flex justify-between items-center sticky top-0 z-50">
-        <div class="flex items-center space-x-10">
-            <div class="text-2xl font-bold text-blue-600 tracking-tighter">NEXUS<span class="text-gray-900">PAY</span></div>
-            <div class="hidden md:flex space-x-6 text-gray-600 font-medium text-sm">
-                <a href="#" class="text-blue-600">Wallet</a>
-                <a href="#" class="hover:text-blue-600">Swap</a>
-                <a href="#" class="hover:text-blue-600">Staking</a>
+    <nav class="max-w-lg mx-auto px-6 py-6 flex justify-between items-center sticky top-0 z-50 bg-[#0f172a]/80 backdrop-blur-md">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <i class="fa-solid fa-shield-halved text-white"></i>
+            </div>
+            <div>
+                <h1 class="text-sm font-bold tracking-tight">Main Wallet</h1>
+                <div class="flex items-center text-[10px] text-green-400 font-bold uppercase tracking-widest">
+                    <span class="w-1.5 h-1.5 bg-green-400 rounded-full mr-1.5 animate-pulse"></span> Secured
+                </div>
             </div>
         </div>
-        <div class="flex items-center space-x-4">
-            <div class="bg-blue-50 px-3 py-1 rounded-full text-blue-600 text-xs font-bold border border-blue-100">Mainnet</div>
-            <i class="fa-solid fa-gear text-gray-400 cursor-pointer"></i>
+        <div class="flex space-x-4 text-slate-400">
+            <i class="fa-solid fa-qrcode cursor-pointer hover:text-white transition"></i>
+            <i class="fa-solid fa-gear cursor-pointer hover:text-white transition"></i>
         </div>
     </nav>
 
-    <main class="max-w-6xl mx-auto mt-8 px-4 grid grid-cols-1 lg:grid-cols-3 gap-8 pb-20">
+    <main class="max-w-lg mx-auto px-6 space-y-8">
         
-        <div class="lg:col-span-2 space-y-6">
-            <div class="bg-slate-900 p-8 rounded-[2rem] shadow-2xl text-white relative overflow-hidden">
-                <div class="relative z-10">
-                    <p class="text-slate-400 text-sm font-medium mb-1">Total Balance</p>
-                    <h1 id="main-balance" class="text-5xl font-bold tracking-tight mb-8">$12,450.80</h1>
-                    
-                    <div class="flex space-x-4">
-                        <button onclick="openModal('addModal')" class="flex-1 bg-blue-600 hover:bg-blue-500 py-3 rounded-2xl font-bold transition flex items-center justify-center space-x-2">
-                            <i class="fa-solid fa-plus"></i><span>Buy</span>
-                        </button>
-                        <button onclick="openModal('withdrawModal')" class="flex-1 bg-white/10 hover:bg-white/20 py-3 rounded-2xl font-bold transition flex items-center justify-center space-x-2">
-                            <i class="fa-solid fa-arrow-up"></i><span>Send</span>
-                        </button>
-                        <button class="w-14 bg-white/10 hover:bg-white/20 rounded-2xl flex items-center justify-center">
-                            <i class="fa-solid fa-qrcode"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="absolute -right-10 -top-10 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl"></div>
-            </div>
-
-            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="p-6 border-b border-gray-50 flex justify-between items-center">
-                    <h3 class="font-bold text-gray-800">Transactions</h3>
-                    <button class="text-gray-400 hover:text-blue-600 transition"><i class="fa-solid fa-sliders"></i></button>
-                </div>
-                <div id="transaction-list" class="divide-y divide-gray-50">
-                    <div class="p-6 flex justify-between items-center">
-                        <div class="flex items-center space-x-4">
-                            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center"><i class="fa-solid fa-arrow-down"></i></div>
-                            <div>
-                                <p class="font-bold text-gray-900">Received Bonus</p>
-                                <p class="text-xs text-gray-400">Mar 23, 2026 • Completed</p>
-                            </div>
+        <div class="relative overflow-hidden bg-gradient-to-br from-blue-700 to-indigo-900 p-8 rounded-[2.5rem] shadow-2xl shadow-blue-900/20">
+            <div class="relative z-10 text-center">
+                <p class="text-blue-100/70 text-xs font-semibold uppercase tracking-widest mb-2">Total Portfolio</p>
+                <h2 id="total-balance" class="text-4xl font-extrabold tracking-tighter mb-8">$0.00</h2>
+                
+                <div class="grid grid-cols-3 gap-4">
+                    <button onclick="openModal('addModal')" class="flex flex-col items-center space-y-2 group">
+                        <div class="w-12 h-12 bg-white/10 group-hover:bg-white/20 rounded-2xl flex items-center justify-center transition">
+                            <i class="fa-solid fa-plus text-white"></i>
                         </div>
-                        <p class="font-bold text-green-500">+$1,200.00</p>
-                    </div>
+                        <span class="text-[11px] font-bold text-blue-100">Buy</span>
+                    </button>
+                    <button onclick="openModal('withdrawModal')" class="flex flex-col items-center space-y-2 group">
+                        <div class="w-12 h-12 bg-white/10 group-hover:bg-white/20 rounded-2xl flex items-center justify-center transition">
+                            <i class="fa-solid fa-arrow-up text-white"></i>
+                        </div>
+                        <span class="text-[11px] font-bold text-blue-100">Send</span>
+                    </button>
+                    <button class="flex flex-col items-center space-y-2 group">
+                        <div class="w-12 h-12 bg-white/10 group-hover:bg-white/20 rounded-2xl flex items-center justify-center transition">
+                            <i class="fa-solid fa-arrow-down text-white"></i>
+                        </div>
+                        <span class="text-[11px] font-bold text-blue-100">Receive</span>
+                    </button>
                 </div>
             </div>
+            <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
         </div>
 
-        <div class="space-y-6">
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                <h3 class="font-bold text-gray-800 mb-4">Assets</h3>
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center text-white"><i class="fa-solid fa-coins"></i></div>
-                            <span class="font-bold text-sm">FakeCoin (NC)</span>
+        <section>
+            <h3 class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-4 px-2">Assets</h3>
+            <div class="space-y-3">
+                <div class="glass p-4 rounded-2xl flex justify-between items-center">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-10 h-10 bg-black rounded-full flex items-center justify-center border border-slate-700">
+                            <img src="https://cryptologos.cc/logos/solana-sol-logo.png" class="w-6" alt="SOL">
                         </div>
-                        <div class="text-right">
-                            <p class="text-sm font-bold">5,000.00</p>
-                            <p class="text-[10px] text-gray-400">$5,000.00</p>
+                        <div>
+                            <p class="font-bold text-sm">Solana</p>
+                            <p class="text-[10px] text-slate-500 font-bold uppercase">SOL <span class="text-green-400 ml-1">+2.4%</span></p>
                         </div>
+                    </div>
+                    <div class="text-right">
+                        <p id="sol-qty" class="text-sm font-bold">0.00 SOL</p>
+                        <p id="sol-val" class="text-[10px] text-slate-500 font-bold">$0.00</p>
+                    </div>
+                </div>
+
+                <div class="glass p-4 rounded-2xl flex justify-between items-center">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center border border-slate-700">
+                            <i class="fa-brands fa-ethereum text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-sm">Ethereum</p>
+                            <p class="text-[10px] text-slate-500 font-bold uppercase">ETH</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-bold">0.00 ETH</p>
+                        <p class="text-[10px] text-slate-500 font-bold">$0.00</p>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
+
+        <section>
+            <div class="flex justify-between items-center mb-4 px-2">
+                <h3 class="text-slate-400 text-xs font-bold uppercase tracking-widest">Recent Activity</h3>
+                <button onclick="clearHistory()" class="text-[10px] text-red-400 font-bold hover:underline">CLEAR ALL</button>
+            </div>
+            <div id="history-container" class="space-y-2">
+                </div>
+        </section>
+
     </main>
 
     <div id="addModal" class="modal">
-        <div class="bg-white p-8 rounded-[2.5rem] w-full max-w-md mx-4 shadow-2xl">
-            <h2 class="text-2xl font-bold mb-6">Add Funds</h2>
-            <div class="space-y-4">
-                <label class="block text-sm font-bold text-gray-500">Amount (USD)</label>
-                <input type="number" id="addAmount" placeholder="0.00" class="w-full p-4 bg-gray-100 rounded-2xl outline-none focus:ring-2 ring-blue-500 font-bold text-xl">
-                <button onclick="processAdd()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold mt-4">Confirm Deposit</button>
-                <button onclick="closeModal('addModal')" class="w-full text-gray-400 font-medium py-2">Cancel</button>
-            </div>
+        <div class="bg-slate-900 p-8 rounded-[2.5rem] w-full max-w-sm mx-4 border border-slate-800">
+            <h2 class="text-xl font-bold mb-6 flex items-center"><i class="fa-solid fa-circle-plus text-blue-500 mr-2"></i> Add SOL</h2>
+            <input type="number" id="addAmount" placeholder="Amount of SOL" class="w-full p-4 bg-slate-800 rounded-2xl outline-none focus:ring-2 ring-blue-500 font-bold mb-4 text-white">
+            <button onclick="processDeposit()" class="w-full bg-blue-600 py-4 rounded-2xl font-bold hover:bg-blue-500 transition shadow-lg shadow-blue-600/20">Confirm Buy</button>
+            <button onclick="closeModal('addModal')" class="w-full text-slate-500 text-sm mt-4">Close</button>
         </div>
     </div>
 
     <div id="withdrawModal" class="modal">
-        <div class="bg-white p-8 rounded-[2.5rem] w-full max-w-md mx-4 shadow-2xl">
-            <h2 class="text-2xl font-bold mb-2">Send Assets</h2>
-            <p class="text-gray-400 text-sm mb-6">Send funds to any wallet address</p>
-            <div class="space-y-4">
-                <label class="block text-sm font-bold text-gray-500">Recipient Address</label>
-                <input type="text" id="withdrawAddr" placeholder="0x..." class="w-full p-4 bg-gray-100 rounded-2xl outline-none focus:ring-2 ring-blue-500 text-sm font-mono">
-                
-                <label class="block text-sm font-bold text-gray-500">Amount</label>
-                <input type="number" id="withdrawAmount" placeholder="0.00" class="w-full p-4 bg-gray-100 rounded-2xl outline-none focus:ring-2 ring-blue-500 font-bold text-xl">
-                
-                <button onclick="processWithdraw()" class="w-full bg-gray-900 text-white py-4 rounded-2xl font-bold mt-4">Withdraw Now</button>
-                <button onclick="closeModal('withdrawModal')" class="w-full text-gray-400 font-medium py-2">Cancel</button>
-            </div>
+        <div class="bg-slate-900 p-8 rounded-[2.5rem] w-full max-w-sm mx-4 border border-slate-800">
+            <h2 class="text-xl font-bold mb-2 flex items-center"><i class="fa-solid fa-paper-plane text-indigo-500 mr-2"></i> Send SOL</h2>
+            <p class="text-slate-500 text-xs mb-6 font-medium">Network: Solana Mainnet Beta</p>
+            <input type="text" id="withdrawAddr" placeholder="Recipient Address" class="w-full p-4 bg-slate-800 rounded-2xl outline-none focus:ring-2 ring-indigo-500 text-xs font-mono mb-3 text-white">
+            <input type="number" id="withdrawAmount" placeholder="0.00 SOL" class="w-full p-4 bg-slate-800 rounded-2xl outline-none focus:ring-2 ring-indigo-500 font-bold mb-6 text-white">
+            <button onclick="processWithdraw()" class="w-full bg-white text-black py-4 rounded-2xl font-bold hover:bg-slate-200 transition">Send Assets</button>
+            <button onclick="closeModal('withdrawModal')" class="text-slate-500 text-sm block w-full mt-4">Cancel</button>
         </div>
     </div>
 
     <script>
-        let currentBalance = 12450.80;
+        const SOL_PRICE = 145.50; // Hardcoded fake price
+        let wallet = JSON.parse(localStorage.getItem('walletData')) || {
+            solBalance: 0,
+            history: []
+        };
+
+        function save() {
+            localStorage.setItem('walletData', JSON.stringify(wallet));
+            render();
+        }
 
         function openModal(id) { document.getElementById(id).classList.add('active'); }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-        function updateUI() {
-            document.getElementById('main-balance').innerText = `$${currentBalance.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-        }
+        function render() {
+            const usdVal = wallet.solBalance * SOL_PRICE;
+            document.getElementById('total-balance').innerText = `$${usdVal.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            document.getElementById('sol-qty').innerText = `${wallet.solBalance.toFixed(2)} SOL`;
+            document.getElementById('sol-val').innerText = `$${usdVal.toLocaleString()}`;
 
-        function addTransaction(title, amount, isPositive) {
-            const list = document.getElementById('transaction-list');
-            const date = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            const html = `
-                <div class="p-6 flex justify-between items-center animate-fade-in">
-                    <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 ${isPositive ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'} rounded-2xl flex items-center justify-center">
-                            <i class="fa-solid ${isPositive ? 'fa-arrow-down' : 'fa-arrow-up'}"></i>
+            const container = document.getElementById('history-container');
+            container.innerHTML = wallet.history.length ? '' : '<p class="text-center text-slate-600 text-xs py-10">No transactions yet</p>';
+            
+            wallet.history.forEach((tx) => {
+                const html = `
+                    <div class="glass p-4 rounded-2xl flex justify-between items-center opacity-90">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 ${tx.type === 'in' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'} rounded-lg flex items-center justify-center text-xs">
+                                <i class="fa-solid ${tx.type === 'in' ? 'fa-arrow-down' : 'fa-arrow-up'}"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold">${tx.label}</p>
+                                <p class="text-[9px] text-slate-500 font-bold uppercase">${tx.date}</p>
+                            </div>
                         </div>
-                        <div>
-                            <p class="font-bold text-gray-900">${title}</p>
-                            <p class="text-xs text-gray-400">${date} • Completed</p>
-                        </div>
+                        <p class="text-xs font-extrabold ${tx.type === 'in' ? 'text-green-400' : 'text-slate-200'}">
+                            ${tx.type === 'in' ? '+' : '-'}${tx.amt} SOL
+                        </p>
                     </div>
-                    <p class="font-bold ${isPositive ? 'text-green-500' : 'text-red-500'}">
-                        ${isPositive ? '+' : '-'}$${parseFloat(amount).toLocaleString()}
-                    </p>
-                </div>
-            `;
-            list.insertAdjacentHTML('afterbegin', html);
+                `;
+                container.insertAdjacentHTML('afterbegin', html);
+            });
         }
 
-        function processAdd() {
-            const amt = document.getElementById('addAmount').value;
-            if(amt > 0) {
-                currentBalance += parseFloat(amt);
-                addTransaction('Deposit via Gateway', amt, true);
-                updateUI();
+        function processDeposit() {
+            const val = parseFloat(document.getElementById('addAmount').value);
+            if(val > 0) {
+                wallet.solBalance += val;
+                wallet.history.push({
+                    type: 'in', label: 'Purchased SOL', amt: val, 
+                    date: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                });
+                save();
                 closeModal('addModal');
                 document.getElementById('addAmount').value = '';
             }
         }
 
         function processWithdraw() {
-            const amt = document.getElementById('withdrawAmount').value;
+            const val = parseFloat(document.getElementById('withdrawAmount').value);
             const addr = document.getElementById('withdrawAddr').value;
-            if(amt > 0 && currentBalance >= amt && addr.length > 5) {
-                currentBalance -= parseFloat(amt);
-                addTransaction(`Sent to ${addr.substring(0,6)}...`, amt, false);
-                updateUI();
+            if(val > 0 && wallet.solBalance >= val && addr.length > 10) {
+                wallet.solBalance -= val;
+                wallet.history.push({
+                    type: 'out', label: `Sent to ${addr.substring(0,6)}...`, amt: val,
+                    date: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                });
+                save();
                 closeModal('withdrawModal');
                 document.getElementById('withdrawAmount').value = '';
                 document.getElementById('withdrawAddr').value = '';
-            } else {
-                alert("Check balance or address!");
             }
         }
+
+        function clearHistory() {
+            wallet.history = [];
+            save();
+        }
+
+        // Initialize UI
+        render();
     </script>
 </body>
 </html>
