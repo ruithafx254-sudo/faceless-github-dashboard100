@@ -3,46 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Vault Pro | Multi-Chain</title>
+    <title>Vault Pro | Elite</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#000000">
-    <link rel="manifest" href="./manifest.json">
+    <link rel="manifest" href="manifest.json">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-        
         :root { --trust-blue: #3b82f6; --trust-green: #05f49c; --bg: #000000; --card: #121212; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: white; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
-        
-        /* Shimmer Effect for Loading */
         .shimmer { background: linear-gradient(90deg, #121212 25%, #1a1a1a 50%, #121212 75%); background-size: 200% 100%; animation: shimmer 2s infinite; }
         @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-
         .btn-interact:active { transform: scale(0.92); opacity: 0.8; transition: 0.1s; }
-        
-        /* Premium UI Elements */
         .glass-card { background: var(--card); border: 1px solid rgba(255,255,255,0.04); border-radius: 24px; }
         .confirming-pulse { animation: pulse 2s infinite; color: var(--trust-green); font-size: 10px; font-weight: 800; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-
-        /* Modal Sheet */
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(12px); z-index: 1000; align-items: flex-end; }
         .modal-overlay.active { display: flex; }
         .modal-sheet { background: #141414; width: 100%; border-radius: 32px 32px 0 0; padding: 24px; transform: translateY(100%); transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); border-top: 1px solid rgba(255,255,255,0.08); }
         .modal-overlay.active .modal-sheet { transform: translateY(0); }
-
         .balance-gradient { background: linear-gradient(180deg, #FFFFFF 0%, #999999 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     </style>
 </head>
 <body class="select-none pb-safe">
 
-    <div id="toast" class="fixed top-12 left-1/2 -translate-x-1/2 z-[2000] bg-white text-black px-6 py-3 rounded-full font-bold text-sm shadow-2xl opacity-0 translate-y-[-20px] transition-all duration-300 pointer-events-none">
-        Transaction Confirmed
-    </div>
+    <div id="toast" class="fixed top-12 left-1/2 -translate-x-1/2 z-[2000] bg-white text-black px-6 py-3 rounded-full font-bold text-sm shadow-2xl opacity-0 translate-y-[-20px] transition-all duration-300 pointer-events-none"></div>
 
     <div class="max-w-md mx-auto min-h-screen flex flex-col px-6">
         <header class="flex justify-between items-center py-8">
@@ -87,7 +76,6 @@
 
         <div id="asset-list" class="mt-8 space-y-2">
             <div class="shimmer h-20 w-full rounded-3xl opacity-20"></div>
-            <div class="shimmer h-20 w-full rounded-3xl opacity-10"></div>
         </div>
 
         <section class="mt-10 mb-32">
@@ -96,55 +84,45 @@
         </section>
 
         <nav class="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-2xl border-t border-white/5 px-10 pt-4 pb-10 flex justify-between items-center z-50">
-            <div class="flex flex-col items-center space-y-1 text-white"><i class="fa-solid fa-wallet text-xl"></i><span class="text-[10px] font-black uppercase">Wallet</span></div>
-            <div class="flex flex-col items-center space-y-1 text-gray-600"><i class="fa-solid fa-chart-pie text-xl"></i><span class="text-[10px] font-black uppercase">Market</span></div>
-            <div class="flex flex-col items-center space-y-1 text-gray-600"><i class="fa-solid fa-compass text-xl"></i><span class="text-[10px] font-black uppercase">DApps</span></div>
-            <div class="flex flex-col items-center space-y-1 text-gray-600"><i class="fa-solid fa-gear text-xl"></i><span class="text-[10px] font-black uppercase">Settings</span></div>
+            <div class="flex flex-col items-center space-y-1 text-white"><i class="fa-solid fa-wallet text-xl"></i><span class="text-[10px] font-black">Wallet</span></div>
+            <div class="flex flex-col items-center space-y-1 text-gray-600"><i class="fa-solid fa-chart-pie text-xl"></i><span class="text-[10px] font-black">Market</span></div>
+            <div class="flex flex-col items-center space-y-1 text-gray-600"><i class="fa-solid fa-compass text-xl"></i><span class="text-[10px] font-black">DApps</span></div>
+            <div class="flex flex-col items-center space-y-1 text-gray-600"><i class="fa-solid fa-gear text-xl"></i><span class="text-[10px] font-black">Settings</span></div>
         </nav>
     </div>
 
     <div id="txModal" class="modal-overlay" onclick="if(event.target == this) closeModal()">
         <div class="modal-sheet">
             <div class="w-12 h-1 bg-zinc-800 rounded-full mx-auto mb-10"></div>
-            <h2 id="modalTitle" class="text-3xl font-black mb-8 italic tracking-tighter">NETWORK DEPOSIT</h2>
-            
+            <h2 id="modalTitle" class="text-3xl font-black mb-8 italic italic">TRANSACTION</h2>
             <div class="space-y-6">
                 <div class="glass-card p-5">
-                    <label class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Asset Selection</label>
                     <select id="assetSelect" class="w-full bg-transparent py-2 text-xl font-bold outline-none border-none">
                         <option value="BTC">Bitcoin (BTC)</option>
                         <option value="USDT">Tether (USDT)</option>
                         <option value="ETH">Ethereum (ETH)</option>
-                        <option value="SOL">Solana (SOL)</option>
                     </select>
                 </div>
-
                 <div class="glass-card p-5">
-                    <div class="flex justify-between items-center mb-4">
-                        <label class="text-[10px] font-black text-gray-500 uppercase">Wait Time (Seconds)</label>
-                        <span id="timerVal" class="text-blue-500 font-black text-sm italic">30s</span>
-                    </div>
-                    <input type="range" id="timerInput" min="5" max="180" value="30" class="w-full accent-blue-600" oninput="document.getElementById('timerVal').innerText = this.value + 's'">
+                    <div class="flex justify-between mb-4 text-[10px] font-black text-gray-500 uppercase"><span>Wait Time</span><span id="timerVal" class="text-blue-500">30s</span></div>
+                    <input type="range" id="timerInput" min="5" max="300" value="30" class="w-full accent-blue-600" oninput="document.getElementById('timerVal').innerText = this.value + 's'">
                 </div>
-
-                <div class="glass-card p-8 text-center">
-                    <input type="number" id="txAmount" placeholder="0.00" class="w-full bg-transparent text-6xl font-black outline-none tabular-nums">
+                <div class="glass-card p-8">
+                    <input type="number" id="txAmount" placeholder="0.00" class="w-full bg-transparent text-6xl font-black text-center outline-none">
                 </div>
-                
-                <button onclick="processTx()" class="w-full bg-blue-600 py-6 rounded-3xl font-black text-lg btn-interact shadow-2xl shadow-blue-600/40">BROADCAST TO NETWORK</button>
+                <button onclick="processTx()" class="w-full bg-blue-600 py-6 rounded-3xl font-black text-lg btn-interact">BROADCAST</button>
             </div>
         </div>
     </div>
 
     <script>
-        const PRICES = { USDT: 1, SOL: 145.2, BTC: 64200, ETH: 2450 };
-        let state = JSON.parse(localStorage.getItem('elite_vault_v5')) || { balances: { USDT: 0, BTC: 0, SOL: 0, ETH: 0 }, history: [] };
+        const PRICES = { USDT: 1, BTC: 64200, ETH: 2450 };
+        let state = JSON.parse(localStorage.getItem('elite_vault_v6')) || { balances: { USDT: 0, BTC: 0, ETH: 0 }, history: [] };
         
-        // Persistent logic: Checker runs every second
         setInterval(checkPendingTransactions, 1000);
 
         function openModal(action) {
-            document.getElementById('modalTitle').innerText = action.toUpperCase() + ' ASSET';
+            document.getElementById('modalTitle').innerText = action.toUpperCase();
             document.getElementById('txModal').classList.add('active');
         }
 
@@ -152,126 +130,55 @@
 
         function showToast(msg) {
             const t = document.getElementById('toast');
-            t.innerText = msg;
-            t.style.opacity = "1";
-            t.style.transform = "translate(-50%, 20px)";
-            setTimeout(() => {
-                t.style.opacity = "0";
-                t.style.transform = "translate(-50%, -20px)";
-            }, 3000);
+            t.innerText = msg; t.style.opacity = "1"; t.style.transform = "translate(-50%, 20px)";
+            setTimeout(() => { t.style.opacity = "0"; t.style.transform = "translate(-50%, -20px)"; }, 3000);
         }
 
         function processTx() {
             const coin = document.getElementById('assetSelect').value;
             const amt = parseFloat(document.getElementById('txAmount').value);
             const seconds = parseInt(document.getElementById('timerInput').value);
-            
             if(!amt || amt <= 0) return;
-
             const now = Date.now();
-            const tx = {
-                id: now,
-                type: document.getElementById('modalTitle').innerText.split(' ')[0],
-                coin: coin,
-                amt: amt,
-                status: 'pending',
-                date: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
-                finishAt: now + (seconds * 1000)
-            };
-
-            state.history.push(tx);
-            save();
-            closeModal();
-            document.getElementById('txAmount').value = '';
-            showToast("Transaction Broadcasted");
+            state.history.push({ id: now, type: document.getElementById('modalTitle').innerText.split(' ')[0], coin, amt, status: 'pending', date: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), finishAt: now + (seconds * 1000) });
+            save(); closeModal(); document.getElementById('txAmount').value = ''; showToast("Transaction Broadcasted");
         }
 
         function checkPendingTransactions() {
-            let changed = false;
-            const now = Date.now();
-
+            let changed = false; const now = Date.now();
             state.history.forEach(tx => {
                 if (tx.status === 'pending' && now >= tx.finishAt) {
                     tx.status = 'confirmed';
-                    const multiplier = (tx.type === 'DEPOSIT' || tx.type === 'BUY') ? 1 : -1;
-                    state.balances[tx.coin] += (tx.amt * multiplier);
-                    showToast(`${tx.coin} Confirmed`);
-                    changed = true;
+                    state.balances[tx.coin] += (tx.type === 'DEPOSIT' || tx.type === 'BUY' ? tx.amt : -tx.amt);
+                    showToast(`${tx.coin} Confirmed`); changed = true;
                 }
             });
-
-            if (changed) save();
-            else render(); // Keep confirmation progress updating
+            if (changed) save(); else render();
         }
 
-        function save() { 
-            localStorage.setItem('elite_vault_v5', JSON.stringify(state)); 
-            render(); 
-        }
+        function save() { localStorage.setItem('elite_vault_v6', JSON.stringify(state)); render(); }
 
         function render() {
-            let total = 0;
-            const assetDiv = document.getElementById('asset-list');
-            assetDiv.innerHTML = '';
-            
+            let total = 0; const assetDiv = document.getElementById('asset-list'); assetDiv.innerHTML = '';
             for(let c in state.balances) {
-                const val = state.balances[c] * PRICES[c];
-                total += val;
-                assetDiv.innerHTML += `
-                    <div class="glass-card p-5 flex justify-between items-center mb-3">
-                        <div class="flex items-center space-x-4">
-                            <div class="w-12 h-12 bg-black rounded-full flex items-center justify-center font-black text-[10px] border border-white/5 shadow-inner">${c}</div>
-                            <div>
-                                <p class="font-extrabold text-sm text-white">${c}</p>
-                                <p class="text-[10px] text-gray-500 font-bold tracking-widest">$${PRICES[c].toLocaleString()}</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="font-black text-sm tabular-nums">${state.balances[c].toLocaleString()}</p>
-                            <p class="text-[10px] text-gray-500 font-bold">$${val.toLocaleString()}</p>
-                        </div>
-                    </div>`;
+                const val = state.balances[c] * PRICES[c]; total += val;
+                assetDiv.innerHTML += `<div class="glass-card p-5 flex justify-between items-center mb-3"><div class="flex items-center space-x-4"><div class="w-11 h-11 bg-black rounded-full flex items-center justify-center font-black text-[10px] border border-white/5">${c}</div><div><p class="font-extrabold text-sm">${c}</p><p class="text-[10px] text-gray-500">$${PRICES[c].toLocaleString()}</p></div></div><div class="text-right"><p class="font-black text-sm">${state.balances[c].toLocaleString()}</p><p class="text-[10px] text-gray-500">$${val.toLocaleString()}</p></div></div>`;
             }
-
             document.getElementById('total-usd').innerText = `$${total.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-
             const hist = document.getElementById('tx-history');
-            hist.innerHTML = state.history.length ? '' : '<div class="py-12 text-center opacity-10 text-[10px] font-black tracking-[4px]">STABLE CONNECTION</div>';
-            
-            state.history.slice(-6).reverse().forEach(tx => {
+            hist.innerHTML = state.history.length ? '' : '<div class="py-12 text-center opacity-10 text-[10px] font-black">SECURE CONNECTION</div>';
+            state.history.slice(-5).reverse().forEach(tx => {
                 const isPending = tx.status === 'pending';
-                const isPositive = (tx.type === 'DEPOSIT' || tx.type === 'BUY');
-                
-                let progressText = 'FINALIZED';
-                if(isPending) {
-                    const elapsed = Date.now() - tx.id;
-                    const total = tx.finishAt - tx.id;
-                    const blocks = Math.min(3, Math.floor((elapsed/total) * 3) + 1);
-                    progressText = `CONFIRMING ${blocks}/3`;
-                }
-
-                hist.innerHTML += `
-                    <div class="flex justify-between items-center py-2">
-                        <div class="flex items-center space-x-4">
-                            <div class="w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center border border-white/5">
-                                <i class="fa-solid ${isPositive ? 'fa-arrow-down text-green-500' : 'fa-arrow-up text-blue-500'} text-[10px]"></i>
-                            </div>
-                            <div>
-                                <p class="text-[11px] font-black uppercase tracking-tighter">${tx.type} ${tx.coin}</p>
-                                <p class="text-[9px] text-gray-500 font-bold">${tx.date}</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-sm font-black ${isPending ? 'text-gray-500' : (isPositive ? 'text-green-500' : 'text-white')}">
-                                ${isPositive ? '+' : '-'}${tx.amt.toLocaleString()}
-                            </p>
-                            <p class="${isPending ? 'confirming-pulse' : 'text-[9px] text-gray-600 font-black italic'}">${progressText}</p>
-                        </div>
-                    </div>`;
+                let subtext = isPending ? `CONFIRMING ${Math.min(3, Math.floor(((Date.now()-tx.id)/(tx.finishAt-tx.id))*3)+1)}/3` : 'FINALIZED';
+                hist.innerHTML += `<div class="flex justify-between items-center py-2"><div class="flex items-center space-x-4"><div class="w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center border border-white/5"><i class="fa-solid ${tx.type==='DEPOSIT'?'fa-arrow-down text-green-500':'fa-arrow-up text-blue-500'} text-[10px]"></i></div><div><p class="text-[11px] font-black uppercase">${tx.type} ${tx.coin}</p><p class="text-[9px] text-gray-500">${tx.date}</p></div></div><div class="text-right"><p class="text-sm font-black ${isPending ? 'text-gray-500' : 'text-white'}">${tx.amt.toLocaleString()}</p><p class="${isPending ? 'confirming-pulse' : 'text-[9px] text-gray-600 font-black italic'}">${subtext}</p></div></div>`;
             });
         }
 
-        function clearData() { if(confirm("Purge local storage?")) { localStorage.clear(); location.reload(); } }
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js'); });
+        }
+
+        function clearData() { if(confirm("Purge Storage?")) { localStorage.clear(); location.reload(); } }
         render();
     </script>
 </body>
