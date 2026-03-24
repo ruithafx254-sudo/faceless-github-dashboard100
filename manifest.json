@@ -1,15 +1,18 @@
 {
-  "name": "Ruitha Wallet Pro",
-  "short_name": "Vault",
-  "start_url": "index.html",
-  "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#00d395",
+  "short_name": "Trust Wallet",
+  "name": "Trust Wallet Dashboard",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2584/2584651.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/14446/14446220.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
-  ]
+  ],
+  "start_url": "./index.html",
+  "background_color": "#000000",
+  "display": "standalone",
+  "scope": "./",
+  "theme_color": "#000000",
+  "description": "Secure Crypto Dashboard"
 }
