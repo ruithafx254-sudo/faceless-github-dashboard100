@@ -3,7 +3,7 @@
   "name": "Trust Wallet Dashboard",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/14446/14446220.png",
+      "src": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/info/logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
