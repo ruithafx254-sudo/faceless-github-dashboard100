@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -9,9 +9,15 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script>
+      // Theme Initialization (Prevents flickering)
+      if (localStorage.theme === 'light' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+        document.documentElement.classList.remove('dark');
+      } else {
+        document.documentElement.classList.add('dark');
+      }
+      
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js')
-          .then(() => console.log("PWA Registered Successfully"));
+        navigator.serviceWorker.register('./sw.js').then(() => console.log("PWA Registered"));
       }
     </script>
 
@@ -19,11 +25,20 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #000000; color: white; -webkit-tap-highlight-color: transparent; }
+        
+        /* Dynamic Theme Colors */
+        body { 
+            font-family: 'Inter', sans-serif; 
+            -webkit-tap-highlight-color: transparent; 
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        .dark body { background-color: #000000; color: white; }
+        body { background-color: #F6F8F9; color: #1E2329; }
+
         .trust-green { color: #31d785; }
         .nav-active { color: #31d785; }
         
-        /* Floating Trade Button */
         .trade-btn-container { position: relative; top: -18px; }
         .trade-btn {
             width: 56px; height: 56px; border-radius: 50%;
@@ -31,15 +46,18 @@
             display: flex; align-items: center; justify-content: center;
             border: 4px solid #000; box-shadow: 0 4px 12px rgba(49, 215, 133, 0.2);
         }
+        .dark .trade-btn { border-color: #000; }
+        .trade-btn { border-color: #fff; }
 
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: flex-end; }
         .modal.active { display: flex; }
-        .modal-content { background: #1c1c1e; width: 100%; border-radius: 1.5rem 1.5rem 0 0; padding: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); }
+        .modal-content { width: 100%; border-radius: 1.5rem 1.5rem 0 0; padding: 1.5rem; transition: background-color 0.3s; }
+        .dark .modal-content { background: #1c1c1e; border-top: 1px solid rgba(255,255,255,0.05); }
+        .modal-content { background: #ffffff; border-top: 1px solid rgba(0,0,0,0.05); }
 
         .incoming-timer { animation: pulse 2s infinite; color: #31d785; font-weight: 700; font-size: 11px; margin-top: 2px; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-        /* Asset Icons */
         .coin-icon { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
         .bg-btc { background: #f7931a; color: white; }
         .bg-eth { background: #627eea; color: white; }
@@ -50,10 +68,15 @@
 <body class="pb-28">
 
     <header class="px-5 pt-6 flex justify-between items-center">
-        <div class="w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center border border-zinc-800">
-            <i class="fa-solid fa-gear text-sm"></i>
+        <div class="flex space-x-3">
+            <div class="w-9 h-9 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center border border-zinc-200 dark:border-zinc-800">
+                <i class="fa-solid fa-gear text-sm"></i>
+            </div>
+            <button onclick="toggleTheme()" class="w-9 h-9 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center border border-zinc-200 dark:border-zinc-800">
+                <i id="theme-icon" class="fa-solid fa-moon text-sm"></i>
+            </button>
         </div>
-        <div class="flex items-center space-x-2 bg-zinc-900 px-4 py-1.5 rounded-full border border-zinc-800">
+        <div class="flex items-center space-x-2 bg-zinc-100 dark:bg-zinc-900 px-4 py-1.5 rounded-full border border-zinc-200 dark:border-zinc-800">
             <span class="text-[13px] font-bold">Main Wallet</span>
             <i class="fa-solid fa-chevron-down text-[10px] opacity-40"></i>
         </div>
@@ -69,25 +92,25 @@
 
     <div class="flex justify-center space-x-8 mt-8">
         <button onclick="openModal('Send')" class="flex flex-col items-center gap-2">
-            <div class="w-12 h-12 bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-800"><i class="fa-solid fa-arrow-up"></i></div>
+            <div class="w-12 h-12 bg-zinc-100 dark:bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-200 dark:border-zinc-800"><i class="fa-solid fa-arrow-up"></i></div>
             <span class="text-xs font-medium opacity-80">Send</span>
         </button>
         <button class="flex flex-col items-center gap-2">
-            <div class="w-12 h-12 bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-800"><i class="fa-solid fa-arrow-down"></i></div>
+            <div class="w-12 h-12 bg-zinc-100 dark:bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-200 dark:border-zinc-800"><i class="fa-solid fa-arrow-down"></i></div>
             <span class="text-xs font-medium opacity-80">Receive</span>
         </button>
         <button class="flex flex-col items-center gap-2">
-            <div class="w-12 h-12 bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-800"><i class="fa-solid fa-repeat"></i></div>
+            <div class="w-12 h-12 bg-zinc-100 dark:bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-200 dark:border-zinc-800"><i class="fa-solid fa-repeat"></i></div>
             <span class="text-xs font-medium opacity-80">Swap</span>
         </button>
         <button onclick="openModal('Buy')" class="flex flex-col items-center gap-2">
-            <div class="w-12 h-12 bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-800"><i class="fa-solid fa-plus"></i></div>
+            <div class="w-12 h-12 bg-zinc-100 dark:bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-200 dark:border-zinc-800"><i class="fa-solid fa-plus"></i></div>
             <span class="text-xs font-medium opacity-80">Buy</span>
         </button>
     </div>
 
-    <div class="flex px-6 mt-10 border-b border-zinc-900 text-[13px] font-bold text-zinc-500 gap-6">
-        <div class="pb-3 border-b-2 border-green-500 text-white">Crypto</div>
+    <div class="flex px-6 mt-10 border-b border-zinc-200 dark:border-zinc-900 text-[13px] font-bold text-zinc-400 gap-6">
+        <div class="pb-3 border-b-2 border-green-500 text-zinc-900 dark:text-white">Crypto</div>
         <div class="pb-3">Watchlist</div>
         <div class="pb-3">NFTs</div>
         <div class="pb-3"><i class="fa-solid fa-clock-rotate-left"></i></div>
@@ -99,29 +122,29 @@
     <div class="px-6 mt-12 pb-10">
         <div class="flex justify-between items-end mb-5">
             <h3 class="text-lg font-bold">Recent Activity</h3>
-            <button onclick="reset()" class="text-[10px] text-zinc-600 font-bold uppercase tracking-widest pb-1">Reset</button>
+            <button onclick="reset()" class="text-[10px] text-zinc-400 font-bold uppercase tracking-widest pb-1">Reset</button>
         </div>
         <div id="history-list" class="space-y-6"></div>
     </div>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-black border-t border-zinc-900 h-20 flex justify-around items-center px-2 z-50">
+    <nav class="fixed bottom-0 left-0 right-0 bg-white dark:bg-black border-t border-zinc-100 dark:border-zinc-900 h-20 flex justify-around items-center px-2 z-50">
         <div class="flex flex-col items-center nav-active">
             <i class="fa-solid fa-house text-xl"></i>
             <span class="text-[10px] mt-1 font-bold">Home</span>
         </div>
-        <div class="flex flex-col items-center text-zinc-500">
+        <div class="flex flex-col items-center text-zinc-400">
             <i class="fa-solid fa-chart-line text-xl"></i>
             <span class="text-[10px] mt-1 font-bold">Trending</span>
         </div>
         <div class="flex flex-col items-center trade-btn-container">
             <div class="trade-btn"><i class="fa-solid fa-right-left"></i></div>
-            <span class="text-[10px] mt-1 font-bold text-zinc-500">Trade</span>
+            <span class="text-[10px] mt-1 font-bold text-zinc-400">Trade</span>
         </div>
-        <div class="flex flex-col items-center text-zinc-500">
+        <div class="flex flex-col items-center text-zinc-400">
             <i class="fa-solid fa-gift text-xl"></i>
             <span class="text-[10px] mt-1 font-bold">Rewards</span>
         </div>
-        <div class="flex flex-col items-center text-zinc-500">
+        <div class="flex flex-col items-center text-zinc-400">
             <i class="fa-solid fa-compass text-xl"></i>
             <span class="text-[10px] mt-1 font-bold">Discover</span>
         </div>
@@ -129,23 +152,23 @@
 
     <div id="txModal" class="modal" onclick="if(event.target==this) closeTx()">
         <div class="modal-content">
-            <div class="w-10 h-1 bg-zinc-700 rounded-full mx-auto mb-6"></div>
+            <div class="w-10 h-1 bg-zinc-300 dark:bg-zinc-700 rounded-full mx-auto mb-6"></div>
             <h2 id="modalTitle" class="text-xl font-bold mb-6">Buy Asset</h2>
             <div class="space-y-5">
-                <select id="assetSelect" class="w-full bg-zinc-900 p-4 rounded-xl font-bold outline-none border border-zinc-800">
+                <select id="assetSelect" class="w-full bg-zinc-100 dark:bg-zinc-900 p-4 rounded-xl font-bold outline-none border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white">
                     <option value="USDT">Tether (USDT)</option>
                     <option value="BTC">Bitcoin (BTC)</option>
                     <option value="ETH">Ethereum (ETH)</option>
                     <option value="SOL">Solana (SOL)</option>
                 </select>
-                <div class="bg-zinc-900 p-4 rounded-xl border border-zinc-800">
-                    <div class="flex justify-between text-[11px] font-bold text-zinc-500 uppercase mb-3">
+                <div class="bg-zinc-100 dark:bg-zinc-900 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800">
+                    <div class="flex justify-between text-[11px] font-bold text-zinc-400 uppercase mb-3">
                         <span>Countdown Timer</span>
                         <span id="timerLabel" class="trust-green">30s</span>
                     </div>
                     <input type="range" id="timerSlider" min="5" max="60" value="30" class="w-full accent-green-500" oninput="document.getElementById('timerLabel').innerText = this.value + 's'">
                 </div>
-                <input type="number" id="txAmount" placeholder="0.00" class="w-full bg-transparent text-center text-4xl font-bold outline-none py-4 tabular-nums">
+                <input type="number" id="txAmount" placeholder="0.00" class="w-full bg-transparent text-center text-4xl font-bold outline-none py-4 tabular-nums text-zinc-900 dark:text-white">
                 <button onclick="submitTx()" class="w-full bg-green-500 text-black py-4 rounded-full font-bold text-lg">Confirm</button>
             </div>
         </div>
@@ -161,6 +184,20 @@
 
         let state = JSON.parse(localStorage.getItem('trust_fixed_v1')) || { balances: { USDT: 0, BTC: 0, ETH: 0, SOL: 0 }, history: [] };
         let activeMode = '';
+
+        // Theme Toggle Logic
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.theme = isDark ? 'dark' : 'light';
+            updateThemeIcon();
+        }
+
+        function updateThemeIcon() {
+            const icon = document.getElementById('theme-icon');
+            const isDark = document.documentElement.classList.contains('dark');
+            icon.className = isDark ? 'fa-solid fa-moon text-sm' : 'fa-solid fa-sun text-sm';
+        }
+        updateThemeIcon();
 
         function openModal(mode) {
             activeMode = mode;
@@ -208,14 +245,14 @@
                             <div>
                                 <div class="flex items-center space-x-2">
                                     <span class="font-bold text-[15px] uppercase">${c}</span>
-                                    <span class="text-xs text-zinc-500 font-medium">${COINS[c].name}</span>
+                                    <span class="text-xs text-zinc-400 font-medium">${COINS[c].name}</span>
                                 </div>
-                                <p class="text-[13px] font-bold text-zinc-500 mt-0.5">$${COINS[c].price.toLocaleString()}</p>
+                                <p class="text-[13px] font-bold text-zinc-400 mt-0.5">$${COINS[c].price.toLocaleString()}</p>
                             </div>
                         </div>
                         <div class="text-right">
                             <p class="font-bold text-[15px] tabular-nums">${state.balances[c].toLocaleString()}</p>
-                            <p class="text-[13px] text-zinc-500 mt-0.5 tabular-nums">$${usdValue.toLocaleString()}</p>
+                            <p class="text-[13px] text-zinc-400 mt-0.5 tabular-nums">$${usdValue.toLocaleString()}</p>
                         </div>
                     </div>`;
             }
@@ -229,19 +266,19 @@
                 hist.innerHTML += `
                     <div class="flex justify-between items-center">
                         <div class="flex items-center space-x-4">
-                            <div class="w-10 h-10 bg-zinc-900 rounded-full flex items-center justify-center border border-zinc-800">
-                                <i class="fa-solid ${tx.type==='Buy'?'fa-arrow-down text-green-500':'fa-arrow-up text-zinc-500'} text-[10px]"></i>
+                            <div class="w-10 h-10 bg-zinc-100 dark:bg-zinc-900 rounded-full flex items-center justify-center border border-zinc-200 dark:border-zinc-800">
+                                <i class="fa-solid ${tx.type==='Buy'?'fa-arrow-down text-green-500':'fa-arrow-up text-zinc-400'} text-[10px]"></i>
                             </div>
                             <div>
                                 <p class="text-[14px] font-bold">${tx.type} ${tx.coin}</p>
-                                <p class="text-[11px] text-zinc-600 font-bold">${tx.timeStr}</p>
+                                <p class="text-[11px] text-zinc-400 font-bold">${tx.timeStr}</p>
                             </div>
                         </div>
                         <div class="text-right">
-                            <p class="font-bold tabular-nums ${isPending ? 'text-zinc-600' : (tx.type==='Buy'?'text-green-500':'text-white')}">
+                            <p class="font-bold tabular-nums ${isPending ? 'text-zinc-400' : (tx.type==='Buy'?'text-green-500':'dark:text-white text-zinc-900')}">
                                 ${tx.type==='Buy'?'+':'-'}${tx.amt.toLocaleString()}
                             </p>
-                            ${isPending ? `<p class="incoming-timer">Incoming Transaction: ${tx.timeLeft}s</p>` : `<p class="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">Completed</p>`}
+                            ${isPending ? `<p class="incoming-timer">Incoming Transaction: ${tx.timeLeft}s</p>` : `<p class="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">Completed</p>`}
                         </div>
                     </div>`;
             });
