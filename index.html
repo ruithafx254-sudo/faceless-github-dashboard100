@@ -1,155 +1,225 @@
-<script>
-    const COINS = {
-        BTC: { name: 'Bitcoin', price: 70848, icon: 'fa-bitcoin', colorClass: 'bg-btc' },
-        ETH: { name: 'Ethereum', price: 2160, icon: 'fa-ethereum', colorClass: 'bg-eth' },
-        SOL: { name: 'Solana', price: 91.50, icon: 'fa-bolt', colorClass: 'bg-sol' },
-        USDT: { name: 'Tether', price: 1.00, icon: 'fa-dollar-sign', colorClass: 'bg-usdt' }
-    };
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Trust Wallet | Dashboard</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <script>
+      if (localStorage.getItem('theme') === 'light') {
+          document.documentElement.classList.add('light-mode');
+      }
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').then(() => console.log("PWA Registered"));
+      }
+    </script>
 
-    let state = JSON.parse(localStorage.getItem('trust_fixed_v1')) || { balances: { USDT: 0, BTC: 0, ETH: 0, SOL: 0 }, history: [] };
-    let activeMode = '';
-    let currentTotalDisplayed = 0; // Track the current visual total
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #000000; color: white; -webkit-tap-highlight-color: transparent; transition: background 0.3s, color 0.3s; }
+        .bg-zinc-900 { background-color: #18181b; }
+        .border-zinc-800 { border-color: #27272a; }
+        .text-zinc-400 { color: #a1a1aa; }
+        .text-zinc-500 { color: #71717a; }
+        .light-mode body { background-color: #ffffff; color: #000000; }
+        .light-mode .bg-zinc-900 { background-color: #f4f4f5; }
+        .light-mode .border-zinc-800 { border-color: #e4e4e7; }
+        .trust-green { color: #31d785; }
+        .nav-active { color: #31d785; }
+        .trade-btn { width: 56px; height: 56px; border-radius: 50%; background-color: #31d785; color: #000; display: flex; align-items: center; justify-content: center; border: 4px solid #000; }
+        .light-mode .trade-btn { border-color: #ffffff; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: flex-end; }
+        .modal.active { display: flex; }
+        .modal-content { background: #1c1c1e; width: 100%; border-radius: 1.5rem 1.5rem 0 0; padding: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); }
+        .incoming-timer { animation: pulse 2s infinite; color: #31d785; font-weight: 700; font-size: 11px; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .coin-icon { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .bg-btc { background: #f7931a; color: white; }
+        .bg-eth { background: #627eea; color: white; }
+        .bg-sol { background: linear-gradient(135deg, #14f195, #9945ff); color: white; }
+        .bg-usdt { background: #26a17b; color: white; }
+    </style>
+</head>
+<body class="pb-28">
 
-    // Helper function to animate the counter
-    function animateValue(obj, start, end, duration) {
-        let startTimestamp = null;
-        const step = (timestamp) => {
-            if (!startTimestamp) startTimestamp = timestamp;
-            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-            const currentVal = progress * (end - start) + start;
-            obj.innerHTML = `$${currentVal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-            if (progress < 1) {
-                window.requestAnimationFrame(step);
-            }
+    <header class="px-5 pt-6 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+            <div class="w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center border border-zinc-800"><i class="fa-solid fa-gear text-sm"></i></div>
+            <button onclick="toggleTheme()" class="w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center border border-zinc-800"><i id="theme-icon" class="fa-solid fa-moon text-sm"></i></button>
+        </div>
+        <div class="flex items-center space-x-2 bg-zinc-900 px-4 py-1.5 rounded-full border border-zinc-800">
+            <span class="text-[13px] font-bold">Main Wallet</span>
+            <i class="fa-solid fa-chevron-down text-[10px] opacity-40"></i>
+        </div>
+        <div class="flex space-x-5 text-zinc-400">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <i class="fa-solid fa-expand"></i>
+        </div>
+    </header>
+
+    <div class="mt-10 text-center px-5">
+        <h1 id="main-total" class="text-[44px] font-bold tracking-tight tabular-nums">$0.00</h1>
+    </div>
+
+    <div class="flex justify-center space-x-8 mt-8">
+        <button onclick="openModal('Send')" class="flex flex-col items-center gap-2">
+            <div class="w-12 h-12 bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-800"><i class="fa-solid fa-arrow-up"></i></div>
+            <span class="text-xs font-medium opacity-80">Send</span>
+        </button>
+        <button class="flex flex-col items-center gap-2">
+            <div class="w-12 h-12 bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-800"><i class="fa-solid fa-arrow-down"></i></div>
+            <span class="text-xs font-medium opacity-80">Receive</span>
+        </button>
+        <button class="flex flex-col items-center gap-2">
+            <div class="w-12 h-12 bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-800"><i class="fa-solid fa-repeat"></i></div>
+            <span class="text-xs font-medium opacity-80">Swap</span>
+        </button>
+        <button onclick="openModal('Buy')" class="flex flex-col items-center gap-2">
+            <div class="w-12 h-12 bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-800"><i class="fa-solid fa-plus"></i></div>
+            <span class="text-xs font-medium opacity-80">Buy</span>
+        </button>
+    </div>
+
+    <div class="flex px-6 mt-10 border-b border-zinc-900 text-[13px] font-bold text-zinc-500 gap-6">
+        <div class="pb-3 border-b-2 border-green-500 text-current">Crypto</div>
+        <div class="pb-3">Watchlist</div>
+        <div class="pb-3">NFTs</div>
+        <div class="pb-3 ml-auto"><i class="fa-solid fa-sliders"></i></div>
+    </div>
+
+    <div id="crypto-list" class="px-6 mt-6 space-y-6"></div>
+
+    <div class="px-6 mt-12 pb-10">
+        <div class="flex justify-between items-end mb-5">
+            <h3 class="text-lg font-bold">Recent Activity</h3>
+            <button onclick="reset()" class="text-[10px] text-zinc-600 font-bold uppercase tracking-widest pb-1">Reset</button>
+        </div>
+        <div id="history-list" class="space-y-6"></div>
+    </div>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-black border-t border-zinc-900 h-20 flex justify-around items-center px-2 z-50">
+        <div class="flex flex-col items-center nav-active"><i class="fa-solid fa-house text-xl"></i><span class="text-[10px] mt-1 font-bold">Home</span></div>
+        <div class="flex flex-col items-center text-zinc-500"><i class="fa-solid fa-chart-line text-xl"></i><span class="text-[10px] mt-1 font-bold">Trending</span></div>
+        <div class="flex flex-col items-center"><div class="trade-btn"><i class="fa-solid fa-right-left"></i></div><span class="text-[10px] mt-1 font-bold text-zinc-500">Trade</span></div>
+        <div class="flex flex-col items-center text-zinc-500"><i class="fa-solid fa-gift text-xl"></i><span class="text-[10px] mt-1 font-bold">Rewards</span></div>
+        <div class="flex flex-col items-center text-zinc-500"><i class="fa-solid fa-compass text-xl"></i><span class="text-[10px] mt-1 font-bold">Discover</span></div>
+    </nav>
+
+    <div id="txModal" class="modal" onclick="if(event.target==this) closeTx()">
+        <div class="modal-content">
+            <div class="w-10 h-1 bg-zinc-700 rounded-full mx-auto mb-6"></div>
+            <h2 id="modalTitle" class="text-xl font-bold mb-6">Buy Asset</h2>
+            <div class="space-y-5">
+                <select id="assetSelect" class="w-full bg-zinc-900 p-4 rounded-xl font-bold outline-none border border-zinc-800">
+                    <option value="USDT">Tether (USDT)</option>
+                    <option value="BTC">Bitcoin (BTC)</option>
+                    <option value="ETH">Ethereum (ETH)</option>
+                    <option value="SOL">Solana (SOL)</option>
+                </select>
+                <div class="bg-zinc-900 p-4 rounded-xl border border-zinc-800">
+                    <div class="flex justify-between text-[11px] font-bold text-zinc-500 uppercase mb-3"><span>Countdown</span><span id="timerLabel" class="trust-green">30s</span></div>
+                    <input type="range" id="timerSlider" min="5" max="60" value="30" class="w-full accent-green-500" oninput="document.getElementById('timerLabel').innerText = this.value + 's'">
+                </div>
+                <input type="number" id="txAmount" placeholder="0.00" class="w-full bg-transparent text-center text-4xl font-bold outline-none py-4">
+                <button onclick="submitTx()" class="w-full bg-green-500 text-black py-4 rounded-full font-bold text-lg">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const COINS = {
+            BTC: { name: 'Bitcoin', price: 70848, icon: 'fa-bitcoin', colorClass: 'bg-btc' },
+            ETH: { name: 'Ethereum', price: 2160, icon: 'fa-ethereum', colorClass: 'bg-eth' },
+            SOL: { name: 'Solana', price: 91.50, icon: 'fa-bolt', colorClass: 'bg-sol' },
+            USDT: { name: 'Tether', price: 1.00, icon: 'fa-dollar-sign', colorClass: 'bg-usdt' }
         };
-        window.requestAnimationFrame(step);
-    }
 
-    function toggleTheme() {
-        const body = document.documentElement;
-        const icon = document.getElementById('theme-icon');
-        if (body.classList.contains('light-mode')) {
-            body.classList.remove('light-mode');
-            icon.classList.replace('fa-sun', 'fa-moon');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            body.classList.add('light-mode');
-            icon.classList.replace('fa-moon', 'fa-sun');
-            localStorage.setItem('theme', 'light');
-        }
-    }
+        let state = JSON.parse(localStorage.getItem('trust_fixed_v1')) || { balances: { USDT: 0, BTC: 0, ETH: 0, SOL: 0 }, history: [] };
+        let activeMode = '';
+        let lastKnownTotal = 0;
 
-    if (localStorage.getItem('theme') === 'light') {
-        document.getElementById('theme-icon').classList.replace('fa-moon', 'fa-sun');
-    }
-
-    function openModal(mode) {
-        activeMode = mode;
-        document.getElementById('modalTitle').innerText = mode + " Crypto";
-        document.getElementById('txModal').classList.add('active');
-    }
-
-    function closeTx() { document.getElementById('txModal').classList.remove('active'); }
-
-    function submitTx() {
-        const coin = document.getElementById('assetSelect').value;
-        const amt = parseFloat(document.getElementById('txAmount').value);
-        const seconds = parseInt(document.getElementById('timerSlider').value);
-        if(!amt || amt <= 0) return;
-
-        state.history.push({
-            id: Date.now(),
-            type: activeMode,
-            coin,
-            amt,
-            status: 'pending',
-            timeLeft: seconds,
-            target: Date.now() + (seconds * 1000),
-            timeStr: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-        });
-        save();
-        closeTx();
-        document.getElementById('txAmount').value = '';
-    }
-
-    function save() { localStorage.setItem('trust_fixed_v1', JSON.stringify(state)); render(); }
-
-    function render() {
-        let total = 0;
-        const list = document.getElementById('crypto-list');
-        list.innerHTML = '';
-
-        for(let c in state.balances) {
-            const usdValue = state.balances[c] * COINS[c].price;
-            total += usdValue;
-            list.innerHTML += `
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center space-x-4">
-                        <div class="coin-icon ${COINS[c].colorClass}"><i class="fa-brands ${COINS[c].icon === 'fa-bitcoin' ? 'fa-bitcoin' : (COINS[c].icon === 'fa-ethereum' ? 'fa-ethereum' : 'fa-solid ' + COINS[c].icon)}"></i></div>
-                        <div>
-                            <div class="flex items-center space-x-2">
-                                <span class="font-bold text-[15px] uppercase text-current">${c}</span>
-                                <span class="text-xs text-zinc-500 font-medium">${COINS[c].name}</span>
-                            </div>
-                            <p class="text-[13px] font-bold text-zinc-500 mt-0.5">$${COINS[c].price.toLocaleString()}</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-bold text-[15px] tabular-nums text-current">${state.balances[c].toLocaleString()}</p>
-                        <p class="text-[13px] text-zinc-500 mt-0.5 tabular-nums">$${usdValue.toLocaleString()}</p>
-                    </div>
-                </div>`;
+        function animateValue(start, end, duration) {
+            const obj = document.getElementById('main-total');
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const current = progress * (end - start) + start;
+                obj.innerText = `$${current.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                if (progress < 1) { window.requestAnimationFrame(step); }
+            };
+            window.requestAnimationFrame(step);
         }
 
-        // Animate the main total if it changed
-        const totalDisplay = document.getElementById('main-total');
-        if (total !== currentTotalDisplayed) {
-            animateValue(totalDisplay, currentTotalDisplayed, total, 800); // 800ms animation
-            currentTotalDisplayed = total;
+        function toggleTheme() {
+            document.documentElement.classList.toggle('light-mode');
+            const isLight = document.documentElement.classList.contains('light-mode');
+            document.getElementById('theme-icon').className = isLight ? 'fa-solid fa-sun text-sm' : 'fa-solid fa-moon text-sm';
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
         }
 
-        const hist = document.getElementById('history-list');
-        hist.innerHTML = state.history.length ? '' : '<p class="text-center py-10 opacity-20 text-[11px] font-bold tracking-widest">NO RECENT ACTIVITY</p>';
-        
-        state.history.slice(-8).reverse().forEach(tx => {
-            const isPending = tx.status === 'pending';
-            hist.innerHTML += `
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center space-x-4">
-                        <div class="w-10 h-10 bg-zinc-900 rounded-full flex items-center justify-center border border-zinc-800">
-                            <i class="fa-solid ${tx.type==='Buy'?'fa-arrow-down text-green-500':'fa-arrow-up text-zinc-500'} text-[10px]"></i>
-                        </div>
-                        <div>
-                            <p class="text-[14px] font-bold text-current">${tx.type} ${tx.coin}</p>
-                            <p class="text-[11px] text-zinc-600 font-bold">${tx.timeStr}</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-bold tabular-nums ${isPending ? 'text-zinc-600' : (tx.type==='Buy'?'text-green-500':'text-current')}">
-                            ${tx.type==='Buy'?'+':'-'}${tx.amt.toLocaleString()}
-                        </p>
-                        ${isPending ? `<p class="incoming-timer">Incoming Transaction: ${tx.timeLeft}s</p>` : `<p class="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">Completed</p>`}
-                    </div>
-                </div>`;
-        });
-    }
+        function openModal(mode) { activeMode = mode; document.getElementById('modalTitle').innerText = mode + " Crypto"; document.getElementById('txModal').classList.add('active'); }
+        function closeTx() { document.getElementById('txModal').classList.remove('active'); }
 
-    setInterval(() => {
-        let changed = false;
-        const now = Date.now();
-        state.history.forEach(tx => {
-            if(tx.status === 'pending') {
-                tx.timeLeft = Math.max(0, Math.ceil((tx.target - now) / 1000));
-                if(tx.timeLeft <= 0) {
-                    tx.status = 'confirmed';
-                    state.balances[tx.coin] += (tx.type === 'Buy' ? tx.amt : -tx.amt);
-                    changed = true;
-                }
+        function submitTx() {
+            const coin = document.getElementById('assetSelect').value;
+            const amt = parseFloat(document.getElementById('txAmount').value);
+            const seconds = parseInt(document.getElementById('timerSlider').value);
+            if(!amt || amt <= 0) return;
+            state.history.push({ id: Date.now(), type: activeMode, coin, amt, status: 'pending', timeLeft: seconds, target: Date.now() + (seconds * 1000), timeStr: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
+            save(); closeTx(); document.getElementById('txAmount').value = '';
+        }
+
+        function save() { localStorage.setItem('trust_fixed_v1', JSON.stringify(state)); render(); }
+
+        function render() {
+            let total = 0;
+            const list = document.getElementById('crypto-list');
+            list.innerHTML = '';
+            for(let c in state.balances) {
+                const usdValue = state.balances[c] * COINS[c].price;
+                total += usdValue;
+                list.innerHTML += `<div class="flex justify-between items-center"><div class="flex items-center space-x-4"><div class="coin-icon ${COINS[c].colorClass}"><i class="fa-brands ${COINS[c].icon === 'fa-bitcoin' ? 'fa-bitcoin' : (COINS[c].icon === 'fa-ethereum' ? 'fa-ethereum' : 'fa-solid ' + COINS[c].icon)}"></i></div><div><div class="flex items-center space-x-2"><span class="font-bold text-[15px] uppercase">${c}</span><span class="text-xs text-zinc-500 font-medium">${COINS[c].name}</span></div><p class="text-[13px] font-bold text-zinc-500 mt-0.5">$${COINS[c].price.toLocaleString()}</p></div></div><div class="text-right"><p class="font-bold text-[15px] tabular-nums">${state.balances[c].toLocaleString()}</p><p class="text-[13px] text-zinc-500 mt-0.5 tabular-nums">$${usdValue.toLocaleString()}</p></div></div>`;
             }
-        });
-        if(changed) save(); else render();
-    }, 1000);
 
-    function reset() { if(confirm("Wipe data?")) { localStorage.clear(); location.reload(); } }
-    render();
-</script>
+            if (total !== lastKnownTotal) {
+                animateValue(lastKnownTotal, total, 1000);
+                lastKnownTotal = total;
+            } else if (lastKnownTotal === 0) {
+                document.getElementById('main-total').innerText = `$${total.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            }
+
+            const hist = document.getElementById('history-list');
+            hist.innerHTML = state.history.length ? '' : '<p class="text-center py-10 opacity-20 text-[11px] font-bold tracking-widest">NO RECENT ACTIVITY</p>';
+            state.history.slice(-8).reverse().forEach(tx => {
+                const isPending = tx.status === 'pending';
+                hist.innerHTML += `<div class="flex justify-between items-center"><div class="flex items-center space-x-4"><div class="w-10 h-10 bg-zinc-900 rounded-full flex items-center justify-center border border-zinc-800"><i class="fa-solid ${tx.type==='Buy'?'fa-arrow-down text-green-500':'fa-arrow-up text-zinc-500'} text-[10px]"></i></div><div><p class="text-[14px] font-bold">${tx.type} ${tx.coin}</p><p class="text-[11px] text-zinc-600 font-bold">${tx.timeStr}</p></div></div><div class="text-right"><p class="font-bold tabular-nums ${isPending ? 'text-zinc-600' : (tx.type==='Buy'?'text-green-500':'text-current')}">${tx.type==='Buy'?'+':'-'}${tx.amt.toLocaleString()}</p>${isPending ? `<p class="incoming-timer">Incoming: ${tx.timeLeft}s</p>` : `<p class="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">Completed</p>`}</div></div>`;
+            });
+        }
+
+        setInterval(() => {
+            let changed = false;
+            const now = Date.now();
+            state.history.forEach(tx => {
+                if(tx.status === 'pending') {
+                    tx.timeLeft = Math.max(0, Math.ceil((tx.target - now) / 1000));
+                    if(tx.timeLeft <= 0) {
+                        tx.status = 'confirmed';
+                        state.balances[tx.coin] += (tx.type === 'Buy' ? tx.amt : -tx.amt);
+                        changed = true;
+                    }
+                }
+            });
+            if(changed) save(); else render();
+        }, 1000);
+
+        function reset() { if(confirm("Wipe data?")) { localStorage.clear(); location.reload(); } }
+        render();
+    </script>
+</body>
+</html>
