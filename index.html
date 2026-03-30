@@ -36,7 +36,7 @@
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: flex-end; }
         .modal.active { display: flex; }
         .modal-content { background: #1c1c1e; width: 100%; border-radius: 1.5rem 1.5rem 0 0; padding: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); }
-        .incoming-timer { animation: pulse 2s infinite; color: #31d785; font-weight: 700; font-size: 11px; }
+        .incoming-timer { animation: pulse 2s infinite; color: #31d785; font-weight: 600; font-size: 11px; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         .coin-icon { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
         .bg-btc { background: #f7931a; color: white; }
@@ -94,10 +94,10 @@
 
     <div id="crypto-list" class="px-6 mt-6 space-y-6"></div>
 
-    <div class="px-6 mt-12 pb-10">
-        <div class="flex justify-between items-end mb-5">
-            <h3 class="text-lg font-bold">Recent Activity</h3>
-            <button onclick="reset()" class="text-[10px] text-zinc-600 font-bold uppercase tracking-widest pb-1">Reset</button>
+    <div class="px-6 mt-10 pb-10">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-[17px] font-bold">Recent Activity</h3>
+            <button onclick="reset()" class="text-[11px] text-zinc-500 font-semibold">View All</button>
         </div>
         <div id="history-list" class="space-y-6"></div>
     </div>
@@ -188,7 +188,7 @@
             }
 
             if (total !== lastKnownTotal) {
-                animateValue(lastKnownTotal, total, 1000);
+                animateValue(lastKnownTotal, total, 800);
                 lastKnownTotal = total;
             } else if (lastKnownTotal === 0) {
                 document.getElementById('main-total').innerText = `$${total.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
@@ -198,7 +198,26 @@
             hist.innerHTML = state.history.length ? '' : '<p class="text-center py-10 opacity-20 text-[11px] font-bold tracking-widest">NO RECENT ACTIVITY</p>';
             state.history.slice(-8).reverse().forEach(tx => {
                 const isPending = tx.status === 'pending';
-                hist.innerHTML += `<div class="flex justify-between items-center"><div class="flex items-center space-x-4"><div class="w-10 h-10 bg-zinc-900 rounded-full flex items-center justify-center border border-zinc-800"><i class="fa-solid ${tx.type==='Buy'?'fa-arrow-down text-green-500':'fa-arrow-up text-zinc-500'} text-[10px]"></i></div><div><p class="text-[14px] font-bold">${tx.type} ${tx.coin}</p><p class="text-[11px] text-zinc-600 font-bold">${tx.timeStr}</p></div></div><div class="text-right"><p class="font-bold tabular-nums ${isPending ? 'text-zinc-600' : (tx.type==='Buy'?'text-green-500':'text-current')}">${tx.type==='Buy'?'+':'-'}${tx.amt.toLocaleString()}</p>${isPending ? `<p class="incoming-timer">Incoming: ${tx.timeLeft}s</p>` : `<p class="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">Completed</p>`}</div></div>`;
+                const colorClass = tx.type === 'Buy' ? 'text-green-500' : 'text-white';
+                
+                hist.innerHTML += `
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-10 h-10 bg-zinc-900 rounded-full flex items-center justify-center border border-zinc-800">
+                                <i class="fa-solid ${tx.type === 'Buy' ? 'fa-arrow-down text-green-500' : 'fa-arrow-up text-zinc-400'} text-[12px]"></i>
+                            </div>
+                            <div>
+                                <p class="text-[15px] font-semibold">${tx.type} ${tx.coin}</p>
+                                <p class="text-[12px] text-zinc-500 font-medium">${tx.timeStr}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-[15px] tabular-nums ${isPending ? 'text-zinc-500' : colorClass}">
+                                ${tx.type === 'Buy' ? '+' : '-'}${tx.amt.toLocaleString()}
+                            </p>
+                            ${isPending ? `<p class="incoming-timer">Pending: ${tx.timeLeft}s</p>` : `<span class="text-[10px] text-zinc-500 font-bold bg-zinc-900 px-2 py-0.5 rounded-md border border-zinc-800">Confirmed</span>`}
+                        </div>
+                    </div>`;
             });
         }
 
@@ -218,7 +237,7 @@
             if(changed) save(); else render();
         }, 1000);
 
-        function reset() { if(confirm("Wipe data?")) { localStorage.clear(); location.reload(); } }
+        function reset() { if(confirm("Wipe all transaction history?")) { localStorage.clear(); location.reload(); } }
         render();
     </script>
 </body>
