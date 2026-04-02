@@ -1,17 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wallet Demo</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-
-<style>
+<title>Demo Wallet Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"><style>
 body {
-    margin: 0;
     font-family: 'Inter', sans-serif;
     background: #f6f7fb;
+    margin: 0;
 }
 
 .container {
@@ -20,263 +16,190 @@ body {
     padding: 15px;
 }
 
-/* HEADER */
-.top {
+.topbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .search {
-    flex: 1;
-    background: #e9ecf3;
-    border-radius: 20px;
+    background: #eee;
     padding: 10px;
-    margin: 0 10px;
-    color: gray;
+    border-radius: 20px;
+    width: 80%;
 }
 
-/* WALLET */
 .wallet {
-    background: white;
-    border-radius: 25px;
-    padding: 20px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+    background: #fff;
+    border-radius: 20px;
+    padding: 15px;
 }
 
 .balance {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 600;
 }
 
-.sub {
-    color: gray;
-    font-size: 13px;
-}
-
-/* ACTIONS */
 .actions {
     display: flex;
     justify-content: space-between;
-    margin-top: 20px;
+    margin-top: 15px;
 }
 
-.action {
-    text-align: center;
+.btn {
+    background: #eef0f5;
+    padding: 10px;
+    border-radius: 12px;
     flex: 1;
-}
-
-.circle {
-    background: #eef1f7;
-    padding: 15px;
-    border-radius: 15px;
     margin: 5px;
+    text-align: center;
     cursor: pointer;
-    font-size: 18px;
 }
 
-/* TABS */
 .tabs {
     display: flex;
     margin-top: 20px;
+}
+
+.tab {
+    margin-right: 15px;
     font-weight: 600;
+    cursor: pointer;
 }
 
-.tabs div {
-    margin-right: 20px;
-    padding-bottom: 5px;
+.active {
+    color: blue;
 }
 
-.active-tab {
-    border-bottom: 3px solid #3b5cff;
-}
-
-/* CRYPTO */
-.crypto {
-    background: white;
-    margin-top: 10px;
+.coin {
+    background: #fff;
     padding: 15px;
+    margin-top: 10px;
     border-radius: 15px;
     display: flex;
     justify-content: space-between;
 }
 
-/* PENDING */
 .pending {
     background: #fff3cd;
     padding: 10px;
-    border-radius: 10px;
     margin-top: 10px;
-    font-size: 13px;
+    border-radius: 10px;
 }
 
-/* MODAL */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    max-width: 420px;
+    background: #fff;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px;
+}
+
 .modal {
     position: fixed;
     bottom: -100%;
     left: 0;
     right: 0;
-    background: white;
+    background: #fff;
     padding: 20px;
-    border-radius: 25px 25px 0 0;
+    border-radius: 20px 20px 0 0;
     transition: 0.3s;
 }
 
-.modal.active {
-    bottom: 0;
-}
+.modal.active { bottom: 0; }
 
 input, select {
     width: 100%;
-    padding: 12px;
+    padding: 10px;
     margin-top: 10px;
     border-radius: 10px;
-    border: 1px solid #ddd;
+    border: 1px solid #ccc;
 }
 
 button {
     width: 100%;
-    padding: 14px;
-    margin-top: 15px;
-    border: none;
-    border-radius: 12px;
+    padding: 12px;
+    margin-top: 10px;
     background: #3b5cff;
     color: white;
-    font-weight: 600;
-    cursor: pointer;
+    border: none;
+    border-radius: 10px;
 }
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-    <!-- TOP -->
-    <div class="top">
-        ⚙️
-        <div class="search">Search</div>
-        📊
-    </div>
-
-    <!-- WALLET -->
-    <div class="wallet">
-        <div class="balance">$<span id="balance">0.00</span></div>
-        <div class="sub">Demo Wallet</div>
-
-        <div class="actions">
-            <div class="action">
-                <div class="circle" onclick="openModal('send')">⬆️</div>
-                <small>Send</small>
-            </div>
-            <div class="action">
-                <div class="circle">⬇️</div>
-                <small>Receive</small>
-            </div>
-            <div class="action">
-                <div class="circle">🔄</div>
-                <small>Swap</small>
-            </div>
-            <div class="action">
-                <div class="circle" onclick="openModal('buy')">➕</div>
-                <small>Buy</small>
-            </div>
-        </div>
-    </div>
-
-    <!-- TABS -->
-    <div class="tabs">
-        <div class="active-tab">Crypto</div>
-        <div>Watchlist</div>
-        <div>NFTs</div>
-    </div>
-
-    <!-- CRYPTO -->
-    <div class="crypto">
-        <div>
-            <strong>USDT</strong><br>
-            <span class="sub">Demo Token</span>
-        </div>
-        <div>$<span id="balance2">0.00</span></div>
-    </div>
-
-    <!-- PENDING -->
-    <div id="pendingBox"></div>
-
+</style></head><body><div class="container"><div class="topbar">
+    <div>⚙️</div>
+    <input class="search" placeholder="Search">
+</div><div class="wallet">
+    <div class="balance">$<span id="balance">0.00</span></div><div class="actions">
+    <div class="btn" onclick="openModal('send')">Send</div>
+    <div class="btn" onclick="openModal('receive')">Receive</div>
+    <div class="btn" onclick="openModal('swap')">Swap</div>
+    <div class="btn" onclick="openModal('buy')">Buy</div>
 </div>
 
-<!-- MODAL -->
-<div class="modal" id="modal">
+</div><div class="tabs">
+    <div class="tab active">Crypto</div>
+    <div class="tab">Watchlist</div>
+</div><div class="coin">
+    <div>BTC<br><small>$67,162</small></div>
+    <div>$0.00</div>
+</div><div class="coin">
+    <div>USDT<br><small>Demo</small></div>
+    <div>$<span id="balance2">0.00</span></div>
+</div><div id="pendingList"></div></div><div class="bottom-nav">
+    <div>Home</div>
+    <div>Trade</div>
+    <div>Rewards</div>
+</div><div class="modal" id="modal">
     <h3 id="title"></h3>
-
-    <input type="number" id="amount" placeholder="Enter amount">
-
+    <input type="number" id="amount" placeholder="Amount">
     <select id="time">
-        <option value="5">5 sec</option>
-        <option value="10">10 sec</option>
-        <option value="30">30 sec</option>
+        <option value="10">10s</option>
+        <option value="30">30s</option>
         <option value="60">1 min</option>
         <option value="120">2 min</option>
     </select>
-
     <button onclick="confirmAction()">Confirm</button>
-</div>
+</div><script>
+let balance = parseFloat(localStorage.getItem('bal') || 0);
+let type = '';
 
-<script>
-let balance = parseFloat(localStorage.getItem("balance")) || 0;
-let currentAction = "";
-
-function updateUI() {
-    document.getElementById("balance").innerText = balance.toFixed(2);
-    document.getElementById("balance2").innerText = balance.toFixed(2);
-    localStorage.setItem("balance", balance);
+function update() {
+    document.getElementById('balance').innerText = balance.toFixed(2);
+    document.getElementById('balance2').innerText = balance.toFixed(2);
+    localStorage.setItem('bal', balance);
 }
 
-function openModal(type) {
-    currentAction = type;
-    document.getElementById("title").innerText = type.toUpperCase();
-    document.getElementById("modal").classList.add("active");
-}
-
-function closeModal() {
-    document.getElementById("modal").classList.remove("active");
+function openModal(t) {
+    type = t;
+    document.getElementById('modal').classList.add('active');
+    document.getElementById('title').innerText = t.toUpperCase();
 }
 
 function confirmAction() {
-    let amount = parseFloat(document.getElementById("amount").value);
-    let time = parseInt(document.getElementById("time").value);
+    let amt = parseFloat(document.getElementById('amount').value);
+    let time = parseInt(document.getElementById('time').value);
 
-    if (!amount || amount <= 0) {
-        alert("Enter valid amount");
-        return;
-    }
+    let div = document.createElement('div');
+    div.className = 'pending';
+    div.innerText = `${type} $${amt} pending (${time}s)`;
 
-    let box = document.getElementById("pendingBox");
+    document.getElementById('pendingList').appendChild(div);
 
-    let div = document.createElement("div");
-    div.className = "pending";
+    setTimeout(() => {
+        if(type === 'buy') balance += amt;
+        if(type === 'send') balance = Math.max(0, balance - amt);
 
-    let seconds = time;
+        div.innerText = `${type} $${amt} completed`;
+        update();
+    }, time * 1000);
 
-    let interval = setInterval(() => {
-        div.innerText = `${currentAction.toUpperCase()} $${amount} pending... (${seconds}s)`;
-        seconds--;
+    document.getElementById('modal').classList.remove('active');
+}
 
-        if (seconds < 0) {
-            clearInterval(interval);
-
-            if (currentAction === "buy") {
-                balance += amount;
-            } else if (currentAction === "send") {
-                balance -= amount;
-                if (balance < 0) balance = 0;
-            }
-
-            div.innerText = `${currentAction.toUpperCase()} $${amount} completed`;
-            updateUI();
-        }
-
-    }, 1000);
-
-    box.appendChild(div);
+update();
+</script></body>
+</html>
