@@ -69,9 +69,20 @@
 
         .hidden { display: none !important; }
         .tab-view { animation: fadeIn 0.3s ease-out; }
+
+        /* Gateway Loader Overlay */
+        #gatewayLoader {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; color: white;
+        }
+        #gatewayLoader.active { display: flex; animation: fadeIn 0.3s ease-out; }
     </style>
 </head>
 <body class="pb-28">
+
+    <div id="gatewayLoader">
+        <i class="fa-solid fa-circle-notch fa-spin text-5xl text-[#31d785] mb-6"></i>
+        <p class="font-bold text-lg tracking-wide">Directing to secure gateway...</p>
+    </div>
 
     <header class="px-5 pt-6 flex justify-between items-center">
         <div class="flex items-center space-x-3">
@@ -103,9 +114,9 @@
                 <div class="w-14 h-14 bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-800"><i class="fa-solid fa-arrow-down"></i></div>
                 <span class="text-[13px] font-medium opacity-80">Deposit</span>
             </button>
-            <button onclick="openModal('cardModal')" class="flex flex-col items-center gap-2">
+            <button onclick="openModal('cardsListModal')" class="flex flex-col items-center gap-2">
                 <div class="w-14 h-14 bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-800"><i class="fa-solid fa-credit-card"></i></div>
-                <span class="text-[13px] font-medium opacity-80">Add Card</span>
+                <span class="text-[13px] font-medium opacity-80">Cards</span>
             </button>
             <button onclick="alert('Swap interface coming soon!')" class="flex flex-col items-center gap-2">
                 <div class="w-14 h-14 bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-800"><i class="fa-solid fa-repeat"></i></div>
@@ -182,68 +193,18 @@
     <div id="view-rewards" class="tab-view hidden px-6 mt-6">
         <h2 class="text-2xl font-bold mb-2">Staking Rewards</h2>
         <p class="text-zinc-500 text-sm mb-6">Earn crypto by staking your available balances.</p>
-        
         <div class="bg-gradient-to-r from-[#26a17b] to-[#31d785] rounded-2xl p-6 text-black mb-6">
             <p class="text-sm font-bold opacity-80 mb-1">Total Earned</p>
             <h1 class="text-3xl font-bold mb-4">$0.00</h1>
             <button class="bg-black text-white px-5 py-2 rounded-full font-bold text-sm">Claim Rewards</button>
         </div>
-
-        <h3 class="text-[16px] font-bold mb-4 mt-8">Available to Stake</h3>
-        <div class="space-y-4">
-            <div class="bg-zinc-900 rounded-2xl p-4 border border-zinc-800 flex justify-between items-center">
-                <div class="flex items-center space-x-3">
-                    <div class="coin-icon bg-eth w-10 h-10 text-sm"><i class="fa-brands fa-ethereum"></i></div>
-                    <div>
-                        <p class="font-bold">ETH</p>
-                        <p class="text-xs text-[#31d785] font-bold">Up to 4.2% APR</p>
-                    </div>
-                </div>
-                <button class="bg-zinc-800 px-4 py-2 rounded-xl text-sm font-bold text-white">Stake</button>
-            </div>
-            <div class="bg-zinc-900 rounded-2xl p-4 border border-zinc-800 flex justify-between items-center">
-                <div class="flex items-center space-x-3">
-                    <div class="coin-icon bg-sol w-10 h-10 text-sm"><i class="fa-solid fa-bolt"></i></div>
-                    <div>
-                        <p class="font-bold">SOL</p>
-                        <p class="text-xs text-[#31d785] font-bold">Up to 7.1% APR</p>
-                    </div>
-                </div>
-                <button class="bg-zinc-800 px-4 py-2 rounded-xl text-sm font-bold text-white">Stake</button>
-            </div>
-        </div>
     </div>
 
     <div id="view-discover" class="tab-view hidden px-6 mt-6">
         <h2 class="text-2xl font-bold mb-6">Discover Web3</h2>
-        
         <div class="relative mb-8">
             <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500"></i>
-            <input type="text" class="w-full bg-zinc-900 border border-zinc-800 p-3 pl-10 rounded-xl font-medium text-sm" placeholder="Search DApps, exchanges, games...">
-        </div>
-
-        <h3 class="text-[16px] font-bold mb-4">DeFi Protocols</h3>
-        <div class="grid grid-cols-2 gap-4">
-            <div class="bg-zinc-900 rounded-2xl p-4 border border-zinc-800 flex flex-col items-center text-center cursor-pointer hover:bg-zinc-800 transition">
-                <div class="w-12 h-12 bg-[#ff007a] rounded-full flex items-center justify-center text-white text-xl mb-3"><i class="fa-solid fa-horse-head"></i></div>
-                <p class="font-bold text-sm">Uniswap</p>
-                <p class="text-xs text-zinc-500 mt-1">Exchange</p>
-            </div>
-            <div class="bg-zinc-900 rounded-2xl p-4 border border-zinc-800 flex flex-col items-center text-center cursor-pointer hover:bg-zinc-800 transition">
-                <div class="w-12 h-12 bg-[#1fc7d4] rounded-full flex items-center justify-center text-white text-xl mb-3"><i class="fa-solid fa-pancake"></i></div>
-                <p class="font-bold text-sm">PancakeSwap</p>
-                <p class="text-xs text-zinc-500 mt-1">Exchange</p>
-            </div>
-            <div class="bg-zinc-900 rounded-2xl p-4 border border-zinc-800 flex flex-col items-center text-center cursor-pointer hover:bg-zinc-800 transition">
-                <div class="w-12 h-12 bg-[#2ba363] rounded-full flex items-center justify-center text-white text-xl mb-3"><i class="fa-solid fa-ghost"></i></div>
-                <p class="font-bold text-sm">Aave</p>
-                <p class="text-xs text-zinc-500 mt-1">Lending</p>
-            </div>
-            <div class="bg-zinc-900 rounded-2xl p-4 border border-zinc-800 flex flex-col items-center text-center cursor-pointer hover:bg-zinc-800 transition">
-                <div class="w-12 h-12 bg-[#2a2a3a] rounded-full flex items-center justify-center text-white text-xl mb-3 border border-zinc-700"><i class="fa-solid fa-sailboat"></i></div>
-                <p class="font-bold text-sm">OpenSea</p>
-                <p class="text-xs text-zinc-500 mt-1">Marketplace</p>
-            </div>
+            <input type="text" class="w-full bg-zinc-900 border border-zinc-800 p-3 pl-10 rounded-xl font-medium text-sm" placeholder="Search DApps...">
         </div>
     </div>
 
@@ -270,12 +231,29 @@
         </div>
     </nav>
 
-    <div id="cardModal" class="modal" onclick="if(event.target==this) closeModal('cardModal')">
+    <div id="cardsListModal" class="modal" onclick="if(event.target==this) closeModal('cardsListModal')">
+        <div class="modal-content">
+            <div class="w-10 h-1 bg-zinc-700 rounded-full mx-auto mb-6"></div>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">Your Linked Cards</h2>
+                <button onclick="closeModal('cardsListModal')" class="text-zinc-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            
+            <div id="linkedCardsContainer" class="space-y-4 mb-6">
+                </div>
+
+            <button onclick="openModal('addCardModal'); closeModal('cardsListModal');" class="w-full bg-zinc-800 text-white py-4 rounded-xl font-bold text-[16px] border border-zinc-700 hover:bg-zinc-700 transition">
+                <i class="fa-solid fa-plus mr-2"></i> Link New Card
+            </button>
+        </div>
+    </div>
+
+    <div id="addCardModal" class="modal" onclick="if(event.target==this) closeModal('addCardModal')">
         <div class="modal-content">
             <div class="w-10 h-1 bg-zinc-700 rounded-full mx-auto mb-6"></div>
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-bold">Link Payment Card</h2>
-                <button onclick="closeModal('cardModal')" class="text-zinc-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+                <button onclick="closeModal('addCardModal')" class="text-zinc-500"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             <form onsubmit="handleAddCard(event)" class="space-y-4">
                 <div>
@@ -284,7 +262,7 @@
                 </div>
                 <div>
                     <label class="text-[12px] font-bold text-zinc-500 mb-2 block uppercase tracking-wider">Card Number</label>
-                    <input type="text" class="w-full p-4 rounded-xl font-semibold" placeholder="0000 0000 0000 0000" required>
+                    <input type="text" id="cardNumber" class="w-full p-4 rounded-xl font-semibold" placeholder="0000 0000 0000 0000" required>
                 </div>
                 <div class="flex gap-4">
                     <div class="flex-1">
@@ -297,6 +275,30 @@
                     </div>
                 </div>
                 <button type="submit" class="w-full bg-[#31d785] text-black py-4 rounded-xl font-bold text-[16px] mt-2">Verify & Add Card</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="cardActionModal" class="modal" onclick="if(event.target==this) closeModal('cardActionModal')">
+        <div class="modal-content">
+            <div class="w-10 h-1 bg-zinc-700 rounded-full mx-auto mb-6"></div>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">Withdraw from Card</h2>
+                <button onclick="closeModal('cardActionModal')" class="text-zinc-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <form onsubmit="handleCardWithdraw(event)" class="space-y-4">
+                <p class="text-sm text-zinc-400 mb-4">Move funds directly from your linked card to your crypto wallet balance.</p>
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-[12px] font-bold text-zinc-500 block uppercase tracking-wider">Amount</label>
+                        <span id="cardActionMax" class="text-[11px] font-bold text-[#31d785]">Max: $0.00</span>
+                    </div>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-zinc-400">$</span>
+                        <input type="number" id="cardWithdrawAmount" step="0.01" class="w-full p-4 pl-10 rounded-xl font-bold text-lg" placeholder="0.00" required>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-[#31d785] text-black py-4 rounded-xl font-bold text-[16px] mt-2">Confirm Deposit to Wallet</button>
             </form>
         </div>
     </div>
@@ -319,17 +321,18 @@
                     <label class="text-[12px] font-bold text-zinc-500 mb-2 block uppercase tracking-wider">Amount to Deposit</label>
                     <div class="relative">
                         <span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-zinc-400">KES</span>
-                        <input type="number" id="mpesaAmount" class="w-full p-4 pl-14 rounded-xl font-bold text-lg" placeholder="0.00" required>
+                        <input type="number" id="mpesaAmount" oninput="updateKESConversion()" class="w-full p-4 pl-14 rounded-xl font-bold text-lg" placeholder="0.00" required>
                     </div>
+                    <p id="kesConversion" class="text-[12px] text-zinc-500 mt-2 text-right font-medium">≈ $0.00 USD</p>
                 </div>
-                <button type="submit" class="w-full bg-[#31d785] text-black py-4 rounded-xl font-bold text-[16px]">Proceed to Lipwa</button>
+                <button type="submit" class="w-full bg-[#31d785] text-black py-4 rounded-xl font-bold text-[16px]">Proceed to Checkout</button>
             </form>
 
             <div id="dep-card-section" class="hidden text-center py-8">
                 <i class="fa-solid fa-triangle-exclamation text-4xl text-yellow-500 mb-4"></i>
-                <h3 class="font-bold text-lg mb-2">High Traffic</h3>
-                <p class="text-zinc-500 text-sm mb-6">Card deposits are currently experiencing high network congestion. Please use M-Pesa or try again later.</p>
-                <button type="button" onclick="closeModal('depositModal')" class="w-full bg-zinc-800 text-white py-4 rounded-xl font-bold text-[16px]">Close</button>
+                <h3 class="font-bold text-lg mb-2">Notice</h3>
+                <p class="text-zinc-500 text-sm mb-6">To fund your wallet via card, please use the "Cards" menu on the home screen to withdraw directly from linked cards.</p>
+                <button type="button" onclick="closeModal('depositModal'); openModal('cardsListModal')" class="w-full bg-[#31d785] text-black py-4 rounded-xl font-bold text-[16px]">Go to Cards</button>
             </div>
         </div>
     </div>
@@ -351,8 +354,7 @@
                 </div>
                 <div>
                     <label class="text-[12px] font-bold text-zinc-500 mb-2 block uppercase tracking-wider">Withdrawal Method</label>
-                    <select id="withdrawMethod" class="w-full p-4 rounded-xl font-semibold" required>
-                        </select>
+                    <select id="withdrawMethod" class="w-full p-4 rounded-xl font-semibold" required></select>
                 </div>
                 <div>
                     <label class="text-[12px] font-bold text-zinc-500 mb-2 block uppercase tracking-wider">Destination Address / Number</label>
@@ -374,9 +376,13 @@
 
         let state = JSON.parse(localStorage.getItem('trust_live_v2')) || { 
             balances: { USDT: 0, BTC: 0, ETH: 0, SOL: 0 },
-            cardLinked: false
+            linkedCards: []
         };
         let lastKnownTotal = 0;
+        let activeCardIndex = null;
+
+        // KES to USD approximate rate
+        const EXCHANGE_RATE = 130; 
 
         // --- Core UI Functions ---
         function toggleTheme() {
@@ -386,23 +392,14 @@
             localStorage.setItem('theme', isLight ? 'light' : 'dark');
         }
 
-        // --- Tab Navigation Logic ---
         function switchTab(tabId) {
-            // Hide all tab views
-            document.querySelectorAll('.tab-view').forEach(el => {
-                el.classList.add('hidden');
-            });
-            
-            // Show target view
+            document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
             document.getElementById('view-' + tabId).classList.remove('hidden');
 
-            // Reset all nav buttons to inactive state
             document.querySelectorAll('.nav-btn').forEach(el => {
                 el.classList.remove('nav-active');
                 el.classList.add('nav-item');
             });
-            
-            // Set clicked nav button to active
             const activeNav = document.getElementById('nav-' + tabId);
             activeNav.classList.remove('nav-item');
             activeNav.classList.add('nav-active');
@@ -421,27 +418,112 @@
             window.requestAnimationFrame(step);
         }
 
-        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function openModal(id) { 
+            document.getElementById(id).classList.add('active'); 
+            if(id === 'cardsListModal') renderCards();
+        }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
+        // --- Card Management Logic ---
         function handleAddCard(e) {
             e.preventDefault();
             const email = document.getElementById('cardEmail').value.trim().toLowerCase();
+            const cardInput = document.getElementById('cardNumber').value.trim();
             
             if (email === 'joseeruitha@gmail.com') {
-                if(!state.cardLinked) {
-                    state.cardLinked = true;
-                    state.balances.USDT += 1500; 
-                    saveState();
-                    alert("Card added successfully! $1,500 promotional balance has been credited to your USDT wallet.");
-                } else {
-                    alert("Card already linked to this account.");
-                }
-                closeModal('cardModal');
+                const themes = [
+                    'bg-gradient-to-r from-purple-600 to-blue-500', 
+                    'bg-gradient-to-tr from-gray-900 to-zinc-700 border border-zinc-600', 
+                    'bg-gradient-to-r from-red-500 to-orange-400',
+                    'bg-gradient-to-br from-emerald-500 to-teal-700'
+                ];
+                const randomTheme = themes[Math.floor(Math.random() * themes.length)];
+                
+                // Generate a realistic random balance between $300 and $8,500
+                const randomBalance = (Math.random() * 8200) + 300; 
+                
+                const last4 = cardInput.length >= 4 ? cardInput.slice(-4) : '1234';
+
+                if(!state.linkedCards) state.linkedCards = [];
+                state.linkedCards.push({
+                    id: Date.now(),
+                    last4: last4,
+                    balance: randomBalance,
+                    theme: randomTheme
+                });
+
+                saveState();
+                closeModal('addCardModal');
+                openModal('cardsListModal');
+                
                 document.getElementById('cardEmail').value = '';
+                document.getElementById('cardNumber').value = '';
             } else {
-                alert("Error: Invalid card or unauthorized account.");
+                alert("Error: Card invalid or expired for this account.");
             }
+        }
+
+        function renderCards() {
+            const container = document.getElementById('linkedCardsContainer');
+            if(!state.linkedCards || state.linkedCards.length === 0) {
+                container.innerHTML = `<div class="text-center py-6 text-zinc-500 text-sm border border-dashed border-zinc-800 rounded-xl">No cards linked yet.</div>`;
+                return;
+            }
+
+            let html = '';
+            state.linkedCards.forEach((card, index) => {
+                html += `
+                <div onclick="openCardAction(${index})" class="${card.theme} rounded-2xl p-5 mb-4 shadow-lg cursor-pointer transform hover:scale-[1.02] transition">
+                    <div class="flex justify-between items-center mb-6">
+                        <i class="fa-brands fa-cc-visa text-3xl text-white opacity-90"></i>
+                        <i class="fa-solid fa-wifi rotate-90 text-white opacity-50"></i>
+                    </div>
+                    <p class="text-white text-lg tracking-widest mb-4 opacity-90">**** **** **** ${card.last4}</p>
+                    <div class="flex justify-between items-end">
+                        <div>
+                            <p class="text-white text-[10px] uppercase opacity-70 mb-0.5">Available Balance</p>
+                            <p class="text-white font-bold text-lg">$${card.balance.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</p>
+                        </div>
+                        <div class="text-white text-[10px] uppercase opacity-70">Tap to Use</div>
+                    </div>
+                </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function openCardAction(index) {
+            activeCardIndex = index;
+            const card = state.linkedCards[index];
+            document.getElementById('cardActionMax').innerText = `Max: $${card.balance.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+            closeModal('cardsListModal');
+            openModal('cardActionModal');
+        }
+
+        function handleCardWithdraw(e) {
+            e.preventDefault();
+            const amt = parseFloat(document.getElementById('cardWithdrawAmount').value);
+            const card = state.linkedCards[activeCardIndex];
+            
+            if(isNaN(amt) || amt <= 0) return alert("Please enter a valid amount.");
+            if(amt > card.balance) return alert("Insufficient balance on this card.");
+
+            // Deduct from card, add to Wallet
+            card.balance -= amt;
+            state.balances.USDT += amt;
+            
+            saveState();
+            closeModal('cardActionModal');
+            document.getElementById('cardWithdrawAmount').value = '';
+            
+            alert(`Success! $${amt.toFixed(2)} has been withdrawn from your card to your wallet.`);
+        }
+
+        // --- Deposit logic ---
+        function updateKESConversion() {
+            const kes = parseFloat(document.getElementById('mpesaAmount').value) || 0;
+            const usd = kes / EXCHANGE_RATE;
+            document.getElementById('kesConversion').innerText = `≈ $${usd.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} USD`;
         }
 
         function switchDepositTab(tab) {
@@ -468,15 +550,25 @@
             e.preventDefault();
             const amount = document.getElementById('mpesaAmount').value;
             if (!amount || amount <= 0) return alert("Please enter a valid amount.");
+            
+            // Show gateway loader
+            const loader = document.getElementById('gatewayLoader');
+            loader.classList.add('active');
+            
             const invoice = 'INV-' + Math.random().toString(36).substring(2, 8).toUpperCase();
             const targetUrl = `https://lipwa.link/8367?amount=${amount}&invoice=${invoice}`;
-            window.location.href = targetUrl;
+            
+            // Simulate connection delay then redirect
+            setTimeout(() => {
+                window.location.href = targetUrl;
+            }, 2000);
         }
 
+        // --- Withdraw Logic ---
         const withdrawMethods = [
             "Crypto Network (ERC20/TRC20)", "Crypto Network (BEP20)", "Crypto Network (Solana)",
             "M-Pesa (Kenya)", "Airtel Money", "MTN Mobile Money", 
-            "PayPal", "Skrill", "Bank Wire Transfer (SWIFT)", "SEPA Transfer (EU)"
+            "PayPal", "Bank Wire Transfer (SWIFT)"
         ];
 
         function populateWithdrawSelect() {
@@ -495,9 +587,7 @@
             const method = document.getElementById('withdrawMethod').value;
             
             let totalUSD = 0;
-            for(let c in state.balances) {
-                totalUSD += state.balances[c] * COINS[c].price;
-            }
+            for(let c in state.balances) totalUSD += state.balances[c] * COINS[c].price;
 
             if (amt > totalUSD) {
                 alert("Insufficient funds for this withdrawal.");
@@ -508,6 +598,7 @@
             }
         }
 
+        // --- Market Data ---
         async function fetchMarketData() {
             try {
                 const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd');
@@ -522,7 +613,6 @@
                 
                 renderBalances();
             } catch (error) {
-                console.error("API Error:", error);
                 if(COINS.BTC.price === 0) COINS.BTC.price = 68000;
                 if(COINS.ETH.price === 0) COINS.ETH.price = 3500;
                 if(COINS.SOL.price === 0) COINS.SOL.price = 150;
@@ -530,11 +620,8 @@
             }
         }
 
-        // Improved News Fetching with Fallback
         async function fetchNews() {
             const container = document.getElementById('news-list');
-            
-            // Helper to generate HTML snippet for a news item
             const generateNewsHTML = (img, source, time, title, url) => `
                 <div class="flex space-x-4 items-center cursor-pointer hover:opacity-80 transition" onclick="window.open('${url}', '_blank')">
                     <img src="${img}" class="w-16 h-16 rounded-xl object-cover" alt="news" onerror="this.src='https://via.placeholder.com/64/18181b/31d785?text=News'">
@@ -559,15 +646,11 @@
                     const timeString = timeAgo > 60 ? Math.round(timeAgo/60) + 'h ago' : timeAgo + 'm ago';
                     html += generateNewsHTML(item.imageurl, item.source_info.name, timeString, item.title, item.url);
                 });
-                
                 container.innerHTML = html;
             } catch (err) {
-                console.log("Live news blocked. Using realistic fallbacks...");
-                // Hardcoded fallback so the user always sees content
                 container.innerHTML = 
                     generateNewsHTML('https://images.cryptocompare.com/news/default/coindesk.png', 'CoinDesk', '1h ago', 'Bitcoin Dominance Reaches New Yearly High Amid ETF Inflows', '#') +
-                    generateNewsHTML('https://images.cryptocompare.com/news/default/cointelegraph.png', 'CoinTelegraph', '3h ago', 'Ethereum Layer 2 Networks Surpass $10B in Total Value Locked', '#') +
-                    generateNewsHTML('https://images.cryptocompare.com/news/default/decrypt.png', 'Decrypt', '5h ago', 'Solana Ecosystem Expands as Network Activity Hits All-Time High', '#');
+                    generateNewsHTML('https://images.cryptocompare.com/news/default/cointelegraph.png', 'CoinTelegraph', '3h ago', 'Ethereum Layer 2 Networks Surpass $10B in Total Value Locked', '#');
             }
         }
 
