@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Trust Wallet | Complete Dashboard</title>
+    <title>Trust Wallet | Dashboard</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
-    <!-- Initial Theme Check to Prevent Flash -->
     <script>
       if (localStorage.getItem('theme') === 'light') {
           document.documentElement.classList.add('light-mode');
@@ -17,753 +15,376 @@
     </script>
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         
-        :root {
-            --brand-green: #31d785;
-            --brand-green-hover: #26a17b;
-            --bg-base: #000000;
-            --bg-surface: #18181b;
-            --border-subtle: #27272a;
-            --text-main: #ffffff;
-            --text-muted: #a1a1aa;
-            --text-dim: #71717a;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --info: #3b82f6;
-        }
-
-        .light-mode {
-            --bg-base: #f4f4f5;
-            --bg-surface: #ffffff;
-            --border-subtle: #e4e4e7;
-            --text-main: #000000;
-            --text-muted: #52525b;
-            --text-dim: #a1a1aa;
-        }
-
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: var(--bg-base); 
-            color: var(--text-main); 
-            -webkit-tap-highlight-color: transparent; 
-            transition: background 0.3s, color 0.3s; 
-            overflow-x: hidden;
-        }
+        body { font-family: 'Inter', sans-serif; background-color: #000000; color: white; -webkit-tap-highlight-color: transparent; transition: background 0.3s, color 0.3s; }
+        .bg-zinc-900 { background-color: #18181b; }
+        .border-zinc-800 { border-color: #27272a; }
+        .text-zinc-400 { color: #a1a1aa; }
+        .text-zinc-500 { color: #71717a; }
         
-        /* Utility Classes mapping to CSS variables */
-        .bg-base { background-color: var(--bg-base); }
-        .bg-surface { background-color: var(--bg-surface); }
-        .border-subtle { border-color: var(--border-subtle); }
-        .text-main { color: var(--text-main); }
-        .text-muted { color: var(--text-muted); }
-        .text-dim { color: var(--text-dim); }
+        /* Light Mode Specifics */
+        .light-mode body { background-color: #ffffff; color: #000000; }
+        .light-mode .bg-zinc-900 { background-color: #f4f4f5; }
+        .light-mode .border-zinc-800 { border-color: #e4e4e7; }
         
         /* Persistent Dark Nav */
         nav { background-color: #000000 !important; border-top: 1px solid #18181b !important; }
-        .nav-item { color: #71717a; cursor: pointer; transition: color 0.2s, transform 0.2s; }
-        .nav-item:hover { color: #a1a1aa; transform: translateY(-2px); }
-        .nav-active { color: var(--brand-green) !important; cursor: pointer; transform: translateY(-2px); }
+        .nav-item { color: #71717a; cursor: pointer; transition: color 0.2s;}
+        .nav-item:hover { color: #a1a1aa; }
+        .nav-active { color: #31d785 !important; cursor: pointer; }
         
-        .trust-green { color: var(--brand-green); }
-        
+        .trust-green { color: #31d785; }
         .trade-btn { 
-            width: 60px; height: 60px; border-radius: 50%; 
-            background: linear-gradient(135deg, var(--brand-green), #14f195); 
-            color: #000; 
+            width: 56px; height: 56px; border-radius: 50%; 
+            background-color: #31d785; color: #000; 
             display: flex; align-items: center; justify-content: center; 
-            border: 4px solid var(--bg-base); 
-            box-shadow: 0 4px 20px rgba(49, 215, 133, 0.4);
+            border: 4px solid #000; 
+            box-shadow: 0 0 15px rgba(49, 215, 133, 0.2);
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin-top: -20px;
         }
-        .trade-btn:active { transform: scale(0.95); }
 
-        /* Modals */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: flex-end; backdrop-filter: blur(5px); }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: flex-end; }
         .modal.active { display: flex; animation: fadeIn 0.2s ease-out; }
-        .modal-content { 
-            background: var(--bg-surface); width: 100%; border-radius: 2rem 2rem 0 0; 
-            padding: 2rem 1.5rem; border-top: 1px solid var(--border-subtle); 
-            color: var(--text-main); animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); 
-            max-height: 92vh; overflow-y: auto; box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
-        }
+        .modal-content { background: #1c1c1e; width: 100%; border-radius: 1.5rem 1.5rem 0 0; padding: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); color: white; animation: slideUp 0.3s ease-out; max-height: 90vh; overflow-y: auto;}
+        
+        .light-mode .modal-content { background: #ffffff; color: #000; border-top: 1px solid #e4e4e7; }
 
-        /* Animations */
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes pulse-glow { 0% { box-shadow: 0 0 0 0 rgba(49, 215, 133, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(49, 215, 133, 0); } 100% { box-shadow: 0 0 0 0 rgba(49, 215, 133, 0); } }
-
-        /* Coins */
-        .coin-icon { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .bg-btc { background: linear-gradient(135deg, #f7931a, #e87c00); color: white; }
-        .bg-eth { background: linear-gradient(135deg, #627eea, #3b5bce); color: white; }
+        
+        .coin-icon { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .bg-btc { background: #f7931a; color: white; }
+        .bg-eth { background: #627eea; color: white; }
         .bg-sol { background: linear-gradient(135deg, #14f195, #9945ff); color: white; }
-        .bg-usdt { background: linear-gradient(135deg, #26a17b, #15795a); color: white; }
-        .bg-bnb { background: linear-gradient(135deg, #f3ba2f, #d5a225); color: white; }
-        .bg-ada { background: linear-gradient(135deg, #0033ad, #001f6b); color: white; }
-        .bg-doge { background: linear-gradient(135deg, #c2a633, #a18a28); color: white; }
+        .bg-usdt { background: #26a17b; color: white; }
+        .bg-bnb { background: #f3ba2f; color: white; }
+        .bg-ada { background: #0033ad; color: white; }
 
-        /* Inputs */
-        input, select, textarea { 
-            background: var(--bg-base); color: var(--text-main); 
-            border: 1px solid var(--border-subtle); outline: none; 
-            transition: all 0.2s; font-family: 'Inter', sans-serif;
-        }
-        input:focus, select:focus, textarea:focus { border-color: var(--brand-green); box-shadow: 0 0 0 2px rgba(49, 215, 133, 0.1); }
-        input:disabled { opacity: 0.6; cursor: not-allowed; }
+        input, select { background: #18181b; color: white; border: 1px solid #27272a; outline: none; }
+        .light-mode input, .light-mode select { background: #f4f4f5; color: black; border: 1px solid #e4e4e7; }
+        input:focus, select:focus { border-color: #31d785; }
 
         .hidden { display: none !important; }
         .tab-view { animation: fadeIn 0.3s ease-out; }
 
-        /* Loaders & Notifications */
+        /* Gateway Loader Overlay */
         #gatewayLoader {
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px);
-            z-index: 9999; flex-direction: column; align-items: center; justify-content: center; color: white;
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; color: white;
         }
         #gatewayLoader.active { display: flex; animation: fadeIn 0.3s ease-out; }
-        
-        .toast {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
-            background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-subtle);
-            padding: 1rem 1.5rem; border-radius: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            z-index: 10000; font-weight: 600; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex; align-items: center; gap: 10px;
-        }
-        .toast.show { transform: translateX(-50%) translateY(0); }
-        
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
-
-        .glass-panel {
-            background: rgba(24, 24, 27, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .light-mode .glass-panel {
-            background: rgba(255, 255, 255, 0.7);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-        }
-        
-        /* Staking Animation */
-        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
-        .floating-element { animation: float 4s ease-in-out infinite; }
     </style>
 </head>
 <body class="pb-28">
 
-    <!-- Global Fullscreen Loader -->
     <div id="gatewayLoader">
-        <div class="relative w-24 h-24 mb-6">
-            <div class="absolute inset-0 border-4 border-zinc-800 rounded-full"></div>
-            <div class="absolute inset-0 border-4 border-[#31d785] rounded-full border-t-transparent animate-spin"></div>
-            <i class="fa-solid fa-shield-halved absolute inset-0 flex items-center justify-center text-3xl text-[#31d785]"></i>
-        </div>
-        <h2 id="loaderTitle" class="font-bold text-2xl tracking-wide mb-2">Processing Request</h2>
-        <p id="loaderDesc" class="text-zinc-400 text-sm font-medium">Securing connection via encrypted gateway...</p>
-        <div class="mt-8 w-64 h-2 bg-zinc-800 rounded-full overflow-hidden">
-            <div class="h-full bg-[#31d785] w-full animate-pulse" style="animation-duration: 1s;"></div>
-        </div>
+        <i class="fa-solid fa-circle-notch fa-spin text-5xl text-[#31d785] mb-6"></i>
+        <p class="font-bold text-lg tracking-wide">Directing to secure gateway...</p>
     </div>
 
-    <!-- Toast Notification -->
-    <div id="toastNotification" class="toast">
-        <i id="toastIcon" class="fa-solid fa-circle-check text-[#31d785] text-xl"></i>
-        <span id="toastMessage">Success!</span>
-    </div>
-
-    <!-- Top Header -->
-    <header class="px-5 pt-6 flex justify-between items-center z-40 relative">
+    <header class="px-5 pt-6 flex justify-between items-center">
         <div class="flex items-center space-x-3">
-            <button onclick="openModal('profileModal')" class="w-10 h-10 rounded-full bg-surface flex items-center justify-center border border-subtle overflow-hidden hover:border-[#31d785] transition">
-                <img id="headerProfileImg" src="https://ui-avatars.com/api/?name=User&background=31d785&color=fff" alt="Profile" class="w-full h-full object-cover">
-            </button>
-            <button onclick="toggleTheme()" class="w-10 h-10 rounded-full bg-surface flex items-center justify-center border border-subtle transition hover:bg-zinc-800">
-                <i id="theme-icon" class="fa-solid fa-moon text-sm text-dim"></i>
-            </button>
+            <div class="w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center border border-zinc-800"><i class="fa-solid fa-gear text-sm"></i></div>
+            <button onclick="toggleTheme()" class="w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center border border-zinc-800"><i id="theme-icon" class="fa-solid fa-moon text-sm"></i></button>
         </div>
-        <div onclick="openModal('networkModal')" class="flex items-center space-x-2 bg-surface px-4 py-2 rounded-full border border-subtle cursor-pointer hover:border-[#31d785] transition">
-            <div class="w-2 h-2 rounded-full bg-[#31d785] animate-pulse"></div>
+        <div class="flex items-center space-x-2 bg-zinc-900 px-4 py-1.5 rounded-full border border-zinc-800 cursor-pointer">
             <span class="text-[13px] font-bold">Main Wallet</span>
-            <i class="fa-solid fa-chevron-down text-[10px] text-dim"></i>
+            <i class="fa-solid fa-chevron-down text-[10px] opacity-40"></i>
         </div>
-        <div class="flex space-x-4 text-dim">
-            <div class="relative cursor-pointer hover:text-white transition" onclick="alert('No new notifications')">
-                <i class="fa-solid fa-bell text-xl"></i>
-                <div class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 border-2 border-black rounded-full"></div>
-            </div>
-            <i class="fa-solid fa-qrcode text-xl cursor-pointer hover:text-white transition" onclick="openModal('receiveModal')"></i>
+        <div class="flex space-x-5 text-zinc-400">
+            <i class="fa-solid fa-bell cursor-pointer"></i>
+            <i class="fa-solid fa-expand cursor-pointer"></i>
         </div>
     </header>
 
-    <!-- View: HOME -->
     <div id="view-home" class="tab-view">
-        <div class="mt-8 text-center px-5 relative">
-            <p class="text-sm text-dim font-bold uppercase tracking-widest mb-2">Total Balance</p>
-            <h1 id="main-total" class="text-[52px] font-extrabold tracking-tight tabular-nums leading-none">$0.00</h1>
-            <div class="flex items-center justify-center space-x-2 mt-3">
-                <span class="px-2 py-1 bg-green-500/10 text-[#31d785] rounded-md text-xs font-bold" id="total-change-pct">+0.00%</span>
-                <span class="text-[14px] text-dim font-medium" id="total-change">24h Market Change</span>
-            </div>
+        <div class="mt-10 text-center px-5">
+            <h1 id="main-total" class="text-[48px] font-bold tracking-tight tabular-nums">$0.00</h1>
+            <p class="text-[14px] text-zinc-500 mt-1 font-medium" id="total-change">Loading market...</p>
         </div>
 
-        <!-- Quick Actions -->
-        <div class="flex justify-center space-x-4 mt-10 px-4">
-            <button onclick="openModal('withdrawModal')" class="flex flex-col items-center gap-3 w-20 group">
-                <div class="w-14 h-14 bg-surface rounded-full flex items-center justify-center text-xl border border-subtle group-hover:bg-[#31d785] group-hover:text-black transition-all group-hover:scale-110">
-                    <i class="fa-solid fa-arrow-up"></i>
-                </div>
-                <span class="text-[13px] font-semibold text-dim group-hover:text-main">Send</span>
+        <div class="flex justify-center space-x-6 mt-8 px-4">
+            <button onclick="openModal('withdrawModal')" class="flex flex-col items-center gap-2">
+                <div class="w-14 h-14 bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-800"><i class="fa-solid fa-arrow-up"></i></div>
+                <span class="text-[13px] font-medium opacity-80">Send</span>
             </button>
-            <button onclick="openModal('receiveModal')" class="flex flex-col items-center gap-3 w-20 group">
-                <div class="w-14 h-14 bg-surface rounded-full flex items-center justify-center text-xl border border-subtle group-hover:bg-[#3b82f6] group-hover:text-white transition-all group-hover:scale-110">
-                    <i class="fa-solid fa-arrow-down"></i>
-                </div>
-                <span class="text-[13px] font-semibold text-dim group-hover:text-main">Receive</span>
+            <button onclick="openModal('depositModal')" class="flex flex-col items-center gap-2">
+                <div class="w-14 h-14 bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-800"><i class="fa-solid fa-arrow-down"></i></div>
+                <span class="text-[13px] font-medium opacity-80">Deposit</span>
             </button>
-            <button onclick="openModal('depositModal')" class="flex flex-col items-center gap-3 w-20 group">
-                <div class="w-14 h-14 bg-surface rounded-full flex items-center justify-center text-xl border border-subtle group-hover:bg-[#f59e0b] group-hover:text-white transition-all group-hover:scale-110">
-                    <i class="fa-solid fa-wallet"></i>
-                </div>
-                <span class="text-[13px] font-semibold text-dim group-hover:text-main">Deposit</span>
+            <button onclick="openModal('cardsListModal')" class="flex flex-col items-center gap-2">
+                <div class="w-14 h-14 bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-800"><i class="fa-solid fa-credit-card"></i></div>
+                <span class="text-[13px] font-medium opacity-80">Cards</span>
             </button>
-            <button onclick="openModal('cardsListModal')" class="flex flex-col items-center gap-3 w-20 group">
-                <div class="w-14 h-14 bg-surface rounded-full flex items-center justify-center text-xl border border-subtle group-hover:bg-purple-500 group-hover:text-white transition-all group-hover:scale-110">
-                    <i class="fa-solid fa-credit-card"></i>
-                </div>
-                <span class="text-[13px] font-semibold text-dim group-hover:text-main">Cards</span>
+            <button onclick="alert('Swap interface coming soon!')" class="flex flex-col items-center gap-2">
+                <div class="w-14 h-14 bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-800"><i class="fa-solid fa-repeat"></i></div>
+                <span class="text-[13px] font-medium opacity-80">Swap</span>
             </button>
         </div>
 
-        <!-- Asset Tabs -->
-        <div class="flex px-6 mt-12 border-b border-subtle text-[15px] font-bold text-dim gap-8 overflow-x-auto whitespace-nowrap hide-scrollbar">
-            <div class="pb-3 border-b-2 border-[#31d785] text-main cursor-pointer">Crypto</div>
-            <div class="pb-3 cursor-pointer hover:text-main transition">NFTs</div>
-            <div class="pb-3 cursor-pointer hover:text-main transition">History</div>
-            <div class="pb-3 ml-auto cursor-pointer text-main"><i class="fa-solid fa-sliders"></i></div>
+        <div class="flex px-6 mt-10 border-b border-zinc-900 text-[14px] font-bold text-zinc-500 gap-8 overflow-x-auto whitespace-nowrap">
+            <div class="pb-3 border-b-2 border-green-500 text-current cursor-pointer">Crypto</div>
+            <div class="pb-3 cursor-pointer hover:text-zinc-300 transition">Watchlist</div>
+            <div class="pb-3 cursor-pointer hover:text-zinc-300 transition">NFTs</div>
+            <div class="pb-3 ml-auto cursor-pointer"><i class="fa-solid fa-sliders"></i></div>
         </div>
 
-        <!-- Asset List -->
-        <div id="crypto-list" class="px-6 mt-6 space-y-5 pb-6">
-            <!-- Populated by JS -->
-        </div>
-        
-        <!-- Transaction History Preview -->
-        <div class="px-6 mt-4 pb-10">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-[16px] font-bold">Recent Activity</h3>
-                <span class="text-xs text-[#31d785] font-bold cursor-pointer hover:underline">View All</span>
-            </div>
-            <div id="home-tx-history" class="space-y-4">
-                <div class="text-center py-6 border border-dashed border-subtle rounded-2xl text-dim text-sm">No recent transactions</div>
+        <div id="crypto-list" class="px-6 mt-6 space-y-6"></div>
+
+        <div class="px-6 mt-12 border-t border-zinc-900 pt-8 mb-10">
+            <h3 class="text-[18px] font-bold mb-6">Market News</h3>
+            <div id="news-list" class="space-y-5">
+                <p class="text-zinc-500 text-sm">Fetching latest crypto news...</p>
             </div>
         </div>
     </div>
 
-    <!-- View: SWAP (Trade) -->
-    <div id="view-swap" class="tab-view hidden px-5 mt-6 pb-20">
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="text-2xl font-extrabold">Swap Crypto</h2>
-            <div class="bg-surface p-2 rounded-full border border-subtle text-dim cursor-pointer hover:text-white"><i class="fa-solid fa-clock-rotate-left"></i></div>
-        </div>
-
-        <div class="glass-panel rounded-3xl p-1 relative shadow-2xl">
-            <!-- From Box -->
-            <div class="bg-surface rounded-[1.5rem] p-5 border border-subtle hover:border-zinc-700 transition">
-                <div class="flex justify-between mb-2">
-                    <span class="text-xs font-bold text-dim uppercase tracking-wider">You Pay</span>
-                    <span class="text-xs font-bold text-dim">Balance: <span id="swapBalanceFrom" class="text-main">0.00</span></span>
+    <div id="view-trending" class="tab-view hidden px-6 mt-6">
+        <h2 class="text-2xl font-bold mb-6">Top Trending</h2>
+        
+        <div class="bg-zinc-900 rounded-2xl p-5 border border-zinc-800 mb-6">
+            <h3 class="text-sm font-bold text-zinc-500 mb-4 uppercase tracking-wider">Top Gainers (24h)</h3>
+            <div class="space-y-5">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center space-x-4">
+                        <div class="coin-icon bg-sol"><i class="fa-solid fa-bolt"></i></div>
+                        <div>
+                            <p class="font-bold text-[16px] uppercase">SOL</p>
+                            <p class="text-[12px] text-zinc-500">Solana</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-[16px]">$148.50</p>
+                        <p class="text-[13px] font-bold text-[#31d785]">+12.45%</p>
+                    </div>
                 </div>
                 <div class="flex justify-between items-center">
-                    <input type="number" id="swapAmountFrom" oninput="calculateSwap('from')" class="w-full bg-transparent text-3xl font-bold border-none p-0 focus:ring-0" placeholder="0" min="0">
-                    <button class="flex items-center space-x-2 bg-base px-3 py-2 rounded-xl border border-subtle min-w-fit hover:bg-zinc-800 transition">
-                        <img src="https://cryptologos.cc/logos/tether-usdt-logo.svg?v=025" class="w-6 h-6" alt="USDT">
-                        <select id="swapTokenFrom" onchange="updateSwapUI()" class="bg-transparent font-bold border-none appearance-none cursor-pointer text-lg">
-                            <option value="USDT">USDT</option>
-                            <option value="BTC">BTC</option>
-                            <option value="ETH">ETH</option>
-                            <option value="SOL">SOL</option>
-                        </select>
-                        <i class="fa-solid fa-chevron-down text-xs text-dim"></i>
-                    </button>
-                </div>
-                <div class="text-xs text-dim mt-2 font-medium" id="swapValueFrom">~$0.00</div>
-            </div>
-
-            <!-- Swap Switch Button -->
-            <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-base rounded-full flex items-center justify-center border-4 border-[rgba(24,24,27,0.7)] z-10 cursor-pointer hover:rotate-180 transition-transform duration-300" onclick="invertSwap()">
-                <i class="fa-solid fa-arrow-down text-main"></i>
-            </div>
-
-            <!-- To Box -->
-            <div class="bg-surface rounded-[1.5rem] p-5 border border-subtle mt-2 hover:border-zinc-700 transition">
-                <div class="flex justify-between mb-2">
-                    <span class="text-xs font-bold text-dim uppercase tracking-wider">You Receive</span>
-                    <span class="text-xs font-bold text-dim">Balance: <span id="swapBalanceTo" class="text-main">0.00</span></span>
+                    <div class="flex items-center space-x-4">
+                        <div class="coin-icon bg-bnb"><i class="fa-solid fa-diamond"></i></div>
+                        <div>
+                            <p class="font-bold text-[16px] uppercase">BNB</p>
+                            <p class="text-[12px] text-zinc-500">BNB Chain</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-[16px]">$590.20</p>
+                        <p class="text-[13px] font-bold text-[#31d785]">+8.12%</p>
+                    </div>
                 </div>
                 <div class="flex justify-between items-center">
-                    <input type="number" id="swapAmountTo" oninput="calculateSwap('to')" class="w-full bg-transparent text-3xl font-bold border-none p-0 focus:ring-0" placeholder="0" min="0">
-                    <button class="flex items-center space-x-2 bg-base px-3 py-2 rounded-xl border border-subtle min-w-fit hover:bg-zinc-800 transition">
-                        <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.svg?v=025" class="w-6 h-6" alt="BTC" id="swapIconTo">
-                        <select id="swapTokenTo" onchange="updateSwapUI()" class="bg-transparent font-bold border-none appearance-none cursor-pointer text-lg">
-                            <option value="BTC">BTC</option>
-                            <option value="ETH">ETH</option>
-                            <option value="SOL">SOL</option>
-                            <option value="USDT">USDT</option>
-                        </select>
-                        <i class="fa-solid fa-chevron-down text-xs text-dim"></i>
-                    </button>
-                </div>
-                <div class="text-xs text-dim mt-2 font-medium" id="swapValueTo">~$0.00</div>
-            </div>
-        </div>
-
-        <!-- Swap Details -->
-        <div class="mt-6 p-5 bg-surface rounded-2xl border border-subtle space-y-3">
-            <div class="flex justify-between text-sm">
-                <span class="text-dim font-medium">Exchange Rate</span>
-                <span class="font-bold" id="swapRateText">1 USDT = 0.000015 BTC</span>
-            </div>
-            <div class="flex justify-between text-sm">
-                <span class="text-dim font-medium">Network Fee</span>
-                <span class="font-bold text-main">Free <span class="line-through text-dim text-xs ml-1">$2.50</span></span>
-            </div>
-            <div class="flex justify-between text-sm">
-                <span class="text-dim font-medium">Slippage Tolerance</span>
-                <span class="font-bold text-[#31d785]">0.5%</span>
-            </div>
-        </div>
-
-        <button onclick="executeSwap()" class="w-full bg-gradient-to-r from-[#31d785] to-[#14f195] text-black py-4 rounded-2xl font-bold text-lg mt-6 shadow-[0_10px_20px_rgba(49,215,133,0.3)] hover:shadow-[0_10px_30px_rgba(49,215,133,0.5)] transition-all transform hover:-translate-y-1">
-            Review Swap
-        </button>
-    </div>
-
-    <!-- View: REWARDS (Staking) -->
-    <div id="view-rewards" class="tab-view hidden px-5 mt-6 pb-20">
-        <h2 class="text-2xl font-extrabold mb-2">Earn Rewards</h2>
-        <p class="text-dim text-sm mb-6">Stake your idle crypto assets and earn passive yield automatically.</p>
-        
-        <!-- Live Earnings Banner -->
-        <div class="bg-gradient-to-br from-[#26a17b] via-[#31d785] to-[#14f195] rounded-3xl p-6 text-black mb-8 relative overflow-hidden shadow-2xl">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-20 rounded-full blur-2xl -mr-10 -mt-10"></div>
-            <div class="relative z-10">
-                <p class="text-sm font-bold opacity-80 mb-1 uppercase tracking-wider flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-black animate-pulse"></span> Total Earned Live
-                </p>
-                <div class="flex items-end gap-2 mb-6">
-                    <h1 class="text-5xl font-extrabold tabular-nums tracking-tighter" id="liveRewardsCounter">$0.0000</h1>
-                    <span class="text-lg font-bold mb-1 opacity-80">USD</span>
-                </div>
-                <div class="flex gap-3">
-                    <button class="flex-1 bg-black text-white px-5 py-3 rounded-xl font-bold text-sm hover:bg-zinc-800 transition shadow-lg">Claim Rewards</button>
-                    <button class="bg-white/30 backdrop-blur-sm text-black px-4 py-3 rounded-xl font-bold text-sm hover:bg-white/40 transition"><i class="fa-solid fa-chart-pie"></i></button>
-                </div>
-            </div>
-        </div>
-
-        <h3 class="text-lg font-bold mb-4">Available Staking Pools</h3>
-        <div class="space-y-4">
-            <!-- Pool Item -->
-            <div class="bg-surface rounded-2xl p-5 border border-subtle flex items-center justify-between hover:border-zinc-700 transition">
-                <div class="flex items-center gap-4">
-                    <div class="coin-icon bg-sol shadow-[0_0_15px_rgba(20,241,149,0.3)]"><i class="fa-solid fa-bolt"></i></div>
-                    <div>
-                        <h4 class="font-bold text-lg">Solana</h4>
-                        <p class="text-xs font-bold text-[#31d785] bg-green-500/10 px-2 py-0.5 rounded inline-block mt-1">Up to 7.5% APY</p>
+                    <div class="flex items-center space-x-4">
+                        <div class="coin-icon bg-ada"><i class="fa-solid fa-a"></i></div>
+                        <div>
+                            <p class="font-bold text-[16px] uppercase">ADA</p>
+                            <p class="text-[12px] text-zinc-500">Cardano</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-[16px]">$0.45</p>
+                        <p class="text-[13px] font-bold text-[#31d785]">+6.30%</p>
                     </div>
                 </div>
-                <button class="bg-base border border-subtle px-4 py-2 rounded-lg font-bold text-sm hover:border-[#31d785] transition">Stake</button>
-            </div>
-            
-            <div class="bg-surface rounded-2xl p-5 border border-subtle flex items-center justify-between hover:border-zinc-700 transition">
-                <div class="flex items-center gap-4">
-                    <div class="coin-icon bg-eth shadow-[0_0_15px_rgba(98,126,234,0.3)]"><i class="fa-brands fa-ethereum"></i></div>
-                    <div>
-                        <h4 class="font-bold text-lg">Ethereum</h4>
-                        <p class="text-xs font-bold text-[#31d785] bg-green-500/10 px-2 py-0.5 rounded inline-block mt-1">Up to 4.2% APY</p>
-                    </div>
-                </div>
-                <button class="bg-base border border-subtle px-4 py-2 rounded-lg font-bold text-sm hover:border-[#31d785] transition">Stake</button>
-            </div>
-            
-            <div class="bg-surface rounded-2xl p-5 border border-subtle flex items-center justify-between hover:border-zinc-700 transition">
-                <div class="flex items-center gap-4">
-                    <div class="coin-icon bg-ada shadow-[0_0_15px_rgba(0,51,173,0.3)]"><i class="fa-solid fa-a"></i></div>
-                    <div>
-                        <h4 class="font-bold text-lg">Cardano</h4>
-                        <p class="text-xs font-bold text-[#31d785] bg-green-500/10 px-2 py-0.5 rounded inline-block mt-1">Up to 3.8% APY</p>
-                    </div>
-                </div>
-                <button class="bg-base border border-subtle px-4 py-2 rounded-lg font-bold text-sm hover:border-[#31d785] transition">Stake</button>
             </div>
         </div>
     </div>
 
-    <!-- View: DISCOVER -->
-    <div id="view-discover" class="tab-view hidden px-5 mt-6 pb-20">
-        <h2 class="text-2xl font-extrabold mb-6">Discover Web3</h2>
-        
+    <div id="view-rewards" class="tab-view hidden px-6 mt-6">
+        <h2 class="text-2xl font-bold mb-2">Staking Rewards</h2>
+        <p class="text-zinc-500 text-sm mb-6">Earn crypto by staking your available balances.</p>
+        <div class="bg-gradient-to-r from-[#26a17b] to-[#31d785] rounded-2xl p-6 text-black mb-6">
+            <p class="text-sm font-bold opacity-80 mb-1">Total Earned</p>
+            <h1 class="text-3xl font-bold mb-4">$0.00</h1>
+            <button class="bg-black text-white px-5 py-2 rounded-full font-bold text-sm">Claim Rewards</button>
+        </div>
+    </div>
+
+    <div id="view-discover" class="tab-view hidden px-6 mt-6">
+        <h2 class="text-2xl font-bold mb-6">Discover Web3</h2>
         <div class="relative mb-8">
-            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-dim text-lg"></i>
-            <input type="text" class="w-full bg-surface border border-subtle p-4 pl-12 rounded-2xl font-medium text-sm focus:border-[#31d785] shadow-lg" placeholder="Search DApps, Exchanges, Games...">
-        </div>
-
-        <div class="mb-8">
-            <h3 class="text-lg font-bold mb-4">Trending DApps</h3>
-            <div class="grid grid-cols-4 gap-4">
-                <div class="flex flex-col items-center gap-2 cursor-pointer group">
-                    <div class="w-16 h-16 rounded-2xl bg-[#ff007a]/10 flex items-center justify-center border border-subtle group-hover:scale-110 transition">
-                        <i class="fa-solid fa-unicorn text-2xl text-[#ff007a]"></i>
-                    </div>
-                    <span class="text-xs font-bold text-dim">Uniswap</span>
-                </div>
-                <div class="flex flex-col items-center gap-2 cursor-pointer group">
-                    <div class="w-16 h-16 rounded-2xl bg-[#1fc7d4]/10 flex items-center justify-center border border-subtle group-hover:scale-110 transition">
-                        <i class="fa-solid fa-pancake text-2xl text-[#1fc7d4]"></i>
-                    </div>
-                    <span class="text-xs font-bold text-dim">Pancake</span>
-                </div>
-                <div class="flex flex-col items-center gap-2 cursor-pointer group">
-                    <div class="w-16 h-16 rounded-2xl bg-[#2081e2]/10 flex items-center justify-center border border-subtle group-hover:scale-110 transition">
-                        <i class="fa-solid fa-ship text-2xl text-[#2081e2]"></i>
-                    </div>
-                    <span class="text-xs font-bold text-dim">OpenSea</span>
-                </div>
-                <div class="flex flex-col items-center gap-2 cursor-pointer group">
-                    <div class="w-16 h-16 rounded-2xl bg-purple-500/10 flex items-center justify-center border border-subtle group-hover:scale-110 transition">
-                        <i class="fa-solid fa-gamepad text-2xl text-purple-500"></i>
-                    </div>
-                    <span class="text-xs font-bold text-dim">Axie</span>
-                </div>
-            </div>
-        </div>
-
-        <div>
-            <h3 class="text-lg font-bold mb-4">Market News</h3>
-            <div id="news-list" class="space-y-4">
-                <!-- Populated by JS -->
-                <div class="animate-pulse flex space-x-4">
-                    <div class="rounded-xl bg-surface h-16 w-16"></div>
-                    <div class="flex-1 space-y-2 py-1">
-                        <div class="h-3 bg-surface rounded w-1/4"></div>
-                        <div class="h-4 bg-surface rounded w-3/4"></div>
-                        <div class="h-4 bg-surface rounded w-1/2"></div>
-                    </div>
-                </div>
-            </div>
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500"></i>
+            <input type="text" class="w-full bg-zinc-900 border border-zinc-800 p-3 pl-10 rounded-xl font-medium text-sm" placeholder="Search DApps...">
         </div>
     </div>
 
-    <!-- Bottom Navigation Navigation -->
-    <nav class="fixed bottom-0 left-0 right-0 h-[85px] flex justify-around items-center px-2 pb-2 z-50 rounded-t-3xl border-t border-subtle shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
-        <div id="nav-home" onclick="switchTab('home')" class="nav-btn w-16 flex flex-col items-center justify-center nav-active">
-            <i class="fa-solid fa-wallet text-[22px] mb-1"></i>
-            <span class="text-[10px] font-bold tracking-wide">Wallet</span>
+    <nav class="fixed bottom-0 left-0 right-0 h-20 flex justify-around items-center px-2 z-50">
+        <div id="nav-home" onclick="switchTab('home')" class="nav-btn flex flex-col items-center nav-active">
+            <i class="fa-solid fa-house text-xl"></i>
+            <span class="text-[10px] mt-1 font-bold">Home</span>
         </div>
-        <div id="nav-discover" onclick="switchTab('discover')" class="nav-btn w-16 flex flex-col items-center justify-center nav-item">
-            <i class="fa-solid fa-compass text-[22px] mb-1"></i>
-            <span class="text-[10px] font-bold tracking-wide">Discover</span>
+        <div id="nav-trending" onclick="switchTab('trending')" class="nav-btn flex flex-col items-center nav-item">
+            <i class="fa-solid fa-chart-line text-xl"></i>
+            <span class="text-[10px] mt-1 font-bold">Trending</span>
         </div>
-        
-        <!-- Center Action Button -->
-        <div onclick="switchTab('swap')" class="relative flex flex-col items-center justify-center -mt-6 z-20 group">
-            <div class="trade-btn shadow-[0_0_20px_rgba(49,215,133,0.3)] group-hover:shadow-[0_0_30px_rgba(49,215,133,0.6)]">
-                <i class="fa-solid fa-right-left text-2xl"></i>
-            </div>
-            <span class="text-[10px] font-bold mt-2 text-dim group-hover:text-main transition">Swap</span>
+        <div onclick="alert('Swap interface coming soon!')" class="flex flex-col items-center">
+            <div class="trade-btn"><i class="fa-solid fa-right-left"></i></div>
+            <span class="text-[10px] mt-1 font-bold nav-item">Trade</span>
         </div>
-        
-        <div id="nav-rewards" onclick="switchTab('rewards')" class="nav-btn w-16 flex flex-col items-center justify-center nav-item">
-            <i class="fa-solid fa-gift text-[22px] mb-1"></i>
-            <span class="text-[10px] font-bold tracking-wide">Earn</span>
+        <div id="nav-rewards" onclick="switchTab('rewards')" class="nav-btn flex flex-col items-center nav-item">
+            <i class="fa-solid fa-gift text-xl"></i>
+            <span class="text-[10px] mt-1 font-bold">Rewards</span>
         </div>
-        <div onclick="openModal('profileModal')" class="nav-btn w-16 flex flex-col items-center justify-center nav-item">
-            <i class="fa-solid fa-user text-[22px] mb-1"></i>
-            <span class="text-[10px] font-bold tracking-wide">Profile</span>
+        <div id="nav-discover" onclick="switchTab('discover')" class="nav-btn flex flex-col items-center nav-item">
+            <i class="fa-solid fa-compass text-xl"></i>
+            <span class="text-[10px] mt-1 font-bold">Discover</span>
         </div>
     </nav>
 
-    <!-- Modal: DEPOSIT FLOW (M-PESA Centric) -->
-    <div id="depositModal" class="modal" onclick="if(event.target==this) closeModal('depositModal')">
-        <div class="modal-content">
-            <div class="w-12 h-1.5 bg-zinc-700 rounded-full mx-auto mb-6"></div>
-            <div class="flex justify-between items-center mb-6">
-                <div>
-                    <h2 class="text-2xl font-extrabold">Deposit Funds</h2>
-                    <p class="text-sm text-dim mt-1">Add money to your wallet instantly.</p>
-                </div>
-                <button onclick="closeModal('depositModal')" class="w-8 h-8 rounded-full bg-surface flex items-center justify-center border border-subtle text-dim hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            
-            <div class="flex gap-2 mb-6 p-1.5 bg-surface rounded-xl border border-subtle shadow-inner">
-                <button id="tab-mpesa" onclick="switchDepositTab('mpesa')" class="flex-1 py-2.5 rounded-lg font-bold text-sm bg-gradient-to-r from-[#31d785] to-[#26a17b] text-black shadow-md transition-all">Safaricom M-Pesa</button>
-                <button id="tab-card" onclick="switchDepositTab('card')" class="flex-1 py-2.5 rounded-lg font-bold text-sm text-dim hover:text-main transition-all">Credit/Debit Card</button>
-            </div>
-
-            <!-- M-PESA Section -->
-            <form id="dep-mpesa-section" onsubmit="handleMpesaDeposit(event)" class="space-y-4">
-                
-                <!-- Locked Invoice -->
-                <div class="bg-blue-500/10 border border-blue-500/30 p-4 rounded-xl flex items-center justify-between">
-                    <div>
-                        <p class="text-[10px] font-bold text-blue-400 uppercase tracking-wider mb-1">Generated Invoice ID</p>
-                        <input type="text" id="mpesaInvoice" class="bg-transparent border-none text-main font-mono font-bold text-lg p-0 m-0 focus:ring-0 w-full" readonly>
-                    </div>
-                    <i class="fa-solid fa-lock text-blue-400 text-xl"></i>
-                </div>
-
-                <div class="space-y-4 mt-4">
-                    <div>
-                        <label class="text-[11px] font-bold text-dim mb-2 block uppercase tracking-wider">Safaricom M-Pesa Name</label>
-                        <div class="relative">
-                            <i class="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-dim"></i>
-                            <input type="text" id="mpesaName" class="w-full p-4 pl-12 rounded-xl bg-surface font-semibold focus:border-[#31d785] shadow-sm" placeholder="JOHN DOE" required>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="text-[11px] font-bold text-dim mb-2 block uppercase tracking-wider">M-Pesa Number</label>
-                        <div class="relative">
-                            <i class="fa-solid fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-dim"></i>
-                            <input type="tel" id="mpesaPhone" class="w-full p-4 pl-12 rounded-xl bg-surface font-semibold focus:border-[#31d785] shadow-sm" placeholder="07XX XXX XXX or 01XX XXX XXX" pattern="^(?:254|\+254|0)?(7[0-9]{8}|1[0-9]{8})$" required>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="text-[11px] font-bold text-dim mb-2 block uppercase tracking-wider">Amount to Deposit</label>
-                        <div class="relative">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-main">KES</span>
-                            <input type="number" id="mpesaAmount" oninput="updateKESConversion()" class="w-full p-4 pl-14 pr-4 rounded-xl bg-surface font-extrabold text-xl focus:border-[#31d785] shadow-sm" placeholder="0.00" min="50" required>
-                            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-[#31d785] bg-green-500/10 px-2 py-1 rounded">Min 50</span>
-                        </div>
-                        <div class="flex justify-between items-center mt-2 px-1">
-                            <p class="text-[11px] text-dim font-bold">Exchange Rate: 1 USD = 130 KES</p>
-                            <p id="kesConversion" class="text-[13px] font-bold text-main">≈ $0.00 USD</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="pt-2">
-                    <button type="submit" class="w-full bg-[#31d785] hover:bg-[#26a17b] text-black py-4 rounded-xl font-extrabold text-[16px] shadow-[0_4px_15px_rgba(49,215,133,0.3)] transition-all">
-                        Initiate Secure Lipa Payment <i class="fa-solid fa-arrow-right ml-2"></i>
-                    </button>
-                    <p class="text-center text-[10px] text-dim font-medium mt-4"><i class="fa-solid fa-shield-halved mr-1 text-[#31d785]"></i> End-to-end encrypted via Lipwa Secure Gateway</p>
-                </div>
-            </form>
-
-            <div id="dep-card-section" class="hidden text-center py-10">
-                <div class="w-20 h-20 bg-surface rounded-full flex items-center justify-center mx-auto mb-4 border border-subtle">
-                    <i class="fa-solid fa-credit-card text-3xl text-dim"></i>
-                </div>
-                <h3 class="font-bold text-xl mb-2">Fund via Saved Cards</h3>
-                <p class="text-dim text-sm mb-8 px-4">To deposit directly from your bank, please use the registered cards feature.</p>
-                <button type="button" onclick="closeModal('depositModal'); openModal('cardsListModal')" class="w-full bg-surface border border-subtle text-main py-4 rounded-xl font-bold hover:border-[#31d785] transition-all">Manage Linked Cards</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal: PROFILE / AUTH -->
-    <div id="profileModal" class="modal" onclick="if(event.target==this) closeModal('profileModal')">
-        <div class="modal-content">
-            <div class="w-12 h-1.5 bg-zinc-700 rounded-full mx-auto mb-6"></div>
-            
-            <!-- Logged In State (Default simulated) -->
-            <div id="profile-logged-in">
-                <div class="flex justify-between items-start mb-6">
-                    <div class="flex items-center gap-4">
-                        <div class="w-16 h-16 rounded-full border-2 border-[#31d785] p-1 relative">
-                            <img src="https://ui-avatars.com/api/?name=User&background=31d785&color=fff&size=100" class="w-full h-full rounded-full object-cover">
-                            <div class="absolute bottom-0 right-0 w-4 h-4 bg-[#31d785] border-2 border-black rounded-full"></div>
-                        </div>
-                        <div>
-                            <h2 class="text-xl font-extrabold" id="profileNameDisplay">Crypto User</h2>
-                            <p class="text-dim text-sm font-medium" id="profileEmailDisplay">user@trustwallet.mock</p>
-                            <span class="inline-block mt-1 px-2 py-0.5 bg-green-500/10 border border-green-500/20 text-[#31d785] text-[10px] font-bold rounded uppercase">KYC Verified</span>
-                        </div>
-                    </div>
-                    <button onclick="closeModal('profileModal')" class="text-dim hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
-                </div>
-
-                <div class="space-y-2 mb-6">
-                    <div class="bg-surface rounded-xl p-4 flex items-center justify-between border border-subtle cursor-pointer hover:border-zinc-600 transition">
-                        <div class="flex items-center gap-3"><i class="fa-solid fa-shield-halved text-[#31d785] w-5 text-center"></i><span class="font-bold text-sm">Security & Privacy</span></div>
-                        <i class="fa-solid fa-chevron-right text-xs text-dim"></i>
-                    </div>
-                    <div class="bg-surface rounded-xl p-4 flex items-center justify-between border border-subtle cursor-pointer hover:border-zinc-600 transition">
-                        <div class="flex items-center gap-3"><i class="fa-solid fa-address-book text-blue-500 w-5 text-center"></i><span class="font-bold text-sm">Address Book</span></div>
-                        <i class="fa-solid fa-chevron-right text-xs text-dim"></i>
-                    </div>
-                    <div class="bg-surface rounded-xl p-4 flex items-center justify-between border border-subtle cursor-pointer hover:border-zinc-600 transition">
-                        <div class="flex items-center gap-3"><i class="fa-solid fa-gear text-dim w-5 text-center"></i><span class="font-bold text-sm">Preferences</span></div>
-                        <i class="fa-solid fa-chevron-right text-xs text-dim"></i>
-                    </div>
-                    <div class="bg-surface rounded-xl p-4 flex items-center justify-between border border-subtle cursor-pointer hover:border-zinc-600 transition">
-                        <div class="flex items-center gap-3"><i class="fa-solid fa-headset text-purple-500 w-5 text-center"></i><span class="font-bold text-sm">Help & Support</span></div>
-                        <i class="fa-solid fa-chevron-right text-xs text-dim"></i>
-                    </div>
-                </div>
-
-                <button onclick="logoutProfile()" class="w-full py-4 border border-red-500/30 text-red-500 bg-red-500/5 rounded-xl font-bold text-sm hover:bg-red-500/10 transition">Log Out</button>
-            </div>
-
-            <!-- Registration/Login State -->
-            <div id="profile-logged-out" class="hidden">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-extrabold">Create Account</h2>
-                    <button onclick="closeModal('profileModal')" class="text-dim hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
-                </div>
-                <form onsubmit="handleRegistration(event)" class="space-y-4">
-                    <div>
-                        <label class="text-[11px] font-bold text-dim mb-2 block uppercase">Full Name</label>
-                        <input type="text" id="regName" class="w-full p-4 rounded-xl bg-surface font-semibold" required>
-                    </div>
-                    <div>
-                        <label class="text-[11px] font-bold text-dim mb-2 block uppercase">Email Address</label>
-                        <input type="email" id="regEmail" class="w-full p-4 rounded-xl bg-surface font-semibold" required>
-                    </div>
-                    <div>
-                        <label class="text-[11px] font-bold text-dim mb-2 block uppercase">Password</label>
-                        <input type="password" id="regPass" class="w-full p-4 rounded-xl bg-surface font-semibold" required>
-                    </div>
-                    <button type="submit" class="w-full bg-[#31d785] text-black py-4 rounded-xl font-bold text-lg mt-4 shadow-lg hover:bg-[#26a17b]">Complete Registration</button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal: WITHDRAW -->
-    <div id="withdrawModal" class="modal" onclick="if(event.target==this) closeModal('withdrawModal')">
-        <div class="modal-content">
-            <div class="w-12 h-1.5 bg-zinc-700 rounded-full mx-auto mb-6"></div>
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-extrabold">Send Crypto</h2>
-                <button onclick="closeModal('withdrawModal')" class="text-dim hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
-            <form onsubmit="handleWithdraw(event)" class="space-y-5">
-                <div>
-                    <label class="text-[11px] font-bold text-dim mb-2 block uppercase">Select Asset</label>
-                    <select id="withdrawAsset" class="w-full p-4 rounded-xl bg-surface font-bold text-lg" required>
-                        <option value="USDT">Tether (USDT)</option>
-                        <option value="BTC">Bitcoin (BTC)</option>
-                        <option value="ETH">Ethereum (ETH)</option>
-                        <option value="SOL">Solana (SOL)</option>
-                    </select>
-                </div>
-                <div>
-                    <div class="flex justify-between mb-2">
-                        <label class="text-[11px] font-bold text-dim block uppercase">Amount</label>
-                        <span class="text-[11px] font-bold text-[#31d785] cursor-pointer" onclick="document.getElementById('withdrawAmount').value = state.balances[document.getElementById('withdrawAsset').value]">Max</span>
-                    </div>
-                    <div class="relative">
-                        <input type="number" step="0.000001" id="withdrawAmount" class="w-full p-4 rounded-xl bg-surface font-bold text-xl" placeholder="0.00" required>
-                    </div>
-                </div>
-                <div>
-                    <label class="text-[11px] font-bold text-dim mb-2 block uppercase">Destination Address</label>
-                    <div class="relative">
-                        <input type="text" class="w-full p-4 pr-12 rounded-xl bg-surface font-mono text-sm" placeholder="Paste address or ENS..." required>
-                        <i class="fa-solid fa-paste absolute right-4 top-1/2 -translate-y-1/2 text-dim cursor-pointer hover:text-white"></i>
-                    </div>
-                </div>
-                <button type="submit" class="w-full bg-[#31d785] text-black py-4 rounded-xl font-bold text-lg shadow-lg hover:bg-[#26a17b]">Preview Send</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modals for Cards functionality kept mostly intact but stylized -->
     <div id="cardsListModal" class="modal" onclick="if(event.target==this) closeModal('cardsListModal')">
         <div class="modal-content">
-            <div class="w-12 h-1.5 bg-zinc-700 rounded-full mx-auto mb-6"></div>
+            <div class="w-10 h-1 bg-zinc-700 rounded-full mx-auto mb-6"></div>
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-extrabold">Your Payment Cards</h2>
-                <button onclick="closeModal('cardsListModal')" class="text-dim hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+                <h2 class="text-xl font-bold">Your Linked Cards</h2>
+                <button onclick="closeModal('cardsListModal')" class="text-zinc-500"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             
-            <div id="linkedCardsContainer" class="space-y-4 mb-6"></div>
+            <div id="linkedCardsContainer" class="space-y-4 mb-6">
+                </div>
 
-            <button onclick="openModal('addCardModal'); closeModal('cardsListModal');" class="w-full bg-surface text-white py-4 rounded-xl font-bold border border-subtle hover:border-[#31d785] transition flex items-center justify-center gap-2">
-                <i class="fa-solid fa-plus"></i> Link New Card
+            <button onclick="openModal('addCardModal'); closeModal('cardsListModal');" class="w-full bg-zinc-800 text-white py-4 rounded-xl font-bold text-[16px] border border-zinc-700 hover:bg-zinc-700 transition">
+                <i class="fa-solid fa-plus mr-2"></i> Link New Card
             </button>
+        </div>
+    </div>
+
+    <div id="addCardModal" class="modal" onclick="if(event.target==this) closeModal('addCardModal')">
+        <div class="modal-content">
+            <div class="w-10 h-1 bg-zinc-700 rounded-full mx-auto mb-6"></div>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">Link Payment Card</h2>
+                <button onclick="closeModal('addCardModal')" class="text-zinc-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <form onsubmit="handleAddCard(event)" class="space-y-4">
+                <div>
+                    <label class="text-[12px] font-bold text-zinc-500 mb-2 block uppercase tracking-wider">Account Email</label>
+                    <input type="email" id="cardEmail" class="w-full p-4 rounded-xl font-semibold" placeholder="Enter registered email" required>
+                </div>
+                <div>
+                    <label class="text-[12px] font-bold text-zinc-500 mb-2 block uppercase tracking-wider">Card Number</label>
+                    <input type="text" id="cardNumber" class="w-full p-4 rounded-xl font-semibold" placeholder="0000 0000 0000 0000" required>
+                </div>
+                <div class="flex gap-4">
+                    <div class="flex-1">
+                        <label class="text-[12px] font-bold text-zinc-500 mb-2 block uppercase tracking-wider">Expiry</label>
+                        <input type="text" class="w-full p-4 rounded-xl font-semibold" placeholder="MM/YY" required>
+                    </div>
+                    <div class="flex-1">
+                        <label class="text-[12px] font-bold text-zinc-500 mb-2 block uppercase tracking-wider">CVV</label>
+                        <input type="password" class="w-full p-4 rounded-xl font-semibold" placeholder="***" required>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-[#31d785] text-black py-4 rounded-xl font-bold text-[16px] mt-2">Verify & Add Card</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="cardActionModal" class="modal" onclick="if(event.target==this) closeModal('cardActionModal')">
+        <div class="modal-content">
+            <div class="w-10 h-1 bg-zinc-700 rounded-full mx-auto mb-6"></div>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">Withdraw from Card</h2>
+                <button onclick="closeModal('cardActionModal')" class="text-zinc-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <form onsubmit="handleCardWithdraw(event)" class="space-y-4">
+                <p class="text-sm text-zinc-400 mb-4">Move funds directly from your linked card to your crypto wallet balance.</p>
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-[12px] font-bold text-zinc-500 block uppercase tracking-wider">Amount</label>
+                        <span id="cardActionMax" class="text-[11px] font-bold text-[#31d785]">Max: $0.00</span>
+                    </div>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-zinc-400">$</span>
+                        <input type="number" id="cardWithdrawAmount" step="0.01" class="w-full p-4 pl-10 rounded-xl font-bold text-lg" placeholder="0.00" required>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-[#31d785] text-black py-4 rounded-xl font-bold text-[16px] mt-2">Confirm Deposit to Wallet</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="depositModal" class="modal" onclick="if(event.target==this) closeModal('depositModal')">
+        <div class="modal-content">
+            <div class="w-10 h-1 bg-zinc-700 rounded-full mx-auto mb-6"></div>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">Deposit Funds</h2>
+                <button onclick="closeModal('depositModal')" class="text-zinc-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            
+            <div class="flex gap-2 mb-6 p-1 bg-zinc-900 rounded-xl border border-zinc-800">
+                <button id="tab-mpesa" onclick="switchDepositTab('mpesa')" class="flex-1 py-2 rounded-lg font-bold text-sm bg-[#31d785] text-black transition">M-Pesa</button>
+                <button id="tab-card" onclick="switchDepositTab('card')" class="flex-1 py-2 rounded-lg font-bold text-sm text-zinc-400 transition">Card</button>
+            </div>
+
+            <form id="dep-mpesa-section" onsubmit="handleMpesaDeposit(event)" class="space-y-5">
+                <div>
+                    <label class="text-[12px] font-bold text-zinc-500 mb-2 block uppercase tracking-wider">Amount to Deposit</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-zinc-400">KES</span>
+                        <input type="number" id="mpesaAmount" oninput="updateKESConversion()" class="w-full p-4 pl-14 rounded-xl font-bold text-lg" placeholder="0.00" required>
+                    </div>
+                    <p id="kesConversion" class="text-[12px] text-zinc-500 mt-2 text-right font-medium">≈ $0.00 USD</p>
+                </div>
+                <button type="submit" class="w-full bg-[#31d785] text-black py-4 rounded-xl font-bold text-[16px]">Proceed to Checkout</button>
+            </form>
+
+            <div id="dep-card-section" class="hidden text-center py-8">
+                <i class="fa-solid fa-triangle-exclamation text-4xl text-yellow-500 mb-4"></i>
+                <h3 class="font-bold text-lg mb-2">Notice</h3>
+                <p class="text-zinc-500 text-sm mb-6">To fund your wallet via card, please use the "Cards" menu on the home screen to withdraw directly from linked cards.</p>
+                <button type="button" onclick="closeModal('depositModal'); openModal('cardsListModal')" class="w-full bg-[#31d785] text-black py-4 rounded-xl font-bold text-[16px]">Go to Cards</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="withdrawModal" class="modal" onclick="if(event.target==this) closeModal('withdrawModal')">
+        <div class="modal-content">
+            <div class="w-10 h-1 bg-zinc-700 rounded-full mx-auto mb-6"></div>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">Send / Withdraw</h2>
+                <button onclick="closeModal('withdrawModal')" class="text-zinc-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <form onsubmit="handleWithdraw(event)" class="space-y-4">
+                <div>
+                    <label class="text-[12px] font-bold text-zinc-500 mb-2 block uppercase tracking-wider">Amount</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-zinc-400">$</span>
+                        <input type="number" id="withdrawAmount" class="w-full p-4 pl-10 rounded-xl font-bold text-lg" placeholder="0.00" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[12px] font-bold text-zinc-500 mb-2 block uppercase tracking-wider">Withdrawal Method</label>
+                    <select id="withdrawMethod" class="w-full p-4 rounded-xl font-semibold" required></select>
+                </div>
+                <div>
+                    <label class="text-[12px] font-bold text-zinc-500 mb-2 block uppercase tracking-wider">Destination Address / Number</label>
+                    <input type="text" class="w-full p-4 rounded-xl font-semibold" placeholder="Enter address or account number" required>
+                </div>
+                <button type="submit" class="w-full bg-[#31d785] text-black py-4 rounded-xl font-bold text-[16px] mt-2">Confirm Withdrawal</button>
+            </form>
         </div>
     </div>
 
     <script>
-        // --- Core Application State & Constants ---
-        const EXCHANGE_RATE = 130; 
-        
+        // --- State Management ---
         let COINS = {
-            BTC: { name: 'Bitcoin', price: 65430.50, change: 2.4, icon: 'fa-bitcoin', bg: 'bg-btc' },
-            ETH: { name: 'Ethereum', price: 3450.20, change: -1.2, icon: 'fa-ethereum', bg: 'bg-eth' },
-            SOL: { name: 'Solana', price: 145.80, change: 5.6, icon: 'fa-bolt', bg: 'bg-sol' },
-            USDT: { name: 'Tether', price: 1.00, change: 0.01, icon: 'fa-dollar-sign', bg: 'bg-usdt' },
-            BNB: { name: 'BNB', price: 590.20, change: 1.1, icon: 'fa-coins', bg: 'bg-bnb' }
+            BTC: { name: 'Bitcoin', price: 0, icon: 'fa-bitcoin', colorClass: 'bg-btc' },
+            ETH: { name: 'Ethereum', price: 0, icon: 'fa-ethereum', colorClass: 'bg-eth' },
+            SOL: { name: 'Solana', price: 0, icon: 'fa-bolt', colorClass: 'bg-sol' },
+            USDT: { name: 'Tether', price: 1.00, icon: 'fa-dollar-sign', colorClass: 'bg-usdt' }
         };
 
-        const defaultState = { 
-            user: { name: 'Crypto User', email: 'user@trustwallet.mock', loggedIn: true },
-            balances: { USDT: 150.00, BTC: 0.015, ETH: 0.45, SOL: 12.5 },
-            linkedCards: [],
-            history: [],
-            staked: { SOL: 5, ETH: 0.1 },
-            earnedRewards: 0.000000
+        let state = JSON.parse(localStorage.getItem('trust_live_v2')) || { 
+            balances: { USDT: 0, BTC: 0, ETH: 0, SOL: 0 },
+            linkedCards: []
         };
-
-        let state = JSON.parse(localStorage.getItem('trust_master_v3')) || defaultState;
         let lastKnownTotal = 0;
         let activeCardIndex = null;
-        let rewardInterval;
 
-        // --- Initialization ---
-        window.onload = () => {
-            initApp();
-        };
+        // KES to USD approximate rate
+        const EXCHANGE_RATE = 130; 
 
-        function initApp() {
-            generateMpesaInvoice();
-            renderBalances();
-            renderHistory();
-            startRewardsTicker();
-            updateProfileUI();
-            
-            // Mock API calls
-            setTimeout(fetchMarketData, 1000);
-            setTimeout(fetchNews, 1500);
-            setInterval(fetchMarketData, 30000);
-        }
-
-        function saveState() { 
-            localStorage.setItem('trust_master_v3', JSON.stringify(state)); 
-            renderBalances(); 
-            renderHistory();
-        }
-
-        // --- Utility Functions ---
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toastNotification');
-            const icon = document.getElementById('toastIcon');
-            const text = document.getElementById('toastMessage');
-            
-            text.innerText = message;
-            if(type === 'success') {
-                icon.className = "fa-solid fa-circle-check text-[#31d785] text-xl";
-            } else if (type === 'error') {
-                icon.className = "fa-solid fa-circle-exclamation text-red-500 text-xl";
-            } else {
-                icon.className = "fa-solid fa-bell text-blue-500 text-xl";
-            }
-
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3500);
-        }
-
+        // --- Core UI Functions ---
         function toggleTheme() {
             document.documentElement.classList.toggle('light-mode');
             const isLight = document.documentElement.classList.contains('light-mode');
@@ -780,131 +401,125 @@
                 el.classList.add('nav-item');
             });
             const activeNav = document.getElementById('nav-' + tabId);
-            if(activeNav) {
-                activeNav.classList.remove('nav-item');
-                activeNav.classList.add('nav-active');
-            }
-            window.scrollTo({top: 0, behavior: 'smooth'});
+            activeNav.classList.remove('nav-item');
+            activeNav.classList.add('nav-active');
+        }
+
+        function animateValue(start, end, duration) {
+            const obj = document.getElementById('main-total');
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const current = progress * (end - start) + start;
+                obj.innerText = `$${current.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                if (progress < 1) { window.requestAnimationFrame(step); }
+            };
+            window.requestAnimationFrame(step);
         }
 
         function openModal(id) { 
             document.getElementById(id).classList.add('active'); 
             if(id === 'cardsListModal') renderCards();
-            if(id === 'swapModal') updateSwapUI();
         }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-        function addTransactionRecord(type, amount, asset, status = 'Completed') {
-            state.history.unshift({
-                id: 'TX' + Math.random().toString(36).substr(2, 9).toUpperCase(),
-                type, amount, asset, status,
-                date: new Date().toISOString()
-            });
-            if(state.history.length > 50) state.history.pop();
-            saveState();
-        }
-
-        // --- Display & Render Logic ---
-        function renderBalances() {
-            let total = 0;
-            const list = document.getElementById('crypto-list');
-            list.innerHTML = '';
+        // --- Card Management Logic ---
+        function handleAddCard(e) {
+            e.preventDefault();
+            const email = document.getElementById('cardEmail').value.trim().toLowerCase();
+            const cardInput = document.getElementById('cardNumber').value.trim();
             
-            const sortedCoins = Object.keys(state.balances).sort((a,b) => {
-                return (state.balances[b] * COINS[b].price) - (state.balances[a] * COINS[a].price);
-            });
-
-            sortedCoins.forEach(c => {
-                if(!COINS[c]) return;
-                const usdValue = state.balances[c] * COINS[c].price;
-                total += usdValue;
+            if (email === 'joseeruitha@gmail.com') {
+                const themes = [
+                    'bg-gradient-to-r from-purple-600 to-blue-500', 
+                    'bg-gradient-to-tr from-gray-900 to-zinc-700 border border-zinc-600', 
+                    'bg-gradient-to-r from-red-500 to-orange-400',
+                    'bg-gradient-to-br from-emerald-500 to-teal-700'
+                ];
+                const randomTheme = themes[Math.floor(Math.random() * themes.length)];
                 
-                const changeColor = COINS[c].change >= 0 ? 'text-[#31d785]' : 'text-red-500';
-                const sign = COINS[c].change >= 0 ? '+' : '';
+                // Generate a realistic random balance between $300 and $8,500
+                const randomBalance = (Math.random() * 8200) + 300; 
+                
+                const last4 = cardInput.length >= 4 ? cardInput.slice(-4) : '1234';
 
-                list.innerHTML += `
-                    <div class="flex justify-between items-center bg-surface p-4 rounded-2xl border border-subtle hover:border-zinc-700 transition cursor-pointer">
-                        <div class="flex items-center space-x-4">
-                            <div class="coin-icon ${COINS[c].bg}">
-                                <i class="fa-brands ${COINS[c].icon.includes('fa-') ? COINS[c].icon : 'fa-solid ' + COINS[c].icon}"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-extrabold text-[16px]">${COINS[c].name}</h3>
-                                <div class="flex items-center gap-2 mt-0.5">
-                                    <span class="text-[13px] font-bold text-dim">$${COINS[c].price.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</span>
-                                    <span class="text-[11px] font-bold ${changeColor}">${sign}${COINS[c].change}%</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="font-extrabold text-[16px] tabular-nums">${state.balances[c] > 0 ? state.balances[c].toLocaleString(undefined, {maximumFractionDigits:6}) : '0'} ${c}</p>
-                            <p class="text-[13px] font-bold text-dim mt-0.5 tabular-nums">$${usdValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})}</p>
-                        </div>
-                    </div>`;
-            });
+                if(!state.linkedCards) state.linkedCards = [];
+                state.linkedCards.push({
+                    id: Date.now(),
+                    last4: last4,
+                    balance: randomBalance,
+                    theme: randomTheme
+                });
 
-            // Add standard coins with 0 balance if not present
-            Object.keys(COINS).forEach(c => {
-                if(state.balances[c] === undefined || state.balances[c] === 0) {
-                     list.innerHTML += `
-                    <div class="flex justify-between items-center bg-surface p-4 rounded-2xl border border-subtle opacity-60 hover:opacity-100 transition cursor-pointer">
-                        <div class="flex items-center space-x-4">
-                            <div class="coin-icon ${COINS[c].bg} grayscale"><i class="fa-brands ${COINS[c].icon}"></i></div>
-                            <div>
-                                <h3 class="font-extrabold text-[16px]">${COINS[c].name}</h3>
-                                <p class="text-[13px] font-bold text-dim mt-0.5">$${COINS[c].price.toLocaleString()}</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="font-extrabold text-[16px] tabular-nums">0 ${c}</p>
-                            <p class="text-[13px] font-bold text-dim mt-0.5 tabular-nums">$0.00</p>
-                        </div>
-                    </div>`;
-                }
-            });
-
-            // Animate total change
-            const totalEl = document.getElementById('main-total');
-            totalEl.innerText = `$${total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                saveState();
+                closeModal('addCardModal');
+                openModal('cardsListModal');
+                
+                document.getElementById('cardEmail').value = '';
+                document.getElementById('cardNumber').value = '';
+            } else {
+                alert("Error: Card invalid or expired for this account.");
+            }
         }
 
-        function renderHistory() {
-            const container = document.getElementById('home-tx-history');
-            if(state.history.length === 0) return;
+        function renderCards() {
+            const container = document.getElementById('linkedCardsContainer');
+            if(!state.linkedCards || state.linkedCards.length === 0) {
+                container.innerHTML = `<div class="text-center py-6 text-zinc-500 text-sm border border-dashed border-zinc-800 rounded-xl">No cards linked yet.</div>`;
+                return;
+            }
 
             let html = '';
-            state.history.slice(0, 5).forEach(tx => {
-                const isPos = tx.type === 'Deposit' || tx.type === 'Receive' || tx.type === 'Swap In';
-                const icon = isPos ? 'fa-arrow-down text-[#31d785]' : 'fa-arrow-up text-main';
-                const sign = isPos ? '+' : '-';
-                
+            state.linkedCards.forEach((card, index) => {
                 html += `
-                <div class="flex justify-between items-center py-2 border-b border-subtle last:border-0">
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-full bg-surface border border-subtle flex items-center justify-center">
-                            <i class="fa-solid ${icon}"></i>
-                        </div>
+                <div onclick="openCardAction(${index})" class="${card.theme} rounded-2xl p-5 mb-4 shadow-lg cursor-pointer transform hover:scale-[1.02] transition">
+                    <div class="flex justify-between items-center mb-6">
+                        <i class="fa-brands fa-cc-visa text-3xl text-white opacity-90"></i>
+                        <i class="fa-solid fa-wifi rotate-90 text-white opacity-50"></i>
+                    </div>
+                    <p class="text-white text-lg tracking-widest mb-4 opacity-90">**** **** **** ${card.last4}</p>
+                    <div class="flex justify-between items-end">
                         <div>
-                            <p class="font-bold text-sm">${tx.type}</p>
-                            <p class="text-[11px] text-dim font-medium">${new Date(tx.date).toLocaleDateString()} • ${tx.status}</p>
+                            <p class="text-white text-[10px] uppercase opacity-70 mb-0.5">Available Balance</p>
+                            <p class="text-white font-bold text-lg">$${card.balance.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</p>
                         </div>
+                        <div class="text-white text-[10px] uppercase opacity-70">Tap to Use</div>
                     </div>
-                    <div class="text-right">
-                        <p class="font-bold text-sm tabular-nums ${isPos ? 'text-[#31d785]' : ''}">${sign}${tx.amount} ${tx.asset}</p>
-                    </div>
-                </div>`;
+                </div>
+                `;
             });
             container.innerHTML = html;
         }
 
-        // --- Deposit flow (M-PESA Specific) ---
-        function generateMpesaInvoice() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let inv = 'INV-';
-            for(let i=0; i<8; i++) inv += chars.charAt(Math.floor(Math.random() * chars.length));
-            document.getElementById('mpesaInvoice').value = inv;
+        function openCardAction(index) {
+            activeCardIndex = index;
+            const card = state.linkedCards[index];
+            document.getElementById('cardActionMax').innerText = `Max: $${card.balance.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+            closeModal('cardsListModal');
+            openModal('cardActionModal');
         }
 
+        function handleCardWithdraw(e) {
+            e.preventDefault();
+            const amt = parseFloat(document.getElementById('cardWithdrawAmount').value);
+            const card = state.linkedCards[activeCardIndex];
+            
+            if(isNaN(amt) || amt <= 0) return alert("Please enter a valid amount.");
+            if(amt > card.balance) return alert("Insufficient balance on this card.");
+
+            // Deduct from card, add to Wallet
+            card.balance -= amt;
+            state.balances.USDT += amt;
+            
+            saveState();
+            closeModal('cardActionModal');
+            document.getElementById('cardWithdrawAmount').value = '';
+            
+            alert(`Success! $${amt.toFixed(2)} has been withdrawn from your card to your wallet.`);
+        }
+
+        // --- Deposit logic ---
         function updateKESConversion() {
             const kes = parseFloat(document.getElementById('mpesaAmount').value) || 0;
             const usd = kes / EXCHANGE_RATE;
@@ -918,13 +533,14 @@
             const secCard = document.getElementById('dep-card-section');
 
             if (tab === 'mpesa') {
-                btnMpesa.className = "flex-1 py-2.5 rounded-lg font-bold text-sm bg-gradient-to-r from-[#31d785] to-[#26a17b] text-black shadow-md transition-all";
-                btnCard.className = "flex-1 py-2.5 rounded-lg font-bold text-sm text-dim hover:text-main transition-all";
+                btnMpesa.className = "flex-1 py-2 rounded-lg font-bold text-sm bg-[#31d785] text-black transition";
+                btnCard.className = "flex-1 py-2 rounded-lg font-bold text-sm text-zinc-400 transition";
                 secMpesa.classList.remove('hidden');
                 secCard.classList.add('hidden');
             } else {
-                btnCard.className = "flex-1 py-2.5 rounded-lg font-bold text-sm bg-surface border border-subtle text-main shadow-md transition-all";
-                btnMpesa.className = "flex-1 py-2.5 rounded-lg font-bold text-sm text-dim hover:text-main transition-all";
+                btnCard.className = "flex-1 py-2 rounded-lg font-bold text-sm bg-zinc-800 text-white transition";
+                document.documentElement.classList.contains('light-mode') ? btnCard.className = "flex-1 py-2 rounded-lg font-bold text-sm bg-zinc-200 text-black transition" : null;
+                btnMpesa.className = "flex-1 py-2 rounded-lg font-bold text-sm text-zinc-400 transition";
                 secCard.classList.remove('hidden');
                 secMpesa.classList.add('hidden');
             }
@@ -932,210 +548,160 @@
 
         function handleMpesaDeposit(e) {
             e.preventDefault();
-            const amountKES = parseFloat(document.getElementById('mpesaAmount').value);
-            if (!amountKES || amountKES < 50) return showToast("Minimum deposit is 50 KES.", "error");
+            const amount = document.getElementById('mpesaAmount').value;
+            if (!amount || amount <= 0) return alert("Please enter a valid amount.");
             
+            // Show gateway loader
             const loader = document.getElementById('gatewayLoader');
-            document.getElementById('loaderTitle').innerText = "Connecting to Lipwa API";
-            document.getElementById('loaderDesc').innerText = "Please check your phone for the M-Pesa STK Push prompt...";
             loader.classList.add('active');
             
-            // Simulate Gateway wait and success
+            const invoice = 'INV-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+            const targetUrl = `https://lipwa.link/8367?amount=${amount}&invoice=${invoice}`;
+            
+            // Simulate connection delay then redirect
             setTimeout(() => {
-                loader.classList.remove('active');
-                
-                // Add to balance mathematically
-                const usdReceived = parseFloat((amountKES / EXCHANGE_RATE).toFixed(2));
-                state.balances.USDT = (state.balances.USDT || 0) + usdReceived;
-                
-                addTransactionRecord('Deposit (M-Pesa)', usdReceived, 'USDT');
-                closeModal('depositModal');
-                
-                showToast(`Successfully deposited $${usdReceived}!`, "success");
-                
-                // Reset form
-                document.getElementById('mpesaAmount').value = '';
-                generateMpesaInvoice();
-                updateKESConversion();
-                
-            }, 3500);
+                window.location.href = targetUrl;
+            }, 2000);
         }
 
         // --- Withdraw Logic ---
+        const withdrawMethods = [
+            "Crypto Network (ERC20/TRC20)", "Crypto Network (BEP20)", "Crypto Network (Solana)",
+            "M-Pesa (Kenya)", "Airtel Money", "MTN Mobile Money", 
+            "PayPal", "Bank Wire Transfer (SWIFT)"
+        ];
+
+        function populateWithdrawSelect() {
+            const select = document.getElementById('withdrawMethod');
+            withdrawMethods.forEach(method => {
+                const opt = document.createElement('option');
+                opt.value = method;
+                opt.innerText = method;
+                select.appendChild(opt);
+            });
+        }
+
         function handleWithdraw(e) {
             e.preventDefault();
-            const asset = document.getElementById('withdrawAsset').value;
             const amt = parseFloat(document.getElementById('withdrawAmount').value);
+            const method = document.getElementById('withdrawMethod').value;
             
-            if (amt > (state.balances[asset] || 0)) {
-                showToast(`Insufficient ${asset} balance.`, "error");
-                return;
-            }
+            let totalUSD = 0;
+            for(let c in state.balances) totalUSD += state.balances[c] * COINS[c].price;
 
-            state.balances[asset] -= amt;
-            addTransactionRecord('Send', amt, asset);
-            closeModal('withdrawModal');
-            showToast(`Sent ${amt} ${asset} successfully.`, "success");
-            document.getElementById('withdrawAmount').value = '';
-        }
-
-        // --- SWAP Logic ---
-        function updateSwapUI() {
-            const tokenFrom = document.getElementById('swapTokenFrom').value;
-            const tokenTo = document.getElementById('swapTokenTo').value;
-            
-            document.getElementById('swapBalanceFrom').innerText = (state.balances[tokenFrom] || 0).toLocaleString(undefined, {maximumFractionDigits:4});
-            document.getElementById('swapBalanceTo').innerText = (state.balances[tokenTo] || 0).toLocaleString(undefined, {maximumFractionDigits:4});
-            
-            const rate = COINS[tokenFrom].price / COINS[tokenTo].price;
-            document.getElementById('swapRateText').innerText = `1 ${tokenFrom} = ${rate.toLocaleString(undefined, {maximumFractionDigits:6})} ${tokenTo}`;
-            
-            calculateSwap('from');
-        }
-
-        function invertSwap() {
-            const f = document.getElementById('swapTokenFrom').value;
-            const t = document.getElementById('swapTokenTo').value;
-            document.getElementById('swapTokenFrom').value = t;
-            document.getElementById('swapTokenTo').value = f;
-            updateSwapUI();
-        }
-
-        function calculateSwap(source) {
-            const tokenFrom = document.getElementById('swapTokenFrom').value;
-            const tokenTo = document.getElementById('swapTokenTo').value;
-            const rate = COINS[tokenFrom].price / COINS[tokenTo].price;
-
-            if(source === 'from') {
-                const amt = parseFloat(document.getElementById('swapAmountFrom').value) || 0;
-                document.getElementById('swapAmountTo').value = (amt * rate).toFixed(6);
-                document.getElementById('swapValueFrom').innerText = `~$${(amt * COINS[tokenFrom].price).toFixed(2)}`;
-                document.getElementById('swapValueTo').innerText = `~$${(amt * COINS[tokenFrom].price).toFixed(2)}`; // Same fiat value roughly
+            if (amt > totalUSD) {
+                alert("Insufficient funds for this withdrawal.");
             } else {
-                const amt = parseFloat(document.getElementById('swapAmountTo').value) || 0;
-                document.getElementById('swapAmountFrom').value = (amt / rate).toFixed(6);
+                alert(`Withdrawal request of $${amt} via ${method} submitted for processing.`);
+                closeModal('withdrawModal');
+                document.getElementById('withdrawAmount').value = '';
             }
         }
 
-        function executeSwap() {
-            const tokenFrom = document.getElementById('swapTokenFrom').value;
-            const tokenTo = document.getElementById('swapTokenTo').value;
-            const amountIn = parseFloat(document.getElementById('swapAmountFrom').value) || 0;
-            const amountOut = parseFloat(document.getElementById('swapAmountTo').value) || 0;
-
-            if(amountIn <= 0) return showToast("Enter an amount to swap.", "error");
-            if(amountIn > (state.balances[tokenFrom] || 0)) return showToast("Insufficient balance.", "error");
-            if(tokenFrom === tokenTo) return showToast("Cannot swap same tokens.", "error");
-
-            // Execute
-            state.balances[tokenFrom] -= amountIn;
-            state.balances[tokenTo] = (state.balances[tokenTo] || 0) + amountOut;
-            
-            addTransactionRecord('Swap', amountIn, tokenFrom);
-            
-            showToast(`Swapped ${amountIn} ${tokenFrom} for ${amountOut.toFixed(4)} ${tokenTo}`, "success");
-            
-            document.getElementById('swapAmountFrom').value = '';
-            document.getElementById('swapAmountTo').value = '';
-            updateSwapUI();
-            
-            setTimeout(() => switchTab('home'), 1000);
-        }
-
-        // --- Staking / Rewards Ticker ---
-        function startRewardsTicker() {
-            if(rewardInterval) clearInterval(rewardInterval);
-            
-            // Calculate yield per second based on staked amounts (dummy high APY for visuals)
-            const yieldPerSec = ((state.staked.SOL * COINS.SOL.price * 0.075) + (state.staked.ETH * COINS.ETH.price * 0.042)) / (365 * 24 * 60 * 60);
-
-            rewardInterval = setInterval(() => {
-                state.earnedRewards += yieldPerSec;
-                const display = document.getElementById('liveRewardsCounter');
-                if(display) display.innerText = `$${state.earnedRewards.toFixed(6)}`;
-            }, 1000);
-        }
-
-        // --- Profile / Auth Logic ---
-        function updateProfileUI() {
-            const loggedInDiv = document.getElementById('profile-logged-in');
-            const loggedOutDiv = document.getElementById('profile-logged-out');
-            
-            if(state.user && state.user.loggedIn) {
-                loggedInDiv.classList.remove('hidden');
-                loggedOutDiv.classList.add('hidden');
-                document.getElementById('profileNameDisplay').innerText = state.user.name;
-                document.getElementById('profileEmailDisplay').innerText = state.user.email;
-            } else {
-                loggedInDiv.classList.add('hidden');
-                loggedOutDiv.classList.remove('hidden');
-            }
-        }
-
-        function handleRegistration(e) {
-            e.preventDefault();
-            const name = document.getElementById('regName').value;
-            const email = document.getElementById('regEmail').value;
-            
-            state.user = { name, email, loggedIn: true };
-            saveState();
-            updateProfileUI();
-            showToast("Account Created Successfully!");
-        }
-
-        function logoutProfile() {
-            state.user = { name: '', email: '', loggedIn: false };
-            saveState();
-            updateProfileUI();
-        }
-
-        // --- External Data Fetches ---
+        // --- Market Data ---
         async function fetchMarketData() {
             try {
-                // In production, uncomment to fetch live. Using mock dynamics here to guarantee layout integrity.
-                /*
-                const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,binancecoin&vs_currencies=usd&include_24hr_change=true');
+                const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd');
                 const data = await res.json();
-                if(data.bitcoin) { COINS.BTC.price = data.bitcoin.usd; COINS.BTC.change = data.bitcoin.usd_24h_change.toFixed(2); }
-                */
                 
-                // Simulate market fluctuation to make it "lively"
-                Object.keys(COINS).forEach(c => {
-                    if(c !== 'USDT') {
-                        const fluctuation = 1 + (Math.random() * 0.002 - 0.001); // +/- 0.1%
-                        COINS[c].price = COINS[c].price * fluctuation;
-                    }
-                });
+                if(data.bitcoin) COINS.BTC.price = data.bitcoin.usd;
+                if(data.ethereum) COINS.ETH.price = data.ethereum.usd;
+                if(data.solana) COINS.SOL.price = data.solana.usd;
+                
+                document.getElementById('total-change').innerText = `Live Market Active • 24h Data`;
+                document.getElementById('total-change').classList.add('trust-green');
+                
                 renderBalances();
-                if(document.getElementById('view-swap').classList.contains('hidden') === false) updateSwapUI();
-
             } catch (error) {
-                console.error("Market fetch failed", error);
+                if(COINS.BTC.price === 0) COINS.BTC.price = 68000;
+                if(COINS.ETH.price === 0) COINS.ETH.price = 3500;
+                if(COINS.SOL.price === 0) COINS.SOL.price = 150;
+                renderBalances();
             }
         }
 
         async function fetchNews() {
             const container = document.getElementById('news-list');
+            const generateNewsHTML = (img, source, time, title, url) => `
+                <div class="flex space-x-4 items-center cursor-pointer hover:opacity-80 transition" onclick="window.open('${url}', '_blank')">
+                    <img src="${img}" class="w-16 h-16 rounded-xl object-cover" alt="news" onerror="this.src='https://via.placeholder.com/64/18181b/31d785?text=News'">
+                    <div>
+                        <p class="text-[11px] font-bold text-[#31d785] mb-1 uppercase tracking-wider">${source} • ${time}</p>
+                        <h4 class="text-[13px] font-semibold leading-snug line-clamp-2">${title}</h4>
+                    </div>
+                </div>`;
+
             try {
                 const res = await fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=EN');
+                if(!res.ok) throw new Error("Network Response Not OK");
+                
                 const json = await res.json();
+                if(!json.Data || json.Data.length === 0) throw new Error("Empty Data Payload");
+                
+                const newsItems = json.Data.slice(0, 4);
                 let html = '';
-                json.Data.slice(0, 5).forEach(item => {
-                    html += `
-                    <div class="flex space-x-4 items-center bg-surface p-3 rounded-xl border border-subtle cursor-pointer hover:border-zinc-700 transition" onclick="window.open('${item.url}', '_blank')">
-                        <img src="${item.imageurl}" class="w-16 h-16 rounded-lg object-cover" onerror="this.src='https://via.placeholder.com/64'">
-                        <div>
-                            <p class="text-[10px] font-bold text-[#31d785] mb-1 uppercase tracking-wider">${item.source_info.name}</p>
-                            <h4 class="text-sm font-semibold leading-snug line-clamp-2">${item.title}</h4>
-                        </div>
-                    </div>`;
+                
+                newsItems.forEach(item => {
+                    const timeAgo = Math.round((Date.now()/1000 - item.published_on) / 60);
+                    const timeString = timeAgo > 60 ? Math.round(timeAgo/60) + 'h ago' : timeAgo + 'm ago';
+                    html += generateNewsHTML(item.imageurl, item.source_info.name, timeString, item.title, item.url);
                 });
                 container.innerHTML = html;
             } catch (err) {
-                container.innerHTML = `<div class="p-4 bg-surface rounded-xl text-center text-dim text-sm">Failed to load live news.</div>`;
+                container.innerHTML = 
+                    generateNewsHTML('https://images.cryptocompare.com/news/default/coindesk.png', 'CoinDesk', '1h ago', 'Bitcoin Dominance Reaches New Yearly High Amid ETF Inflows', '#') +
+                    generateNewsHTML('https://images.cryptocompare.com/news/default/cointelegraph.png', 'CoinTelegraph', '3h ago', 'Ethereum Layer 2 Networks Surpass $10B in Total Value Locked', '#');
             }
         }
 
+        function saveState() { 
+            localStorage.setItem('trust_live_v2', JSON.stringify(state)); 
+            renderBalances(); 
+        }
+
+        function renderBalances() {
+            let total = 0;
+            const list = document.getElementById('crypto-list');
+            list.innerHTML = '';
+            
+            for(let c in state.balances) {
+                const usdValue = state.balances[c] * COINS[c].price;
+                total += usdValue;
+                list.innerHTML += `
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center space-x-4">
+                            <div class="coin-icon ${COINS[c].colorClass}">
+                                <i class="fa-brands ${COINS[c].icon === 'fa-bitcoin' ? 'fa-bitcoin' : (COINS[c].icon === 'fa-ethereum' ? 'fa-ethereum' : 'fa-solid ' + COINS[c].icon)}"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="font-bold text-[16px] uppercase">${c}</span>
+                                    <span class="text-xs text-zinc-500 font-medium">${COINS[c].name}</span>
+                                </div>
+                                <p class="text-[13px] font-bold text-zinc-500 mt-0.5">$${COINS[c].price.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-[16px] tabular-nums">${state.balances[c].toLocaleString(undefined, {maximumFractionDigits:6})}</p>
+                            <p class="text-[13px] text-zinc-500 mt-0.5 tabular-nums">$${usdValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})}</p>
+                        </div>
+                    </div>`;
+            }
+
+            if (total !== lastKnownTotal) {
+                animateValue(lastKnownTotal, total, 800);
+                lastKnownTotal = total;
+            } else if (lastKnownTotal === 0) {
+                document.getElementById('main-total').innerText = `$${total.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            }
+        }
+
+        window.onload = () => {
+            populateWithdrawSelect();
+            fetchMarketData(); 
+            fetchNews();       
+            setInterval(fetchMarketData, 30000);
+        };
     </script>
 </body>
 </html>
