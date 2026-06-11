@@ -110,9 +110,9 @@
                 <div class="w-14 h-14 bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-800"><i class="fa-solid fa-arrow-up"></i></div>
                 <span class="text-[13px] font-medium opacity-80">Send</span>
             </button>
-            <button onclick="openModal('depositModal')" class="flex flex-col items-center gap-2">
+            <button onclick="openModal('receiveModal'); generateReceiveAddress();" class="flex flex-col items-center gap-2">
                 <div class="w-14 h-14 bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-800"><i class="fa-solid fa-arrow-down"></i></div>
-                <span class="text-[13px] font-medium opacity-80">Deposit</span>
+                <span class="text-[13px] font-medium opacity-80">Receive</span>
             </button>
             <button onclick="openModal('cardsListModal')" class="flex flex-col items-center gap-2">
                 <div class="w-14 h-14 bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-800"><i class="fa-solid fa-credit-card"></i></div>
@@ -125,13 +125,15 @@
         </div>
 
         <div class="flex px-6 mt-10 border-b border-zinc-900 text-[14px] font-bold text-zinc-500 gap-8 overflow-x-auto whitespace-nowrap">
-            <div class="pb-3 border-b-2 border-green-500 text-current cursor-pointer">Crypto</div>
-            <div class="pb-3 cursor-pointer hover:text-zinc-300 transition">Watchlist</div>
-            <div class="pb-3 cursor-pointer hover:text-zinc-300 transition">NFTs</div>
+            <div id="subtab-crypto" onclick="switchSubTab('crypto')" class="pb-3 border-b-2 border-green-500 text-current cursor-pointer">Crypto</div>
+            <div id="subtab-watchlist" onclick="switchSubTab('watchlist')" class="pb-3 cursor-pointer hover:text-zinc-300 transition">Watchlist</div>
+            <div id="subtab-nfts" onclick="switchSubTab('nfts')" class="pb-3 cursor-pointer hover:text-zinc-300 transition">NFTs</div>
             <div class="pb-3 ml-auto cursor-pointer"><i class="fa-solid fa-sliders"></i></div>
         </div>
 
         <div id="crypto-list" class="px-6 mt-6 space-y-6"></div>
+        <div id="watchlist-list" class="px-6 mt-6 space-y-6 hidden"></div>
+        <div id="nfts-list" class="px-6 mt-6 space-y-4 hidden"></div>
 
         <div class="px-6 mt-12 border-t border-zinc-900 pt-8 mb-10">
             <h3 class="text-[18px] font-bold mb-6">Market News</h3>
@@ -195,8 +197,9 @@
         <p class="text-zinc-500 text-sm mb-6">Earn crypto by staking your available balances.</p>
         <div class="bg-gradient-to-r from-[#26a17b] to-[#31d785] rounded-2xl p-6 text-black mb-6">
             <p class="text-sm font-bold opacity-80 mb-1">Total Earned</p>
-            <h1 class="text-3xl font-bold mb-4">$0.00</h1>
-            <button class="bg-black text-white px-5 py-2 rounded-full font-bold text-sm">Claim Rewards</button>
+            <h1 id="rewards-earned-display" class="text-3xl font-bold mb-1">$0.00</h1>
+            <p id="rewards-pending-text" class="text-xs font-bold opacity-75 mb-4">Pending Claim: $15.50</p>
+            <button onclick="claimRewards()" id="claim-rewards-btn" class="bg-black text-white px-5 py-2 rounded-full font-bold text-sm transition active:scale-95">Claim Rewards</button>
         </div>
     </div>
 
@@ -239,8 +242,7 @@
                 <button onclick="closeModal('cardsListModal')" class="text-zinc-500"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             
-            <div id="linkedCardsContainer" class="space-y-4 mb-6">
-                </div>
+            <div id="linkedCardsContainer" class="space-y-4 mb-6"></div>
 
             <button onclick="openModal('addCardModal'); closeModal('cardsListModal');" class="w-full bg-zinc-800 text-white py-4 rounded-xl font-bold text-[16px] border border-zinc-700 hover:bg-zinc-700 transition">
                 <i class="fa-solid fa-plus mr-2"></i> Link New Card
@@ -303,36 +305,46 @@
         </div>
     </div>
 
-    <div id="depositModal" class="modal" onclick="if(event.target==this) closeModal('depositModal')">
+    <div id="receiveModal" class="modal" onclick="if(event.target==this) closeModal('receiveModal')">
         <div class="modal-content">
             <div class="w-10 h-1 bg-zinc-700 rounded-full mx-auto mb-6"></div>
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold">Deposit Funds</h2>
-                <button onclick="closeModal('depositModal')" class="text-zinc-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+                <h2 class="text-xl font-bold">Receive Crypto</h2>
+                <button onclick="closeModal('receiveModal')" class="text-zinc-500"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             
-            <div class="flex gap-2 mb-6 p-1 bg-zinc-900 rounded-xl border border-zinc-800">
-                <button id="tab-mpesa" onclick="switchDepositTab('mpesa')" class="flex-1 py-2 rounded-lg font-bold text-sm bg-[#31d785] text-black transition">M-Pesa</button>
-                <button id="tab-card" onclick="switchDepositTab('card')" class="flex-1 py-2 rounded-lg font-bold text-sm text-zinc-400 transition">Card</button>
-            </div>
-
-            <form id="dep-mpesa-section" onsubmit="handleMpesaDeposit(event)" class="space-y-5">
+            <div class="space-y-5">
                 <div>
-                    <label class="text-[12px] font-bold text-zinc-500 mb-2 block uppercase tracking-wider">Amount to Deposit</label>
-                    <div class="relative">
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-zinc-400">KES</span>
-                        <input type="number" id="mpesaAmount" oninput="updateKESConversion()" class="w-full p-4 pl-14 rounded-xl font-bold text-lg" placeholder="0.00" required>
-                    </div>
-                    <p id="kesConversion" class="text-[12px] text-zinc-500 mt-2 text-right font-medium">≈ $0.00 USD</p>
+                    <label class="text-[12px] font-bold text-zinc-500 mb-2 block uppercase tracking-wider">Select Asset</label>
+                    <select id="receiveAssetSelect" onchange="generateReceiveAddress()" class="w-full p-4 rounded-xl font-semibold bg-zinc-900 border border-zinc-800 text-white">
+                        <option value="BTC">Bitcoin (BTC)</option>
+                        <option value="ETH">Ethereum (ETH)</option>
+                        <option value="SOL">Solana (SOL)</option>
+                        <option value="USDT">Tether (USDT)</option>
+                    </select>
                 </div>
-                <button type="submit" class="w-full bg-[#31d785] text-black py-4 rounded-xl font-bold text-[16px]">Proceed to Checkout</button>
-            </form>
 
-            <div id="dep-card-section" class="hidden text-center py-8">
-                <i class="fa-solid fa-triangle-exclamation text-4xl text-yellow-500 mb-4"></i>
-                <h3 class="font-bold text-lg mb-2">Notice</h3>
-                <p class="text-zinc-500 text-sm mb-6">To fund your wallet via card, please use the "Cards" menu on the home screen to withdraw directly from linked cards.</p>
-                <button type="button" onclick="closeModal('depositModal'); openModal('cardsListModal')" class="w-full bg-[#31d785] text-black py-4 rounded-xl font-bold text-[16px]">Go to Cards</button>
+                <div class="flex flex-col items-center justify-center py-5 bg-zinc-900/40 rounded-xl border border-zinc-800">
+                    <div class="bg-white p-3 rounded-xl mb-3 inline-block">
+                        <div class="w-36 h-36 flex items-center justify-center bg-zinc-100 border-4 border-black relative">
+                            <i class="fa-solid fa-qrcode text-7xl text-black"></i>
+                            <div class="absolute inset-0 flex items-center justify-center opacity-10">
+                                <i class="fa-solid fa-wallet text-2xl text-black"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-xs text-zinc-500 font-medium text-center px-4">Scan address to transfer funds securely into your wallet.</p>
+                </div>
+
+                <div>
+                    <label class="text-[12px] font-bold text-zinc-500 mb-2 block uppercase tracking-wider">Your Deposit Address</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="receiveAddressInput" readonly class="flex-1 p-4 rounded-xl font-mono text-xs bg-zinc-900 border border-zinc-800 text-zinc-300 select-all" value="">
+                        <button onclick="copyReceiveAddress()" id="copyAddressBtn" class="bg-[#31d785] text-black px-4 rounded-xl font-bold text-sm transition hover:opacity-90">
+                            <i class="fa-solid fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -374,15 +386,40 @@
             USDT: { name: 'Tether', price: 1.00, icon: 'fa-dollar-sign', colorClass: 'bg-usdt' }
         };
 
+        let WATCHLIST_DATA = {
+            XRP: { name: 'Ripple', price: 0.58, change: '+2.41%', icon: 'fa-coins', bg: 'bg-zinc-800' },
+            DOGE: { name: 'Dogecoin', price: 0.14, change: '-1.15%', icon: 'fa-dog', bg: 'bg-yellow-600' },
+            MATIC: { name: 'Polygon', price: 0.65, change: '+5.82%', icon: 'fa-cube', bg: 'bg-purple-600' }
+        };
+
+        const MOCK_BASE_ADDRESSES = {
+            BTC: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+            ETH: "0x71C7656EC7ab88b098defB751B7401B5f6d1476B",
+            SOL: "HN7cABviW482ux1G63vdrwZ6E3P4BxtWv84A7vP",
+            USDT: "0x3f5CE0FB54F0ece1509410650d4303abCC80a581"
+        };
+
         let state = JSON.parse(localStorage.getItem('trust_live_v2')) || { 
             balances: { USDT: 0, BTC: 0, ETH: 0, SOL: 0 },
-            linkedCards: []
+            linkedCards: [],
+            rewardsEarned: 0,
+            pendingRewards: 15.50,
+            nfts: [
+                { name: "Bored Ape #4421", collection: "BAYC", floor: "24.50 ETH", img: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=150" },
+                { name: "CryptoPunk #9910", collection: "CryptoPunks", floor: "48.10 ETH", img: "https://images.unsplash.com/photo-1642543492481-44e81e3914a7?w=150" }
+            ]
         };
+
+        // Fallbacks for updated schema additions
+        if (state.rewardsEarned === undefined) state.rewardsEarned = 0;
+        if (state.pendingRewards === undefined || state.pendingRewards === 0) state.pendingRewards = 15.50;
+        if (!state.nfts) state.nfts = [
+            { name: "Bored Ape #4421", collection: "BAYC", floor: "24.50 ETH", img: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=150" },
+            { name: "CryptoPunk #9910", collection: "CryptoPunks", floor: "48.10 ETH", img: "https://images.unsplash.com/photo-1642543492481-44e81e3914a7?w=150" }
+        ];
+
         let lastKnownTotal = 0;
         let activeCardIndex = null;
-
-        // KES to USD approximate rate
-        const EXCHANGE_RATE = 130; 
 
         // --- Core UI Functions ---
         function toggleTheme() {
@@ -403,6 +440,25 @@
             const activeNav = document.getElementById('nav-' + tabId);
             activeNav.classList.remove('nav-item');
             activeNav.classList.add('nav-active');
+            
+            if(tabId === 'rewards') updateRewardsUI();
+        }
+
+        function switchSubTab(subTabId) {
+            const tabs = ['crypto', 'watchlist', 'nfts'];
+            tabs.forEach(t => {
+                const el = document.getElementById('subtab-' + t);
+                const block = document.getElementById(t + '-list');
+                if (t === subTabId) {
+                    el.className = "pb-3 border-b-2 border-green-500 text-current cursor-pointer";
+                    if(block) block.classList.remove('hidden');
+                } else {
+                    el.className = "pb-3 cursor-pointer text-zinc-500 hover:text-zinc-300 transition";
+                    if(block) block.classList.add('hidden');
+                }
+            });
+            if (subTabId === 'watchlist') renderWatchlist();
+            if (subTabId === 'nfts') renderNFTs();
         }
 
         function animateValue(start, end, duration) {
@@ -438,10 +494,7 @@
                     'bg-gradient-to-br from-emerald-500 to-teal-700'
                 ];
                 const randomTheme = themes[Math.floor(Math.random() * themes.length)];
-                
-                // Generate a realistic random balance between $300 and $8,500
                 const randomBalance = (Math.random() * 8200) + 300; 
-                
                 const last4 = cardInput.length >= 4 ? cardInput.slice(-4) : '1234';
 
                 if(!state.linkedCards) state.linkedCards = [];
@@ -486,8 +539,7 @@
                         </div>
                         <div class="text-white text-[10px] uppercase opacity-70">Tap to Use</div>
                     </div>
-                </div>
-                `;
+                </div>`;
             });
             container.innerHTML = html;
         }
@@ -508,7 +560,6 @@
             if(isNaN(amt) || amt <= 0) return alert("Please enter a valid amount.");
             if(amt > card.balance) return alert("Insufficient balance on this card.");
 
-            // Deduct from card, add to Wallet
             card.balance -= amt;
             state.balances.USDT += amt;
             
@@ -516,58 +567,110 @@
             closeModal('cardActionModal');
             document.getElementById('cardWithdrawAmount').value = '';
             
-            alert(`Success! $${amt.toFixed(2)} has been withdrawn from your card to your wallet.`);
+            alert(`Success! $${amt.toFixed(2)} has been transferred into your wallet balance.`);
         }
 
-        // --- Deposit logic ---
-        function updateKESConversion() {
-            const kes = parseFloat(document.getElementById('mpesaAmount').value) || 0;
-            const usd = kes / EXCHANGE_RATE;
-            document.getElementById('kesConversion').innerText = `≈ $${usd.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} USD`;
+        // --- Receive Logic (Randomized Context Addresses) ---
+        function generateReceiveAddress() {
+            const asset = document.getElementById('receiveAssetSelect').value;
+            const base = MOCK_BASE_ADDRESSES[asset] || "0xAddress";
+            const randomChunk = Math.random().toString(36).substring(2, 8).toUpperCase();
+            const compositeAddress = base.substring(0, base.length - 6) + randomChunk;
+            document.getElementById('receiveAddressInput').value = compositeAddress;
         }
 
-        function switchDepositTab(tab) {
-            const btnMpesa = document.getElementById('tab-mpesa');
-            const btnCard = document.getElementById('tab-card');
-            const secMpesa = document.getElementById('dep-mpesa-section');
-            const secCard = document.getElementById('dep-card-section');
+        function copyReceiveAddress() {
+            const input = document.getElementById('receiveAddressInput');
+            input.select();
+            input.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(input.value);
+            
+            const btn = document.getElementById('copyAddressBtn');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-check"></i>`;
+            setTimeout(() => { btn.innerHTML = originalHTML; }, 1500);
+        }
 
-            if (tab === 'mpesa') {
-                btnMpesa.className = "flex-1 py-2 rounded-lg font-bold text-sm bg-[#31d785] text-black transition";
-                btnCard.className = "flex-1 py-2 rounded-lg font-bold text-sm text-zinc-400 transition";
-                secMpesa.classList.remove('hidden');
-                secCard.classList.add('hidden');
-            } else {
-                btnCard.className = "flex-1 py-2 rounded-lg font-bold text-sm bg-zinc-800 text-white transition";
-                document.documentElement.classList.contains('light-mode') ? btnCard.className = "flex-1 py-2 rounded-lg font-bold text-sm bg-zinc-200 text-black transition" : null;
-                btnMpesa.className = "flex-1 py-2 rounded-lg font-bold text-sm text-zinc-400 transition";
-                secCard.classList.remove('hidden');
-                secMpesa.classList.add('hidden');
+        // --- Staking Rewards Logic ---
+        function updateRewardsUI() {
+            document.getElementById('rewards-earned-display').innerText = `$${state.rewardsEarned.toFixed(2)}`;
+            document.getElementById('rewards-pending-text').innerText = `Pending Claim: $${state.pendingRewards.toFixed(2)}`;
+        }
+
+        function claimRewards() {
+            if(state.pendingRewards <= 0) {
+                alert("No pending rewards left to claim right now.");
+                return;
+            }
+            const claimed = state.pendingRewards;
+            state.balances.USDT += claimed;
+            state.rewardsEarned += claimed;
+            state.pendingRewards = 0;
+            
+            saveState();
+            updateRewardsUI();
+            alert(`Claim Successful! $${claimed.toFixed(2)} USDT added directly to your wallet totals.`);
+            
+            setTimeout(() => {
+                state.pendingRewards = parseFloat((Math.random() * 12 + 3).toFixed(2));
+                saveState();
+                updateRewardsUI();
+            }, 30000);
+        }
+
+        // --- Watchlist Rendering Function ---
+        function renderWatchlist() {
+            const container = document.getElementById('watchlist-list');
+            container.innerHTML = '';
+            for(let ticker in WATCHLIST_DATA) {
+                const item = WATCHLIST_DATA[ticker];
+                const isGain = item.change.startsWith('+');
+                container.innerHTML += `
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center space-x-4">
+                            <div class="coin-icon ${item.bg}">
+                                <i class="fa-solid ${item.icon}"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="font-bold text-[16px] uppercase">${ticker}</span>
+                                    <span class="text-xs text-zinc-500 font-medium">${item.name}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-[16px] tabular-nums">$${item.price.toFixed(2)}</p>
+                            <p class="text-[13px] ${isGain ? 'text-[#31d785]' : 'text-red-500'} mt-0.5 font-bold">${item.change}</p>
+                        </div>
+                    </div>`;
             }
         }
 
-        function handleMpesaDeposit(e) {
-            e.preventDefault();
-            const amount = document.getElementById('mpesaAmount').value;
-            if (!amount || amount <= 0) return alert("Please enter a valid amount.");
-            
-            // Show gateway loader
-            const loader = document.getElementById('gatewayLoader');
-            loader.classList.add('active');
-            
-            const invoice = 'INV-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-            const targetUrl = `https://lipwa.link/8367?amount=${amount}&invoice=${invoice}`;
-            
-            // Simulate connection delay then redirect
-            setTimeout(() => {
-                window.location.href = targetUrl;
-            }, 2000);
+        // --- NFT Engine Rendering Function ---
+        function renderNFTs() {
+            const container = document.getElementById('nfts-list');
+            container.innerHTML = '';
+            state.nfts.forEach(nft => {
+                container.innerHTML += `
+                    <div class="flex items-center justify-between bg-zinc-900/50 p-3 rounded-xl border border-zinc-800/60">
+                        <div class="flex items-center space-x-4">
+                            <img src="${nft.img}" class="w-12 h-12 rounded-lg object-cover border border-zinc-700" alt="nft" onerror="this.src='https://via.placeholder.com/150/18181b/31d785?text=NFT'">
+                            <div>
+                                <h4 class="font-bold text-sm">${nft.name}</h4>
+                                <p class="text-xs text-zinc-500">${nft.collection}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[11px] text-zinc-500 font-medium uppercase tracking-wider">Floor Price</p>
+                            <p class="text-sm font-bold trust-green">${nft.floor}</p>
+                        </div>
+                    </div>`;
+            });
         }
 
         // --- Withdraw Logic ---
         const withdrawMethods = [
             "Crypto Network (ERC20/TRC20)", "Crypto Network (BEP20)", "Crypto Network (Solana)",
-            "M-Pesa (Kenya)", "Airtel Money", "MTN Mobile Money", 
             "PayPal", "Bank Wire Transfer (SWIFT)"
         ];
 
@@ -633,10 +736,10 @@
 
             try {
                 const res = await fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=EN');
-                if(!res.ok) throw new Error("Network Response Not OK");
+                if(!res.ok) throw new Error("Network Error");
                 
                 const json = await res.json();
-                if(!json.Data || json.Data.length === 0) throw new Error("Empty Data Payload");
+                if(!json.Data || json.Data.length === 0) throw new Error("Empty Payload");
                 
                 const newsItems = json.Data.slice(0, 4);
                 let html = '';
