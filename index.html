@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Trust Wallet | Secure Crypto Web3 Portal</title>
+    <title>Trust Wallet | Dashboard</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -22,236 +22,164 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         
-        :root {
-            --bg-base: #0B0E11;
-            --bg-card: #181A20;
-            --bg-elevated: #2B313A;
-            --border-color: #23272F;
-            --text-primary: #FFFFFF;
-            --text-secondary: #848E9C;
-            --accent-green: #0ECB81;
-            --accent-blue: #0052FF;
-        }
-
-        .light-mode {
-            --bg-base: #FAFAFA;
-            --bg-card: #FFFFFF;
-            --bg-elevated: #F0F2F5;
-            --border-color: #EAECEF;
-            --text-primary: #1E2329;
-            --text-secondary: #707A8A;
-            --accent-green: #0ECB81;
-            --accent-blue: #0052FF;
-        }
-
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: var(--bg-base); 
-            color: var(--text-primary); 
-            -webkit-tap-highlight-color: transparent; 
-            transition: background 0.3s, color 0.3s; 
-        }
-
-        .binance-card {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 1.25rem;
-        }
-
-        .action-icon-btn {
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, rgba(14, 203, 129, 0.15), rgba(0, 82, 255, 0.1));
-            border: 1px solid rgba(14, 203, 129, 0.2);
-            color: var(--accent-green);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .action-icon-btn:active { transform: scale(0.92); }
-
-        nav { 
-            background-color: var(--bg-card) !important; 
-            border-top: 1px solid var(--border-color) !important; 
-        }
-        .nav-item { color: var(--text-secondary); }
-        .nav-active { color: var(--accent-green) !important; }
+        body { font-family: 'Inter', sans-serif; background-color: #000000; color: white; -webkit-tap-highlight-color: transparent; transition: background 0.3s, color 0.3s; }
+        .bg-zinc-900 { background-color: #18181b; }
+        .border-zinc-800 { border-color: #27272a; }
+        .text-zinc-400 { color: #a1a1aa; }
+        .text-zinc-500 { color: #71717a; }
         
-        .trust-green { color: var(--accent-green); }
+        /* Light Mode Specifics */
+        .light-mode body { background-color: #ffffff; color: #000000; }
+        .light-mode .bg-zinc-900 { background-color: #f4f4f5; }
+        .light-mode .border-zinc-800 { border-color: #e4e4e7; }
+        
+        /* Persistent Dark Nav (Matching your image) */
+        nav { background-color: #000000 !important; border-top: 1px solid #18181b !important; }
+        .nav-item { color: #71717a; }
+        .nav-active { color: #31d785 !important; }
+        
+        .trust-green { color: #31d785; }
+        .trust-bg-green { background-color: #31d785; }
         
         .trade-btn { 
             width: 56px; height: 56px; border-radius: 50%; 
-            background: linear-gradient(135deg, #0ECB81, #0052FF); color: #fff; 
+            background-color: #31d785; color: #000; 
             display: flex; align-items: center; justify-content: center; 
-            border: 4px solid var(--bg-base); 
-            box-shadow: 0 4px 20px rgba(14, 203, 129, 0.3);
+            border: 4px solid #000; 
+            box-shadow: 0 0 15px rgba(49, 215, 133, 0.2);
         }
 
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: flex-end; backdrop-filter: blur(4px); }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: flex-end; }
         .modal.active { display: flex; }
-        .modal-content { background: var(--bg-card); width: 100%; border-radius: 1.75rem 1.75rem 0 0; padding: 1.5rem; border-top: 1px solid var(--border-color); color: var(--text-primary); }
+        .modal-content { background: #1c1c1e; width: 100%; border-radius: 1.5rem 1.5rem 0 0; padding: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); color: white; }
         
-        .incoming-timer { animation: pulse 2s infinite; color: var(--accent-green); font-weight: 600; font-size: 11px; }
+        .incoming-timer { animation: pulse 2s infinite; color: #31d785; font-weight: 600; font-size: 11px; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         
-        .coin-icon { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; }
-        .bg-btc { background: #F3BA2F; color: white; }
-        .bg-eth { background: #627EEA; color: white; }
-        .bg-sol { background: linear-gradient(135deg, #14F195, #9945FF); color: white; }
-        .bg-usdt { background: #26A17B; color: white; }
-        
-        /* Custom scrollbar hiding for smooth feel */
-        ::-webkit-scrollbar { display: none; }
+        .coin-icon { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .bg-btc { background: #f7931a; color: white; }
+        .bg-eth { background: #627eea; color: white; }
+        .bg-sol { background: linear-gradient(135deg, #14f195, #9945ff); color: white; }
+        .bg-usdt { background: #26a17b; color: white; }
     </style>
 </head>
 <body class="pb-28">
 
-    <!-- Header Section -->
     <header class="px-5 pt-6 flex justify-between items-center">
         <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-full binance-card flex items-center justify-center cursor-pointer shadow-sm"><i class="fa-solid fa-qrcode text-sm trust-green"></i></div>
-            <button onclick="toggleTheme()" class="w-10 h-10 rounded-full binance-card flex items-center justify-center cursor-pointer shadow-sm"><i id="theme-icon" class="fa-solid fa-moon text-sm text-zinc-400"></i></button>
+            <div class="w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center border border-zinc-800"><i class="fa-solid fa-gear text-sm"></i></div>
+            <button onclick="toggleTheme()" class="w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center border border-zinc-800"><i id="theme-icon" class="fa-solid fa-moon text-sm"></i></button>
         </div>
-        <div class="flex items-center space-x-2 binance-card px-4 py-2 rounded-full cursor-pointer shadow-sm">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span class="text-[13px] font-bold tracking-wide">Main Wallet 1</span>
-            <i class="fa-solid fa-chevron-down text-[10px] opacity-60"></i>
+        <div class="flex items-center space-x-2 bg-zinc-900 px-4 py-1.5 rounded-full border border-zinc-800">
+            <span class="text-[13px] font-bold">Main Wallet</span>
+            <i class="fa-solid fa-chevron-down text-[10px] opacity-40"></i>
         </div>
-        <div class="flex space-x-4 text-zinc-400">
-            <div class="w-10 h-10 rounded-full binance-card flex items-center justify-center cursor-pointer"><i class="fa-solid fa-bell text-sm"></i></div>
+        <div class="flex space-x-5 text-zinc-400">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <i class="fa-solid fa-expand"></i>
         </div>
     </header>
 
-    <!-- Balance Section -->
-    <div class="mt-8 text-center px-5">
-        <div class="flex items-center justify-center gap-2 text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-1">
-            <span>Estimated Balance</span>
-            <i class="fa-regular fa-eye cursor-pointer" onclick="toggleBalanceVisibility(this)"></i>
-        </div>
-        <h1 id="main-total" class="text-[44px] font-black tracking-tight tabular-nums">$0.00</h1>
-        <div class="flex items-center justify-center gap-2 mt-2">
-            <span class="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-2.5 py-0.5 rounded-md">+$0.00 (0.00%)</span>
-            <span class="text-xs text-zinc-500">Today</span>
-        </div>
+    <div class="mt-10 text-center px-5">
+        <h1 id="main-total" class="text-[48px] font-bold tracking-tight tabular-nums">$0.00</h1>
     </div>
 
-    <!-- Main Action Buttons -->
-    <div class="grid grid-cols-4 gap-3 px-6 mt-8">
-        <button onclick="openModal('Send')" class="flex flex-col items-center gap-2 group">
-            <div class="action-icon-btn group-hover:bg-emerald-500/20"><i class="fa-solid fa-arrow-up"></i></div>
-            <span class="text-[12px] font-semibold text-zinc-400">Send</span>
+    <div class="flex justify-center space-x-8 mt-8">
+        <button onclick="openModal('Send')" class="flex flex-col items-center gap-2">
+            <div class="w-14 h-14 bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-800"><i class="fa-solid fa-arrow-up"></i></div>
+            <span class="text-[13px] font-medium opacity-80">Send</span>
         </button>
-        <button onclick="openModal('Receive')" class="flex flex-col items-center gap-2 group">
-            <div class="action-icon-btn group-hover:bg-emerald-500/20"><i class="fa-solid fa-arrow-down"></i></div>
-            <span class="text-[12px] font-semibold text-zinc-400">Receive</span>
+        <button class="flex flex-col items-center gap-2">
+            <div class="w-14 h-14 bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-800"><i class="fa-solid fa-arrow-down"></i></div>
+            <span class="text-[13px] font-medium opacity-80">Receive</span>
         </button>
-        <button onclick="handleSwapClick()" class="flex flex-col items-center gap-2 group">
-            <div class="action-icon-btn group-hover:bg-emerald-500/20"><i class="fa-solid fa-repeat"></i></div>
-            <span class="text-[12px] font-semibold text-zinc-400">Swap</span>
+        <button class="flex flex-col items-center gap-2">
+            <div class="w-14 h-14 bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-800"><i class="fa-solid fa-repeat"></i></div>
+            <span class="text-[13px] font-medium opacity-80">Swap</span>
         </button>
-        <button onclick="openModal('Buy')" class="flex flex-col items-center gap-2 group">
-            <div class="action-icon-btn group-hover:bg-emerald-500/20"><i class="fa-solid fa-plus"></i></div>
-            <span class="text-[12px] font-semibold text-zinc-400">Buy</span>
+        <button onclick="openModal('Buy')" class="flex flex-col items-center gap-2">
+            <div class="w-14 h-14 bg-zinc-900 rounded-full flex items-center justify-center text-xl border border-zinc-800"><i class="fa-solid fa-plus"></i></div>
+            <span class="text-[13px] font-medium opacity-80">Buy</span>
         </button>
     </div>
 
-    <!-- App Download Direct Link Container (Positioned right under Swap as requested) -->
-    <div class="px-6 mt-5">
-        <div class="binance-card p-4 flex items-center justify-between border border-emerald-500/30 bg-gradient-to-r from-emerald-500/10 to-transparent">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center trust-green">
-                    <i class="fa-solid fa-shield-halved text-lg"></i>
-                </div>
-                <div>
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-400">Official App Integration</h4>
-                    <p class="text-xs text-zinc-400">Unlock high-speed web3 routing & staking</p>
-                </div>
-            </div>
-            <a href="https://trustwallet.com/download" target="_blank" class="bg-emerald-500 text-black px-4 py-2 rounded-full text-xs font-black shadow-lg shadow-emerald-500/20 hover:bg-emerald-400 transition flex items-center gap-1.5">
-                <i class="fa-solid fa-download"></i> Download App
-            </a>
+    <div class="flex px-6 mt-10 border-b border-zinc-900 text-[14px] font-bold text-zinc-500 gap-8">
+        <div class="pb-3 border-b-2 border-green-500 text-current">Crypto</div>
+        <div class="pb-3">Watchlist</div>
+        <div class="pb-3">NFTs</div>
+        <div class="pb-3 ml-auto"><i class="fa-solid fa-sliders"></i></div>
+    </div>
+
+    <div id="crypto-list" class="px-6 mt-6 space-y-6"></div>
+
+    <div class="px-6 mt-12 pb-6">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-[18px] font-bold">Recent Activity</h3>
+            <button onclick="reset()" class="text-[13px] text-zinc-500 font-semibold">View All</button>
+        </div>
+        <div id="history-list" class="space-y-6"></div>
+    </div>
+
+    <!-- Universal Install UI (At the very bottom) -->
+    <div id="install-container" class="hidden px-6 pb-10">
+        <!-- Android Button -->
+        <button id="android-install-btn" class="hidden w-full trust-bg-green text-black py-4 rounded-2xl font-bold text-[16px] flex items-center justify-center gap-2">
+            <i class="fa-solid fa-download"></i> Install App
+        </button>
+        
+        <!-- iOS Instructions -->
+        <div id="ios-install-banner" class="hidden bg-zinc-900 border border-zinc-800 p-5 rounded-2xl text-center">
+            <p class="text-[15px] font-bold mb-2">Install Trust Wallet</p>
+            <p class="text-[13px] text-zinc-500 leading-relaxed">
+                Tap the <i class="fa-solid fa-arrow-up-from-bracket mx-1"></i> <b>Share</b> button below,<br> then select <b>"Add to Home Screen"</b> <i class="fa-solid fa-square-plus mx-1"></i>
+            </p>
         </div>
     </div>
 
-    <!-- Asset Tabs -->
-    <div class="flex px-6 mt-8 border-b border-zinc-800/50 text-[14px] font-bold text-zinc-500 gap-8">
-        <div class="pb-3 border-b-2 border-emerald-500 text-current cursor-pointer">Crypto</div>
-        <div class="pb-3 cursor-pointer hover:text-zinc-300">Watchlist</div>
-        <div class="pb-3 cursor-pointer hover:text-zinc-300">NFTs</div>
-        <div class="pb-3 ml-auto cursor-pointer hover:text-zinc-300"><i class="fa-solid fa-sliders"></i></div>
-    </div>
-
-    <!-- Crypto Portfolio Asset List -->
-    <div id="crypto-list" class="px-6 mt-6 space-y-4"></div>
-
-    <!-- Recent Activity Section -->
-    <div class="px-6 mt-10 pb-10">
-        <div class="flex justify-between items-center mb-5">
-            <h3 class="text-[16px] font-bold tracking-tight">Recent Activity</h3>
-            <button onclick="reset()" class="text-[12px] text-zinc-500 font-semibold hover:text-red-400 transition">Clear Data</button>
-        </div>
-        <div id="history-list" class="space-y-4"></div>
-    </div>
-
-    <!-- Bottom Navigation Bar (Trust Wallet / Binance Fusion) -->
     <nav class="fixed bottom-0 left-0 right-0 h-20 flex justify-around items-center px-2 z-50">
-        <div class="flex flex-col items-center nav-active cursor-pointer">
-            <i class="fa-solid fa-wallet text-xl"></i>
-            <span class="text-[10px] mt-1 font-bold">Wallet</span>
+        <div class="flex flex-col items-center nav-active">
+            <i class="fa-solid fa-house text-xl"></i>
+            <span class="text-[10px] mt-1 font-bold">Home</span>
         </div>
-        <div class="flex flex-col items-center nav-item cursor-pointer hover:text-white transition">
+        <div class="flex flex-col items-center nav-item">
             <i class="fa-solid fa-chart-line text-xl"></i>
-            <span class="text-[10px] mt-1 font-bold">Markets</span>
+            <span class="text-[10px] mt-1 font-bold">Trending</span>
         </div>
-        <div class="flex flex-col items-center cursor-pointer">
-            <div class="trade-btn" onclick="handleSwapClick()"><i class="fa-solid fa-right-left text-lg"></i></div>
+        <div class="flex flex-col items-center">
+            <div class="trade-btn"><i class="fa-solid fa-right-left"></i></div>
             <span class="text-[10px] mt-1 font-bold nav-item">Trade</span>
         </div>
-        <div class="flex flex-col items-center nav-item cursor-pointer hover:text-white transition">
-            <i class="fa-solid fa-compass text-xl"></i>
-            <span class="text-[10px] mt-1 font-bold">Explore</span>
+        <div class="flex flex-col items-center nav-item">
+            <i class="fa-solid fa-gift text-xl"></i>
+            <span class="text-[10px] mt-1 font-bold">Rewards</span>
         </div>
-        <div class="flex flex-col items-center nav-item cursor-pointer hover:text-white transition">
-            <i class="fa-solid fa-user-shield text-xl"></i>
-            <span class="text-[10px] mt-1 font-bold">Settings</span>
+        <div class="flex flex-col items-center nav-item">
+            <i class="fa-solid fa-compass text-xl"></i>
+            <span class="text-[10px] mt-1 font-bold">Discover</span>
         </div>
     </nav>
 
-    <!-- Modal Form Layer -->
     <div id="txModal" class="modal" onclick="if(event.target==this) closeTx()">
-        <div class="modal-content shadow-2xl">
-            <div class="w-12 h-1.5 bg-zinc-700/50 rounded-full mx-auto mb-5"></div>
-            <div class="flex justify-between items-center mb-5">
-                <h2 id="modalTitle" class="text-lg font-bold">Action Asset</h2>
-                <button onclick="closeTx()" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            <div class="space-y-4">
-                <div>
-                    <label class="text-xs text-zinc-400 font-semibold mb-1.5 block">Select Token</label>
-                    <select id="assetSelect" class="w-full binance-card p-3.5 rounded-xl font-bold outline-none border border-zinc-800 text-sm">
-                        <option value="USDT">Tether USD (USDT)</option>
-                        <option value="BTC">Bitcoin (BTC)</option>
-                        <option value="ETH">Ethereum (ETH)</option>
-                        <option value="SOL">Solana (SOL)</option>
-                    </select>
+        <div class="modal-content">
+            <div class="w-10 h-1 bg-zinc-700 rounded-full mx-auto mb-6"></div>
+            <h2 id="modalTitle" class="text-xl font-bold mb-6">Buy Asset</h2>
+            <div class="space-y-5">
+                <select id="assetSelect" class="w-full bg-zinc-900 p-4 rounded-xl font-bold outline-none border border-zinc-800">
+                    <option value="USDT">Tether (USDT)</option>
+                    <option value="BTC">Bitcoin (BTC)</option>
+                    <option value="ETH">Ethereum (ETH)</option>
+                    <option value="SOL">Solana (SOL)</option>
+                </select>
+                <div class="bg-zinc-900 p-4 rounded-xl border border-zinc-800 text-white">
+                    <div class="flex justify-between text-[11px] font-bold text-zinc-500 uppercase mb-3"><span>Countdown</span><span id="timerLabel" class="trust-green">30s</span></div>
+                    <input type="range" id="timerSlider" min="5" max="60" value="30" class="w-full accent-green-500" oninput="document.getElementById('timerLabel').innerText = this.value + 's'">
                 </div>
-                <div class="binance-card p-3.5 rounded-xl border border-zinc-800">
-                    <div class="flex justify-between text-[11px] font-bold text-zinc-500 uppercase mb-2"><span>Network Delay Simulation</span><span id="timerLabel" class="trust-green">30s</span></div>
-                    <input type="range" id="timerSlider" min="5" max="60" value="30" class="w-full accent-emerald-500" oninput="document.getElementById('timerLabel').innerText = this.value + 's'">
-                </div>
-                <div>
-                    <label class="text-xs text-zinc-400 font-semibold mb-1.5 block">Amount</label>
-                    <input type="number" id="txAmount" placeholder="0.00" class="w-full binance-card px-4 py-3.5 text-xl font-bold outline-none border border-zinc-800 text-white rounded-xl">
-                </div>
-                <button onclick="submitTx()" class="w-full bg-emerald-500 text-black py-4 rounded-xl font-bold text-base shadow-lg shadow-emerald-500/20 hover:bg-emerald-400 transition mt-2">Confirm Transaction</button>
+                <input type="number" id="txAmount" placeholder="0.00" class="w-full bg-transparent text-center text-4xl font-bold outline-none py-4 text-white">
+                <button onclick="submitTx()" class="w-full bg-green-500 text-black py-4 rounded-full font-bold text-lg">Confirm</button>
             </div>
         </div>
     </div>
 
-    <!-- Application Script Engine -->
     <script>
         const COINS = {
             BTC: { name: 'Bitcoin', price: 70848, icon: 'fa-bitcoin', colorClass: 'bg-btc' },
@@ -260,28 +188,12 @@
             USDT: { name: 'Tether', price: 1.00, icon: 'fa-dollar-sign', colorClass: 'bg-usdt' }
         };
 
-        let state = JSON.parse(localStorage.getItem('trust_binance_v2')) || { balances: { USDT: 1500, BTC: 0.15, ETH: 1.2, SOL: 12 }, history: [] };
+        let state = JSON.parse(localStorage.getItem('trust_fixed_v1')) || { balances: { USDT: 0, BTC: 0, ETH: 0, SOL: 0 }, history: [] };
         let activeMode = '';
         let lastKnownTotal = 0;
-        let isBalanceHidden = false;
-
-        function handleSwapClick() {
-            // Trigger download app action under swap button requirement
-            window.open('https://trustwallet.com/download', '_blank');
-        }
-
-        function toggleBalanceVisibility(el) {
-            isBalanceHidden = !isBalanceHidden;
-            el.className = isBalanceHidden ? "fa-regular fa-eye-slash cursor-pointer" : "fa-regular fa-eye cursor-pointer";
-            render();
-        }
 
         function animateValue(start, end, duration) {
             const obj = document.getElementById('main-total');
-            if (isBalanceHidden) {
-                obj.innerText = '••••••••';
-                return;
-            }
             let startTimestamp = null;
             const step = (timestamp) => {
                 if (!startTimestamp) startTimestamp = timestamp;
@@ -296,104 +208,63 @@
         function toggleTheme() {
             document.documentElement.classList.toggle('light-mode');
             const isLight = document.documentElement.classList.contains('light-mode');
-            document.getElementById('theme-icon').className = isLight ? 'fa-solid fa-sun text-sm text-amber-500' : 'fa-solid fa-moon text-sm text-zinc-400';
+            document.getElementById('theme-icon').className = isLight ? 'fa-solid fa-sun text-sm' : 'fa-solid fa-moon text-sm';
             localStorage.setItem('theme', isLight ? 'light' : 'dark');
         }
 
-        function openModal(mode) { 
-            activeMode = mode; 
-            document.getElementById('modalTitle').innerText = mode + " Asset"; 
-            document.getElementById('txModal').classList.add('active'); 
-        }
-        
-        function closeTx() { 
-            document.getElementById('txModal').classList.remove('active'); 
-        }
+        function openModal(mode) { activeMode = mode; document.getElementById('modalTitle').innerText = mode + " Crypto"; document.getElementById('txModal').classList.add('active'); }
+        function closeTx() { document.getElementById('txModal').classList.remove('active'); }
 
         function submitTx() {
             const coin = document.getElementById('assetSelect').value;
             const amt = parseFloat(document.getElementById('txAmount').value);
             const seconds = parseInt(document.getElementById('timerSlider').value);
             if(!amt || amt <= 0) return;
-            state.history.push({ 
-                id: Date.now(), 
-                type: activeMode, 
-                coin, 
-                amt, 
-                status: 'pending', 
-                timeLeft: seconds, 
-                target: Date.now() + (seconds * 1000), 
-                timeStr: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) 
-            });
-            save(); 
-            closeTx(); 
-            document.getElementById('txAmount').value = '';
+            state.history.push({ id: Date.now(), type: activeMode, coin, amt, status: 'pending', timeLeft: seconds, target: Date.now() + (seconds * 1000), timeStr: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
+            save(); closeTx(); document.getElementById('txAmount').value = '';
         }
 
-        function save() { 
-            localStorage.setItem('trust_binance_v2', JSON.stringify(state)); 
-            render(); 
-        }
+        function save() { localStorage.setItem('trust_fixed_v1', JSON.stringify(state)); render(); }
 
         function render() {
             let total = 0;
             const list = document.getElementById('crypto-list');
             list.innerHTML = '';
-            
             for(let c in state.balances) {
                 const usdValue = state.balances[c] * COINS[c].price;
                 total += usdValue;
-                list.innerHTML += `
-                    <div class="binance-card p-4 flex justify-between items-center transition hover:border-emerald-500/30">
-                        <div class="flex items-center space-x-3.5">
-                            <div class="coin-icon ${COINS[c].colorClass}">
-                                <i class="fa-brands ${COINS[c].icon === 'fa-bitcoin' ? 'fa-bitcoin' : (COINS[c].icon === 'fa-ethereum' ? 'fa-ethereum' : 'fa-solid ' + COINS[c].icon)}"></i>
-                            </div>
-                            <div>
-                                <div class="flex items-center space-x-2">
-                                    <span class="font-bold text-[15px] uppercase">${c}</span>
-                                    <span class="text-[11px] text-zinc-500 font-semibold">${COINS[c].name}</span>
-                                </div>
-                                <p class="text-[12px] text-zinc-400 font-medium mt-0.5">$${COINS[c].price.toLocaleString()}</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="font-bold text-[15px] tabular-nums">${isBalanceHidden ? '••••' : state.balances[c].toLocaleString()}</p>
-                            <p class="text-[12px] text-zinc-400 mt-0.5 tabular-nums">${isBalanceHidden ? '••••' : '$' + usdValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-                        </div>
-                    </div>`;
+                list.innerHTML += `<div class="flex justify-between items-center"><div class="flex items-center space-x-4"><div class="coin-icon ${COINS[c].colorClass}"><i class="fa-brands ${COINS[c].icon === 'fa-bitcoin' ? 'fa-bitcoin' : (COINS[c].icon === 'fa-ethereum' ? 'fa-ethereum' : 'fa-solid ' + COINS[c].icon)}"></i></div><div><div class="flex items-center space-x-2"><span class="font-bold text-[16px] uppercase">${c}</span><span class="text-xs text-zinc-500 font-medium">${COINS[c].name}</span></div><p class="text-[13px] font-bold text-zinc-500 mt-0.5">$${COINS[c].price.toLocaleString()}</p></div></div><div class="text-right"><p class="font-bold text-[16px] tabular-nums">${state.balances[c].toLocaleString()}</p><p class="text-[13px] text-zinc-500 mt-0.5 tabular-nums">$${usdValue.toLocaleString()}</p></div></div>`;
             }
 
-            if (isBalanceHidden) {
-                document.getElementById('main-total').innerText = '••••••••';
-            } else if (total !== lastKnownTotal) {
-                animateValue(lastKnownTotal, total, 600);
+            if (total !== lastKnownTotal) {
+                animateValue(lastKnownTotal, total, 800);
                 lastKnownTotal = total;
             } else if (lastKnownTotal === 0) {
                 document.getElementById('main-total').innerText = `$${total.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
             }
 
             const hist = document.getElementById('history-list');
-            hist.innerHTML = state.history.length ? '' : '<div class="binance-card p-6 text-center text-zinc-500 text-xs font-semibold tracking-wider">NO RECENT TRANSACTIONS</div>';
-            
-            state.history.slice(-6).reverse().forEach(tx => {
+            hist.innerHTML = state.history.length ? '' : '<p class="text-center py-10 opacity-20 text-[11px] font-bold tracking-widest">NO RECENT ACTIVITY</p>';
+            state.history.slice(-8).reverse().forEach(tx => {
                 const isPending = tx.status === 'pending';
+                const colorClass = tx.type === 'Buy' ? 'text-green-500' : (document.documentElement.classList.contains('light-mode') ? 'text-black' : 'text-white');
+                
                 hist.innerHTML += `
-                    <div class="binance-card p-3.5 flex justify-between items-center">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center border border-zinc-700/50">
-                                <i class="fa-solid ${tx.type === 'Buy' ? 'fa-arrow-down text-emerald-400' : 'fa-arrow-up text-zinc-400'} text-xs"></i>
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-11 h-11 bg-zinc-900 rounded-full flex items-center justify-center border border-zinc-800">
+                                <i class="fa-solid ${tx.type === 'Buy' ? 'fa-arrow-down text-green-500' : 'fa-arrow-up text-zinc-400'} text-[13px]"></i>
                             </div>
                             <div>
-                                <p class="text-[14px] font-bold">${tx.type} ${tx.coin}</p>
-                                <p class="text-[11px] text-zinc-500 font-medium">${tx.timeStr}</p>
+                                <p class="text-[15px] font-bold">${tx.type} ${tx.coin}</p>
+                                <p class="text-[12px] text-zinc-500 font-medium">${tx.timeStr}</p>
                             </div>
                         </div>
                         <div class="text-right">
-                            <p class="font-bold text-[14px] tabular-nums ${isPending ? 'text-zinc-500' : (tx.type === 'Buy' ? 'text-emerald-400' : '')}">
+                            <p class="font-bold text-[16px] tabular-nums ${isPending ? 'text-zinc-500' : colorClass}">
                                 ${tx.type === 'Buy' ? '+' : '-'}${tx.amt.toLocaleString()}
                             </p>
-                            ${isPending ? `<p class="incoming-timer">Syncing: ${tx.timeLeft}s</p>` : `<span class="text-[10px] text-emerald-500 font-bold uppercase tracking-wider">Completed</span>`}
+                            ${isPending ? `<p class="incoming-timer">Pending: ${tx.timeLeft}s</p>` : `<span class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Completed</span>`}
                         </div>
                     </div>`;
             });
@@ -415,14 +286,49 @@
             if(changed) save(); else render();
         }, 1000);
 
-        function reset() { 
-            if(confirm("Are you sure you want to clear wallet state?")) { 
-                localStorage.clear(); 
-                location.reload(); 
-            } 
-        }
-        
+        function reset() { if(confirm("Clear history?")) { localStorage.clear(); location.reload(); } }
         render();
+
+        // --- Install Logic ---
+        const installContainer = document.getElementById('install-container');
+        const androidBtn = document.getElementById('android-install-btn');
+        const iosBanner = document.getElementById('ios-install-banner');
+
+        let deferredPrompt;
+
+        // Detect if the user is on an Apple device
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+        // Detect if the app is already installed
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+        if (!isStandalone) {
+            if (isIOS) {
+                // Show iOS manual instructions
+                installContainer.classList.remove('hidden');
+                iosBanner.classList.remove('hidden');
+            } else {
+                // Listen for Android's automatic install trigger
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    deferredPrompt = e;
+                    installContainer.classList.remove('hidden');
+                    androidBtn.classList.remove('hidden');
+                });
+
+                // Trigger Android install when clicked
+                androidBtn.addEventListener('click', async () => {
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        const { outcome } = await deferredPrompt.userChoice;
+                        if (outcome === 'accepted') {
+                            installContainer.classList.add('hidden');
+                        }
+                        deferredPrompt = null;
+                    }
+                });
+            }
+        }
     </script>
 </body>
 </html>
