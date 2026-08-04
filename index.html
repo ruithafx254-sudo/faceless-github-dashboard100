@@ -114,8 +114,13 @@
 
     <div class="px-6 mt-12 pb-6">
         <div class="flex justify-between items-center mb-6">
-            <h3 class="text-[18px] font-bold">Recent Activity</h3>
-            <button onclick="reset()" class="text-[13px] text-zinc-500 font-semibold">View All</button>
+            <div class="flex items-center gap-3">
+                <h3 class="text-[18px] font-bold">Recent Activity</h3>
+                <button onclick="toggleHistory()" id="toggle-history-btn" class="text-zinc-500 text-[14px]">
+                    <i class="fa-solid fa-eye-slash"></i>
+                </button>
+            </div>
+            <button onclick="reset()" class="text-[13px] text-zinc-500 font-semibold">Clear</button>
         </div>
         <div id="history-list" class="space-y-6"></div>
     </div>
@@ -191,6 +196,7 @@
         let state = JSON.parse(localStorage.getItem('trust_fixed_v1')) || { balances: { USDT: 0, BTC: 0, ETH: 0, SOL: 0 }, history: [] };
         let activeMode = '';
         let lastKnownTotal = 0;
+        let isHistoryHidden = localStorage.getItem('trust_history_hidden') === 'true';
 
         function animateValue(start, end, duration) {
             const obj = document.getElementById('main-total');
@@ -210,6 +216,25 @@
             const isLight = document.documentElement.classList.contains('light-mode');
             document.getElementById('theme-icon').className = isLight ? 'fa-solid fa-sun text-sm' : 'fa-solid fa-moon text-sm';
             localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        }
+
+        function toggleHistory() {
+            isHistoryHidden = !isHistoryHidden;
+            localStorage.setItem('trust_history_hidden', isHistoryHidden);
+            updateHistoryVisibility();
+        }
+
+        function updateHistoryVisibility() {
+            const histList = document.getElementById('history-list');
+            const btn = document.getElementById('toggle-history-btn');
+            
+            if (isHistoryHidden) {
+                histList.style.display = 'none';
+                btn.innerHTML = '<i class="fa-solid fa-eye"></i>';
+            } else {
+                histList.style.display = 'block';
+                btn.innerHTML = '<i class="fa-solid fa-eye-slash"></i>';
+            }
         }
 
         function openModal(mode) { activeMode = mode; document.getElementById('modalTitle').innerText = mode + " Crypto"; document.getElementById('txModal').classList.add('active'); }
@@ -288,6 +313,7 @@
 
         function reset() { if(confirm("Clear history?")) { localStorage.clear(); location.reload(); } }
         render();
+        updateHistoryVisibility(); // Initialize history visibility on load
 
         // --- Install Logic ---
         const installContainer = document.getElementById('install-container');
