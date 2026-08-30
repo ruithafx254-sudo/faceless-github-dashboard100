@@ -33,27 +33,27 @@
         .light-mode .bg-zinc-900 { background-color: #f4f4f5; }
         .light-mode .border-zinc-800 { border-color: #e4e4e7; }
         
-        /* Persistent Dark Nav (Matching your image) */
+        /* Persistent Dark Nav */
         nav { background-color: #000000 !important; border-top: 1px solid #18181b !important; }
         .nav-item { color: #71717a; }
-        .nav-active { color: #31d785 !important; }
+        .nav-active { color: #0052FF !important; }
         
-        .trust-green { color: #31d785; }
-        .trust-bg-green { background-color: #31d785; }
+        .trust-blue { color: #0052FF; }
+        .trust-bg-blue { background-color: #0052FF; }
         
         .trade-btn { 
             width: 56px; height: 56px; border-radius: 50%; 
-            background-color: #31d785; color: #000; 
+            background-color: #0052FF; color: #ffffff; 
             display: flex; align-items: center; justify-content: center; 
             border: 4px solid #000; 
-            box-shadow: 0 0 15px rgba(49, 215, 133, 0.2);
+            box-shadow: 0 0 15px rgba(0, 82, 255, 0.3);
         }
 
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: flex-end; }
         .modal.active { display: flex; }
         .modal-content { background: #1c1c1e; width: 100%; border-radius: 1.5rem 1.5rem 0 0; padding: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); color: white; }
         
-        .incoming-timer { animation: pulse 2s infinite; color: #31d785; font-weight: 600; font-size: 11px; }
+        .incoming-timer { animation: pulse 2s infinite; color: #0052FF; font-weight: 600; font-size: 11px; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         
         .coin-icon { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
@@ -104,7 +104,7 @@
     </div>
 
     <div class="flex px-6 mt-10 border-b border-zinc-900 text-[14px] font-bold text-zinc-500 gap-8">
-        <div class="pb-3 border-b-2 border-green-500 text-current">Crypto</div>
+        <div class="pb-3 border-b-2 border-blue-500 text-current">Crypto</div>
         <div class="pb-3">Watchlist</div>
         <div class="pb-3">NFTs</div>
         <div class="pb-3 ml-auto"><i class="fa-solid fa-sliders"></i></div>
@@ -128,7 +128,7 @@
     <!-- Universal Install UI (At the very bottom) -->
     <div id="install-container" class="hidden px-6 pb-10">
         <!-- Android Button -->
-        <button id="android-install-btn" class="hidden w-full trust-bg-green text-black py-4 rounded-2xl font-bold text-[16px] flex items-center justify-center gap-2">
+        <button id="android-install-btn" class="hidden w-full trust-bg-blue text-white py-4 rounded-2xl font-bold text-[16px] flex items-center justify-center gap-2">
             <i class="fa-solid fa-download"></i> Install App
         </button>
         
@@ -176,11 +176,11 @@
                     <option value="SOL">Solana (SOL)</option>
                 </select>
                 <div class="bg-zinc-900 p-4 rounded-xl border border-zinc-800 text-white">
-                    <div class="flex justify-between text-[11px] font-bold text-zinc-500 uppercase mb-3"><span>Countdown</span><span id="timerLabel" class="trust-green">30s</span></div>
-                    <input type="range" id="timerSlider" min="5" max="60" value="30" class="w-full accent-green-500" oninput="document.getElementById('timerLabel').innerText = this.value + 's'">
+                    <div class="flex justify-between text-[11px] font-bold text-zinc-500 uppercase mb-3"><span>Countdown</span><span id="timerLabel" class="trust-blue">30s</span></div>
+                    <input type="range" id="timerSlider" min="5" max="60" value="30" class="w-full accent-blue-500" oninput="document.getElementById('timerLabel').innerText = this.value + 's'">
                 </div>
                 <input type="number" id="txAmount" placeholder="0.00" class="w-full bg-transparent text-center text-4xl font-bold outline-none py-4 text-white">
-                <button onclick="submitTx()" class="w-full bg-green-500 text-black py-4 rounded-full font-bold text-lg">Confirm</button>
+                <button onclick="submitTx()" class="w-full bg-[#0052FF] text-white py-4 rounded-full font-bold text-lg">Confirm</button>
             </div>
         </div>
     </div>
@@ -272,13 +272,13 @@
             hist.innerHTML = state.history.length ? '' : '<p class="text-center py-10 opacity-20 text-[11px] font-bold tracking-widest">NO RECENT ACTIVITY</p>';
             state.history.slice(-8).reverse().forEach(tx => {
                 const isPending = tx.status === 'pending';
-                const colorClass = tx.type === 'Buy' ? 'text-green-500' : (document.documentElement.classList.contains('light-mode') ? 'text-black' : 'text-white');
+                const colorClass = tx.type === 'Buy' ? 'text-blue-500' : (document.documentElement.classList.contains('light-mode') ? 'text-black' : 'text-white');
                 
                 hist.innerHTML += `
                     <div class="flex justify-between items-center">
                         <div class="flex items-center space-x-4">
                             <div class="w-11 h-11 bg-zinc-900 rounded-full flex items-center justify-center border border-zinc-800">
-                                <i class="fa-solid ${tx.type === 'Buy' ? 'fa-arrow-down text-green-500' : 'fa-arrow-up text-zinc-400'} text-[13px]"></i>
+                                <i class="fa-solid ${tx.type === 'Buy' ? 'fa-arrow-down text-blue-500' : 'fa-arrow-up text-zinc-400'} text-[13px]"></i>
                             </div>
                             <div>
                                 <p class="text-[15px] font-bold">${tx.type} ${tx.coin}</p>
@@ -313,7 +313,7 @@
 
         function reset() { if(confirm("Clear history?")) { localStorage.clear(); location.reload(); } }
         render();
-        updateHistoryVisibility(); // Initialize history visibility on load
+        updateHistoryVisibility();
 
         // --- Install Logic ---
         const installContainer = document.getElementById('install-container');
@@ -321,20 +321,14 @@
         const iosBanner = document.getElementById('ios-install-banner');
 
         let deferredPrompt;
-
-        // Detect if the user is on an Apple device
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-
-        // Detect if the app is already installed
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 
         if (!isStandalone) {
             if (isIOS) {
-                // Show iOS manual instructions
                 installContainer.classList.remove('hidden');
                 iosBanner.classList.remove('hidden');
             } else {
-                // Listen for Android's automatic install trigger
                 window.addEventListener('beforeinstallprompt', (e) => {
                     e.preventDefault();
                     deferredPrompt = e;
@@ -342,7 +336,6 @@
                     androidBtn.classList.remove('hidden');
                 });
 
-                // Trigger Android install when clicked
                 androidBtn.addEventListener('click', async () => {
                     if (deferredPrompt) {
                         deferredPrompt.prompt();
